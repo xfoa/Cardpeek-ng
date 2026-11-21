@@ -1,0 +1,92 @@
+name: Install packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  deb:
+    name: Ubuntu package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install native development files
+        run: sudo apt-get update && sudo apt-get install --yes libpcsclite-dev pkg-config libgtk-3-dev libxkbcommon-x11-dev dpkg-dev python3
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.100"
+      - name: Build Debian package
+        run: python3 packaging/build.py deb
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardpeek-ng-deb
+          path: dist/packages/*.deb
+
+  rpm:
+    name: Alma Linux package
+    runs-on: ubuntu-latest
+    container: almalinux:9
+    steps:
+      - name: Install native development files
+        run: dnf install --assumeyes gcc gcc-c++ make pkgconf-pkg-config pcsc-lite-devel gtk3-devel python3 rpm-build curl
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 --silent --show-error --fail https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.100
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Build RPM package
+        run: python3 packaging/build.py rpm
+      - name: Upload RPM package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardpeek-ng-rpm
+          path: dist/packages/*.rpm
+
+  msi:
+    name: Windows package
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.100"
+      - name: Install WiX
+        run: |
+          dotnet tool install --global wix --version 4.0.6
+          wix extension add WixToolset.UI.wixext/4.0.6
+      - name: Build MSI package
+        run: python packaging/build.py msi
+      - name: Upload MSI package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardpeek-ng-msi
+          path: dist/packages/*.msi
+
+  pkg:
+    name: macOS package
+    runs-on: macos-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.100"
+      - name: Build macOS package
+        run: python3 packaging/build.py pkg
+      - name: Upload macOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardpeek-ng-pkg
+          path: dist/packages/*.pkg

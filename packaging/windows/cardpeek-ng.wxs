@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package
+    Name="Cardpeek-ng"
+    Manufacturer="Cardpeek-ng contributors"
+    Version="@VERSION@"
+    UpgradeCode="2a82a54f-a9cb-4e4d-9314-926d9fb3e69c"
+    Scope="perMachine">
+    <SummaryInformation Description="Smart card inspection and analysis" Keywords="smart card,PCSC" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Cardpeek-ng is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Feature Id="ProductFeature" Title="Cardpeek-ng" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="ARPPRODUCTICON" Value="ApplicationIcon" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/xfoa/Cardpeek-ng" />
+    <Icon Id="ApplicationIcon" SourceFile="@ICON@" />
+    <WixVariable Id="WixUILicenseRtf" Value="@LICENSE_RTF@" />
+  </Package>
+
+  <Fragment>
+  <StandardDirectory Id="ProgramFilesFolder">
+    <Directory Id="INSTALLFOLDER" Name="Cardpeek-ng" />
+  </StandardDirectory>
+  <StandardDirectory Id="ProgramMenuFolder">
+    <Directory Id="ProgramMenuDir" Name="Cardpeek-ng" />
+  </StandardDirectory>
+
+  <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+    <Component Id="DesktopApplication" Guid="*">
+      <File Id="DesktopExecutable" Source="@PAYLOAD@/cardpeek-desktop.exe" KeyPath="yes" />
+      <File Id="CliExecutable" Source="@PAYLOAD@/cardpeek.exe" />
+      <File Id="License" Source="@PAYLOAD@/LICENSE" />
+      <File Id="Notice" Source="@PAYLOAD@/NOTICE.md" />
+      <File Id="ThirdPartyNotices" Source="@PAYLOAD@/THIRD_PARTY_NOTICES.md" />
+    </Component>
+    <Component Id="StartMenuShortcut" Guid="*" Directory="ProgramMenuDir">
+      <Shortcut
+        Id="DesktopShortcut"
+        Name="Cardpeek-ng"
+        Description="Inspect and analyse smart card communication"
+        Target="[#DesktopExecutable]"
+        WorkingDirectory="INSTALLFOLDER"
+        Icon="ApplicationIcon" />
+      <RemoveFolder Id="RemoveProgramMenuDir" On="uninstall" />
+      <RegistryValue Root="HKLM" Key="Software\Cardpeek-ng" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+    <Component Id="CommandPath" Guid="*">
+      <Environment Id="CardpeekPath" Name="PATH" Action="set" System="yes" Part="last" Value="[INSTALLFOLDER]" />
+      <RegistryValue Root="HKLM" Key="Software\Cardpeek-ng" Name="CommandPath" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+  </ComponentGroup>
+  </Fragment>
+</Wix>

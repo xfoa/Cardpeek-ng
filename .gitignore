@@ -1,4 +1,6 @@
 /target/
+/dist/
+__pycache__/
 *.log
 *.raw.trace.json
 *.sensitive.trace.json

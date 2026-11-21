@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install native development files
-        run: sudo apt-get update && sudo apt-get install --yes libpcsclite-dev pkg-config libgtk-3-dev
+        run: sudo apt-get update && sudo apt-get install --yes libpcsclite-dev pkg-config libgtk-3-dev libxkbcommon-x11-dev
       - name: Check out source
         uses: actions/checkout@v4
       - name: Install Rust

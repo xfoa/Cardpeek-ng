@@ -23,7 +23,7 @@ It does not support legacy Cardpeek scripts or files.
 
 To read a physical card, you need a PC/SC reader, a test card, and a running PC/SC service.
 Building from source also requires the Rust toolchain specified by the project and the PC/SC development files.
-On Debian or Ubuntu, install `pcscd`, `libpcsclite-dev`, and `pkg-config`; Windows and macOS provide their own PC/SC support.
+On Debian or Ubuntu, install `pcscd`, `libpcsclite-dev`, `libgtk-3-dev`, `libxkbcommon-x11-dev`, and `pkg-config`; Windows and macOS provide their own PC/SC support.
 
 Start with a disposable test card because card operations can change card state or expose personal data.
 Do not experiment with a card whose contents or continued operation matter to you.
@@ -114,6 +114,7 @@ Review exports for sensitive information first.
 
 Cardpeek-ng uses its own Lua API and native JSON document and trace formats, which are not compatible with legacy Cardpeek analysers, XML documents, or trace captures.
 
+For native install packages, see [Package builders](docs/packaging.md).
 For hardware checks, see [PC/SC hardware tests](docs/hardware-tests.md).
 Cardpeek-ng is distributed under [GPL-3.0-or-later](LICENSE).
 
