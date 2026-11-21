@@ -10,11 +10,11 @@ use cardpeek_app::{
 use cardpeek_core::{Protocol, ResultNode, RunId, TraceRecord, TransportKind};
 use gpui::{
     AnyElement, AppContext, Application, Bounds, ClipboardItem, Context, Div, Entity, FocusHandle,
-    FontWeight, Global, MouseButton, MouseDownEvent, MouseExitEvent, MouseMoveEvent,
-    PathPromptOptions, Pixels, Point, Render, Rgba, ScrollStrategy, SharedString, Stateful,
-    StatefulInteractiveElement, Styled, Task, TitlebarOptions, UniformListScrollHandle, Window,
-    WindowBounds, WindowOptions, anchored, canvas, deferred, div, fill, point, prelude::*, px, rgb,
-    size, uniform_list,
+    FontWeight, Global, Image, ImageFormat, MouseButton, MouseDownEvent, MouseExitEvent,
+    MouseMoveEvent, PathPromptOptions, Pixels, Point, Render, Rgba, ScrollStrategy, SharedString,
+    Stateful, StatefulInteractiveElement, Styled, Task, TitlebarOptions, UniformListScrollHandle,
+    Window, WindowBounds, WindowOptions, anchored, canvas, deferred, div, fill, img, point,
+    prelude::*, px, rgb, size, uniform_list,
 };
 
 use crate::DesktopBackend;
@@ -167,53 +167,71 @@ struct PanelResize {
 
 struct PanelResizeDrag;
 
+struct TreeScrollbarDrag {
+    mouse_y: Pixels,
+    scroll_offset: Pixels,
+}
+
 struct ContextMenu {
     position: Point<Pixels>,
     text: String,
+    tree_text: Option<String>,
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Default)]
 struct ActiveHelpTooltip {
     entry: Option<HelpEntry>,
+    source: Option<SharedString>,
     position: Point<Pixels>,
 }
 
 impl Global for ActiveHelpTooltip {}
 
 trait HelpTarget: StatefulInteractiveElement + Styled + ParentElement + Sized {
-    fn help_target(self, entry: HelpEntry) -> Self {
-        self.relative().child(help_indicator(entry))
+    fn help_target(mut self, entry: HelpEntry) -> Self {
+        let source = SharedString::from(format!("{:?}", self.interactivity().element_id));
+        self.relative().child(help_indicator(entry, source))
     }
 }
 
 impl<T: StatefulInteractiveElement + Styled + ParentElement + Sized> HelpTarget for T {}
 
-fn help_indicator(entry: HelpEntry) -> impl IntoElement {
+fn help_indicator(entry: HelpEntry, source: SharedString) -> impl IntoElement {
     canvas(
         |bounds, _, _| bounds,
         move |bounds, listener_bounds, window, _| {
-            window.on_mouse_event(move |event: &MouseMoveEvent, _, window, cx| {
-                let active = cx.default_global::<ActiveHelpTooltip>();
-                let next = if listener_bounds.contains(&event.position) {
-                    ActiveHelpTooltip {
-                        entry: Some(entry),
-                        position: event.position,
+            window.on_mouse_event({
+                let source = source.clone();
+                move |event: &MouseMoveEvent, _, window, cx| {
+                    let active = cx.default_global::<ActiveHelpTooltip>();
+                    let next = if listener_bounds.contains(&event.position) {
+                        ActiveHelpTooltip {
+                            entry: Some(entry),
+                            source: Some(source.clone()),
+                            position: event.position,
+                        }
+                    } else if active.source == Some(source.clone()) {
+                        ActiveHelpTooltip::default()
+                    } else {
+                        active.clone()
+                    };
+                    if next.entry != active.entry
+                        || next.source != active.source
+                        || next.position != active.position
+                    {
+                        *active = next;
+                        window.refresh();
                     }
-                } else if active.entry == Some(entry) {
-                    ActiveHelpTooltip::default()
-                } else {
-                    *active
-                };
-                if next.entry != active.entry || next.position != active.position {
-                    *active = next;
-                    window.refresh();
                 }
             });
-            window.on_mouse_event(move |_: &MouseExitEvent, _, window, cx| {
-                let active = cx.default_global::<ActiveHelpTooltip>();
-                if active.entry == Some(entry) {
-                    active.entry = None;
-                    window.refresh();
+            window.on_mouse_event({
+                let source = source.clone();
+                move |_: &MouseExitEvent, _, window, cx| {
+                    let active = cx.default_global::<ActiveHelpTooltip>();
+                    if active.source == Some(source.clone()) {
+                        *active = ActiveHelpTooltip::default();
+                        window.refresh();
+                    }
                 }
             });
             let mut x = bounds.origin.x;
@@ -262,6 +280,7 @@ pub struct App {
     tree_rows: Rc<Vec<(ResultNode, usize, bool)>>,
     tree_scroll: UniformListScrollHandle,
     center_selected: Option<String>,
+    tree_scrollbar_drag: Option<TreeScrollbarDrag>,
     tools_height: f32,
     details_width: f32,
     tools_resize: Option<PanelResize>,
@@ -360,6 +379,7 @@ impl App {
             tree_rows: Rc::new(Vec::new()),
             tree_scroll: UniformListScrollHandle::new(),
             center_selected: None,
+            tree_scrollbar_drag: None,
             tools_height: 180.,
             details_width: 360.,
             tools_resize: None,
@@ -630,9 +650,11 @@ impl App {
                             .flex_col()
                             .child(
                                 div()
+                                    .flex()
                                     .text_size(px(18.))
                                     .font_weight(FontWeight::SEMIBOLD)
-                                    .child("Cardpeek-ng"),
+                                    .child(div().child("Cardpeek-"))
+                                    .child(div().text_color(rgb(0xf0d02c)).child("ng")),
                             )
                             .child(
                                 div()
@@ -886,7 +908,7 @@ impl App {
                     } else {
                         button("connect", "Connect", ButtonKind::Primary, selected.is_some(), cx.listener(Self::connect)).into_any_element()
                     })
-                    .child(button("reset", "Reset reader", ButtonKind::Normal, self.state.card_present() && !self.state.run_running(), cx.listener(Self::reset)).when(self.state.help_mode, |element| element.help_target(help::RESET))))
+                    .child(button("reset", "Reset reader", ButtonKind::Normal, self.state.card_present() && !self.state.run_running(), cx.listener(Self::reset)).debug_selector(|| "reset".into()).when(self.state.help_mode, |element| element.help_target(help::RESET))))
         )
     }
 
@@ -1327,6 +1349,7 @@ impl App {
                 cx.notify();
             }),
         )
+        .debug_selector(|| "analyser-picker".into())
         .w(px(150.))
         .overflow_hidden()
         .child(
@@ -1663,7 +1686,7 @@ impl App {
         }
         let row_count = self.tree_rows.len();
         let rows = self.tree_rows.clone();
-        uniform_list(
+        let list = uniform_list(
             "result-tree",
             row_count,
             cx.processor(move |app, range: std::ops::Range<usize>, _, cx| {
@@ -1676,11 +1699,105 @@ impl App {
             }),
         )
         .track_scroll(self.tree_scroll.clone())
-        .flex_1()
+        .absolute()
+        .inset_0()
         .w_full()
         .min_w_0()
-        .min_h_0()
-        .into_any_element()
+        .min_h_0();
+        let scroll_state = self.tree_scroll.0.borrow();
+        let viewport = scroll_state.base_handle.bounds().size.height;
+        let content = scroll_state
+            .last_item_size
+            .unwrap_or_default()
+            .contents
+            .height;
+        let offset = px(-f32::from(scroll_state.base_handle.offset().y));
+        drop(scroll_state);
+        let scrollbar = (content > viewport && viewport > px(0.)).then(|| {
+            let track = (viewport - px(8.)).max(px(1.));
+            let thumb = (track * (viewport / content)).max(px(32.)).min(track);
+            let travel = (track - thumb).max(px(0.));
+            let max_offset = (content - viewport).max(px(1.));
+            let top = px(4.) + travel * (offset / max_offset).clamp(0., 1.);
+            self.tree_scrollbar(cx, top, thumb, track, viewport, content)
+        });
+        div()
+            .relative()
+            .flex_1()
+            .w_full()
+            .min_w_0()
+            .min_h_0()
+            .child(list)
+            .children(scrollbar)
+            .into_any_element()
+    }
+
+    fn tree_scrollbar(
+        &self,
+        cx: &mut Context<'_, Self>,
+        top: Pixels,
+        thumb: Pixels,
+        track: Pixels,
+        viewport: Pixels,
+        content: Pixels,
+    ) -> Stateful<Div> {
+        let scroll = self.tree_scroll.clone();
+        let entity = cx.entity();
+        let start_scroll = scroll.clone();
+        div()
+            .id("tree-scrollbar")
+            .occlude()
+            .absolute()
+            .top(top)
+            .right(px(2.))
+            .w(px(6.))
+            .h(thumb)
+            .rounded_full()
+            .bg(MUTED)
+            .cursor_pointer()
+            .on_mouse_down(
+                MouseButton::Left,
+                cx.listener(move |app, event: &MouseDownEvent, _, cx| {
+                    let offset = -f32::from(start_scroll.0.borrow().base_handle.offset().y);
+                    app.tree_scrollbar_drag = Some(TreeScrollbarDrag {
+                        mouse_y: event.position.y,
+                        scroll_offset: px(offset),
+                    });
+                    cx.stop_propagation();
+                }),
+            )
+            .child(canvas(
+                |_, _, _| (),
+                move |_, (), window, _| {
+                    window.on_mouse_event({
+                        let scroll = scroll.clone();
+                        let entity = entity.clone();
+                        move |event: &MouseMoveEvent, _, _, cx| {
+                            if !event.dragging() {
+                                return;
+                            }
+                            let Some(drag) = entity.read(cx).tree_scrollbar_drag.as_ref() else {
+                                return;
+                            };
+                            let travel = f32::from(track - thumb).max(1.);
+                            let delta = f32::from(event.position.y - drag.mouse_y);
+                            let scroll_delta = f32::from(content - viewport) * delta / travel;
+                            let offset = f32::from(drag.scroll_offset) + scroll_delta;
+                            scroll.0.borrow().base_handle.set_offset(point(
+                                px(0.),
+                                px(-offset.clamp(0., f32::from(content - viewport))),
+                            ));
+                            cx.notify(entity.entity_id());
+                        }
+                    });
+                    let entity = entity.clone();
+                    window.on_mouse_event(move |_: &gpui::MouseUpEvent, _, _, cx| {
+                        entity.update(cx, |app, _| {
+                            app.tree_scrollbar_drag = None;
+                        });
+                    });
+                },
+            ))
     }
 
     #[allow(clippy::too_many_lines)]
@@ -1695,11 +1812,15 @@ impl App {
         let id = node.id.to_string();
         let has_children = !node.children.is_empty();
         let selected = self.state.selected_node.as_ref() == Some(&id);
+        let source = format!("tree-node-{id}");
+        let source_for_menu = source.clone();
+        let pinned = self.context_menu_source.as_deref() == Some(source.as_str());
         let value = node_value(node)
             .split_whitespace()
             .collect::<Vec<_>>()
             .join(" ");
         let copy_text = format!("{}\t{}", node.label, value);
+        let tree_text = self.state.tree_text(&id);
         let symbol = node.class.chars().next().unwrap_or('#').to_string();
         div()
             .id(SharedString::from(format!("node-{id}")))
@@ -1711,25 +1832,27 @@ impl App {
             .pl(px(f32::from(
                 u16::try_from(depth.min(32)).unwrap_or(32) * 14 + 6,
             )))
-            .pr_2()
+            .pr_3()
             .rounded_sm()
             .flex()
             .items_center()
             .gap_2()
             .cursor_pointer()
-            .bg(if selected {
+            .bg(if selected || pinned {
                 GREEN_SOFT
             } else if index.is_multiple_of(2) {
                 WHITE
             } else {
                 CANVAS
             })
-            .hover(move |style| {
-                if selected {
-                    style.bg(GREEN_SOFT)
-                } else {
-                    style.bg(BORDER)
-                }
+            .when(self.context_menu.is_none(), |element| {
+                element.hover(move |style| {
+                    if selected {
+                        style.bg(GREEN_SOFT)
+                    } else {
+                        style.bg(BORDER)
+                    }
+                })
             })
             .on_mouse_down(
                 MouseButton::Left,
@@ -1744,9 +1867,11 @@ impl App {
             .on_mouse_down(
                 MouseButton::Right,
                 cx.listener(move |app, event: &MouseDownEvent, _, cx| {
+                    app.context_menu_source = Some(source_for_menu.clone());
                     app.context_menu = Some(ContextMenu {
                         position: event.position,
                         text: copy_text.clone(),
+                        tree_text: tree_text.clone(),
                     });
                     cx.notify();
                 }),
@@ -2139,6 +2264,7 @@ impl App {
                 cx.notify();
             }),
         )
+        .debug_selector(|| "trace-segment-picker".into())
         .w(px(150.))
         .child(
             div()
@@ -2315,7 +2441,13 @@ impl App {
             } else {
                 CANVAS
             })
-            .hover(|style| style.bg(BORDER))
+            .when(
+                self.context_menu_source.as_deref() == Some(format!("trace-record-{id}").as_str()),
+                |element| element.bg(BORDER),
+            )
+            .when(self.context_menu.is_none(), |element| {
+                element.hover(|style| style.bg(BORDER))
+            })
             .on_mouse_down(
                 MouseButton::Left,
                 cx.listener({
@@ -2330,12 +2462,18 @@ impl App {
             )
             .on_mouse_down(
                 MouseButton::Right,
-                cx.listener(move |app, event: &MouseDownEvent, _, cx| {
-                    app.context_menu = Some(ContextMenu {
-                        position: event.position,
-                        text: copy_text.clone(),
-                    });
-                    cx.notify();
+                cx.listener({
+                    let id = id.clone();
+                    move |app, event: &MouseDownEvent, _, cx| {
+                        let id = id.clone();
+                        app.context_menu_source = Some(format!("trace-record-{id}"));
+                        app.context_menu = Some(ContextMenu {
+                            position: event.position,
+                            text: copy_text.clone(),
+                            tree_text: None,
+                        });
+                        cx.notify();
+                    }
                 }),
             )
             .child(
@@ -2419,6 +2557,8 @@ impl App {
         );
         for (index, log) in self.state.logs.iter().rev().take(50).enumerate() {
             let copy_text = format!("#{}\t{:?}\t{}", log.sequence, log.level, log.message);
+            let source = format!("activity-log-{}", log.sequence);
+            let source_for_menu = source.clone();
             list = list.child(
                 div()
                     .flex()
@@ -2431,13 +2571,21 @@ impl App {
                     } else {
                         CANVAS
                     })
-                    .hover(|style| style.bg(BORDER))
+                    .when(
+                        self.context_menu_source.as_deref() == Some(source.as_str()),
+                        |element| element.bg(BORDER),
+                    )
+                    .when(self.context_menu.is_none(), |element| {
+                        element.hover(|style| style.bg(BORDER))
+                    })
                     .on_mouse_down(
                         MouseButton::Right,
                         cx.listener(move |app, event: &MouseDownEvent, _, cx| {
+                            app.context_menu_source = Some(source_for_menu.clone());
                             app.context_menu = Some(ContextMenu {
                                 position: event.position,
                                 text: copy_text.clone(),
+                                tree_text: None,
                             });
                             cx.notify();
                         }),
@@ -2961,6 +3109,7 @@ impl App {
     fn context_menu(&self, cx: &mut Context<'_, Self>) -> Option<AnyElement> {
         let menu = self.context_menu.as_ref()?;
         let text = menu.text.clone();
+        let tree = menu.tree_text.clone();
         Some(
             deferred(
                 div()
@@ -3000,7 +3149,27 @@ impl App {
                                 }),
                             )
                             .child("Copy"),
-                    ),
+                    )
+                    .children(tree.map(|text| {
+                        div()
+                            .id("context-copy-tree")
+                            .px_3()
+                            .py_2()
+                            .rounded_sm()
+                            .cursor_pointer()
+                            .text_sm()
+                            .hover(|style| style.bg(CANVAS))
+                            .on_mouse_down(
+                                MouseButton::Left,
+                                cx.listener(move |app, _, _, cx| {
+                                    cx.write_to_clipboard(ClipboardItem::new_string(text.clone()));
+                                    app.context_menu = None;
+                                    app.context_menu_source = None;
+                                    cx.notify();
+                                }),
+                            )
+                            .child("Copy tree")
+                    })),
             )
             .with_priority(2)
             .into_any_element(),
@@ -3163,6 +3332,7 @@ impl App {
                             app.context_menu = Some(ContextMenu {
                                 position: event.position,
                                 text: copy_text.clone(),
+                                tree_text: None,
                             });
                             cx.notify();
                         }),
@@ -3303,7 +3473,7 @@ fn render_help_overlay<V: 'static>(enabled: bool, cx: &mut Context<'_, V>) -> Op
     if !enabled {
         return None;
     }
-    let active = *cx.try_global::<ActiveHelpTooltip>()?;
+    let active = cx.try_global::<ActiveHelpTooltip>()?.clone();
     let entry = active.entry?;
     Some(
         deferred(
@@ -3361,6 +3531,7 @@ fn help_text(
     if enabled {
         div()
             .id(id)
+            .debug_selector(|| id.into())
             .help_target(entry)
             .child(help_content(div().child(text)))
             .into_any_element()
@@ -3382,6 +3553,7 @@ fn help_badge(
     enabled: bool,
 ) -> AnyElement {
     if enabled {
+        let id = id.into();
         badge(label, foreground, background)
             .id(id)
             .help_target(entry)
@@ -3489,6 +3661,7 @@ fn exchange_list(
                                 app.context_menu = Some(ContextMenu {
                                     position: event.position,
                                     text: copy_text.clone(),
+                                    tree_text: None,
                                 });
                                 cx.notify();
                             }),
@@ -3604,6 +3777,7 @@ fn help_panel_head(
     panel_head_with_id(id, "", badge_label).child(
         div()
             .id(SharedString::from(format!("{id}-title")))
+            .debug_selector(|| format!("{id}-title"))
             .when(enabled, |element| {
                 element.help_target(entry).child(help_content(
                     div().font_weight(FontWeight::SEMIBOLD).child(title),
@@ -3669,7 +3843,9 @@ fn help_detail_row(
     entry: HelpEntry,
     enabled: bool,
 ) -> Stateful<Div> {
-    let element = detail_row_with_id(id, label, value).relative();
+    let element = detail_row_with_id(id, label, value)
+        .relative()
+        .debug_selector(|| id.into());
     if enabled {
         element
             .help_target(entry)
@@ -3699,6 +3875,7 @@ fn detail_row_with_id(
             div()
                 .w(px(100.))
                 .flex_shrink_0()
+                .whitespace_nowrap()
                 .text_sm()
                 .text_color(MUTED)
                 .child(label),
@@ -3811,23 +3988,12 @@ fn modal(title: &'static str, subtitle: &str, body: Div, actions: Div) -> Div {
         )
 }
 
-fn brand_mark() -> Div {
-    div()
-        .size(px(36.))
-        .rounded_md()
-        .bg(GREEN)
-        .flex()
-        .items_center()
-        .justify_center()
-        .child(
-            div()
-                .w(px(19.))
-                .h(px(25.))
-                .rounded_sm()
-                .border_2()
-                .border_color(WHITE)
-                .child(div().mx_1().mt_1().h(px(6.)).bg(WHITE)),
-        )
+fn brand_mark() -> impl IntoElement {
+    img(std::sync::Arc::new(Image::from_bytes(
+        ImageFormat::Png,
+        include_bytes!("../../../resources/icon.png").to_vec(),
+    )))
+    .size(px(42.))
 }
 
 fn reader_session_icon(connected: bool, card_present: bool) -> Div {
@@ -4014,5 +4180,58 @@ mod tests {
         visual.read_global(|active: &ActiveHelpTooltip, _| {
             assert_eq!(active.entry, None);
         });
+    }
+
+    #[gpui::test]
+    fn help_targets_activate_on_all_tabs(cx: &mut TestAppContext) {
+        let directory = tempfile::tempdir().unwrap();
+        let controller = Rc::new(crate::Controller::new(
+            DesktopBackend::new(None, None),
+            cardpeek_analyser::AnalyserLibrary::at(directory.path()).unwrap(),
+        ));
+        let window = cx.update(|cx| {
+            cx.open_window(WindowOptions::default(), |_, cx| {
+                cx.new(|cx| {
+                    App::new(
+                        controller,
+                        Preferences::load(directory.path().join("preferences")),
+                        None,
+                        cx,
+                    )
+                })
+            })
+            .unwrap()
+        });
+        window
+            .update(cx, |app, _, cx| {
+                app.state.help_mode = true;
+                cx.notify();
+            })
+            .unwrap();
+        let mut visual = gpui::VisualTestContext::from_window(window.into(), cx);
+        visual.simulate_resize(size(px(1280.), px(820.)));
+        for (screen, selector, entry) in [
+            (Screen::Reader, "help-pcsc-title", help::PCSC),
+            (Screen::Reader, "reset", help::RESET),
+            (Screen::Reader, "help-capture-bundles", help::CAPTURE_BUNDLE),
+            (Screen::Analysis, "analyser-picker", help::ANALYSER),
+            (Screen::Trace, "trace-segment-picker", help::SEGMENT),
+            (Screen::Library, "help-telemetry", help::TELEMETRY),
+        ] {
+            window
+                .update(cx, |app, _, cx| {
+                    app.state.screen = screen;
+                    cx.notify();
+                })
+                .unwrap();
+            let bounds = visual
+                .debug_bounds(selector)
+                .unwrap_or_else(|| panic!("missing bounds for {selector}"));
+            visual.simulate_mouse_move(bounds.center(), None, Modifiers::none());
+            visual.read_global(|active: &ActiveHelpTooltip, _| {
+                assert_eq!(active.entry, Some(entry));
+            });
+            assert!(visual.debug_bounds("immediate-help-tooltip").is_some());
+        }
     }
 }

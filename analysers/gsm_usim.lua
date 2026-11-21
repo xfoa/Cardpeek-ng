@@ -239,8 +239,8 @@ local function offer_verification(session)
   local command = make_bytes(session.cla, 0x20, 0x00, 0x01, #data, data)
   local sw = transmit(command, session.cla, false)
   if sw == 0x9000 then
-    cardpeek.log.info('PIN1/CHV1 verified; retrying the previously failed operation once')
-    show_notice('PIN1/CHV1 verified. Retrying the previously failed operation once.')
+    cardpeek.log.info('PIN1/CHV1 verified; will now retry the previously failed operation once')
+    show_notice('PIN1/CHV1 verified. Will now retry the previously failed operation once.')
     return true
   end
 
@@ -1456,7 +1456,7 @@ local function run_analysis()
     local usw, uresponse = select_file(usim, aid, 'application')
     local legacy_usim = false
     local legacy_without_le = false
-    if usw == 0x6E00 then
+    if usw == 0x6E00 or usw == 0x6B00 then
       -- Some legacy USIM implementations reject logical-channel class 00
       -- but accept the same AID selection and filesystem commands class A0.
       usim = { cla = 0xA0, legacy = true, dir_data = {} }

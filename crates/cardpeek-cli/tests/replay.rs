@@ -137,6 +137,80 @@ fn replays_gsm_usim_files_and_preserves_read_only_behaviour() {
 }
 
 #[test]
+fn usim_selection_retries_legacy_variants_after_6b00() {
+    for without_le in [false, true] {
+        let mut trace: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/fixtures/traces/gsm-usim-synthetic-001.json"
+        ))
+        .unwrap();
+        let records = trace["records"].as_array_mut().unwrap();
+        let application_index = records
+            .iter()
+            .position(|record| {
+                record["kind"] == "command"
+                    && record["command"][0] == 0
+                    && record["command"][1] == 164
+                    && record["command"][2] == 4
+            })
+            .unwrap();
+        let mut legacy_records = records[application_index + 1..].to_vec();
+        for record in &mut legacy_records {
+            record["command"][0] = serde_json::json!(0xa0);
+            if record["command"][1] == 164 && record["command"][2] == 2 {
+                record["command"][2] = serde_json::json!(0);
+            }
+            record["id"] = serde_json::json!(format!("legacy-{}", record["id"].as_str().unwrap()));
+        }
+        let application = &mut records[application_index];
+        let command = application["command"].as_array().unwrap().clone();
+        let data = application["response"]["data"].clone();
+        application["response"]["data"] = serde_json::json!([]);
+        application["response"]["status"] = serde_json::json!(0x6b00);
+        let mut legacy = command.clone();
+        legacy[0] = serde_json::json!(0xa0);
+        let status = if without_le { 0x6b00 } else { 0x9000 };
+        records.push(serde_json::json!({
+            "id": "legacy-usim-select",
+            "kind": "command",
+            "command": legacy,
+            "response": { "data": data, "status": status }
+        }));
+        if without_le {
+            let mut without_le_command = command;
+            without_le_command[0] = serde_json::json!(0xa0);
+            without_le_command.pop();
+            records.push(serde_json::json!({
+                "id": "legacy-usim-select-without-le",
+                "kind": "command",
+                "command": without_le_command,
+                "response": { "data": data, "status": 0x9000 }
+            }));
+        }
+        records.extend(legacy_records);
+        let directory = tempfile::tempdir().unwrap();
+        let trace_path = directory.path().join("legacy.json");
+        std::fs::write(&trace_path, serde_json::to_vec(&trace).unwrap()).unwrap();
+        let output = directory.path().join("legacy-result.json");
+        Command::cargo_bin("cardpeek")
+            .unwrap()
+            .arg("replay")
+            .arg(trace_path)
+            .arg("--analysers")
+            .arg(analysers())
+            .arg("gsm-usim")
+            .arg("--output")
+            .arg(&output)
+            .assert()
+            .success();
+        let result = std::fs::read_to_string(output).unwrap();
+        assert!(result.contains("ADF.USIM"));
+        assert!(result.contains("class A0"));
+        assert_eq!(result.contains("without an Le byte"), without_le);
+        assert!(!result.contains("USIM selection failed"));
+    }
+}
+
+#[test]
 fn rejects_an_analyser_that_was_not_discovered() {
     let directory = tempfile::tempdir().unwrap();
     let output = directory.path().join("unused.json");

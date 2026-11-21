@@ -653,6 +653,33 @@ fn search_collapses_matches_and_preserves_manual_expansion() {
     );
 }
 
+#[test]
+fn selected_tree_text_includes_ancestors_and_the_selected_node() {
+    let document = ResultDocument::from_json(
+        &std::fs::read_to_string(fixture("documents/gsm-usim-synthetic-001.json")).unwrap(),
+    )
+    .unwrap();
+    let mut state = DesktopState::default();
+    state.publish_document(DocumentSnapshot {
+        run_id: document.run_id.clone(),
+        revision: document.revision,
+        document: Arc::new(document),
+    });
+    state.selected_node = Some("node-0045".into());
+    let text = state.selected_tree_text().unwrap();
+    assert!(text.starts_with("GSM SIM + USIM\t"));
+    assert!(text.contains("\n  ADF.USIM [A0000000871002FFFFFFFF8907090000]\t"));
+    assert!(text.contains("\n    Short messages (SMS) [6F3C]\tNo value"));
+    assert!(!text.contains("SELECT response"));
+    assert!(!text.contains("Record 1"));
+    assert!(!text.contains("Service provider name"));
+    assert!(!text.ends_with('\n'));
+    assert_eq!(
+        state.tree_text("node-0001").unwrap(),
+        "GSM SIM + USIM\tNo value"
+    );
+}
+
 fn event(operation: &OperationId, kind: EventKind) -> cardpeek_app::Event {
     cardpeek_app::Event {
         sequence: 1,

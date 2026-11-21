@@ -674,6 +674,33 @@ impl DesktopState {
     }
 
     #[must_use]
+    pub fn selected_tree_text(&self) -> Option<String> {
+        self.tree_text(self.selected_node.as_deref()?)
+    }
+
+    #[must_use]
+    pub fn tree_text(&self, selected_id: &str) -> Option<String> {
+        let document = self.document.as_ref()?;
+        let selected = document
+            .document
+            .roots
+            .iter()
+            .find_map(|root| find(root, selected_id))?;
+        let roots = &document.document.roots;
+        let mut nodes = ancestor_ids(selected, roots)
+            .into_iter()
+            .filter_map(|id| roots.iter().find_map(|root| find(root, id)))
+            .collect::<Vec<_>>();
+        nodes.reverse();
+        nodes.push(selected);
+        let mut text = String::new();
+        for (depth, node) in nodes.into_iter().enumerate() {
+            append_tree_text(node, depth, &mut text);
+        }
+        Some(text.trim_end_matches('\n').into())
+    }
+
+    #[must_use]
     pub fn selected(&self) -> Option<&ResultNode> {
         let document = self.document.as_ref()?;
         let selected = self.selected_node.as_ref()?;
@@ -845,6 +872,14 @@ pub fn spaced_hex(bytes: &[u8]) -> String {
         .map(|byte| format!("{byte:02X}"))
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+fn append_tree_text(node: &ResultNode, depth: usize, output: &mut String) {
+    output.push_str(&"  ".repeat(depth));
+    output.push_str(&node.label);
+    output.push('\t');
+    output.push_str(&node_value(node));
+    output.push('\n');
 }
 
 fn first_node(nodes: &[ResultNode]) -> Option<&ResultNode> {
