@@ -150,7 +150,7 @@ impl TextField {
         self.move_to(self.content.len(), window, cx);
     }
 
-    fn enter(&mut self, _: &Enter, _: &mut Window, cx: &mut Context<'_, Self>) {
+    fn enter(_: &mut Self, _: &Enter, _: &mut Window, cx: &mut Context<'_, Self>) {
         cx.emit(TextFieldEvent::Submitted);
     }
 

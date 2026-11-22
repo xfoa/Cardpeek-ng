@@ -500,7 +500,7 @@ impl App {
         cx.notify();
     }
 
-    fn select_paths(&mut self, multiple: bool, cx: &mut Context<'_, Self>) {
+    fn select_paths(multiple: bool, cx: &mut Context<'_, Self>) {
         let receiver = cx.prompt_for_paths(PathPromptOptions {
             files: true,
             directories: false,
@@ -514,7 +514,7 @@ impl App {
                     let result = receiver.await;
                     app.update(&mut cx, |app, _cx| match result {
                         Ok(Ok(Some(paths))) if multiple => {
-                            app.controller.select_analyser_files(paths)
+                            app.controller.select_analyser_files(paths);
                         }
                         Ok(Ok(Some(paths))) => {
                             if let Some(path) = paths.into_iter().next() {
@@ -573,7 +573,7 @@ impl App {
         .detach();
     }
 
-    fn select_interaction_file(&mut self, cx: &mut Context<'_, Self>) {
+    fn select_interaction_file(cx: &mut Context<'_, Self>) {
         let receiver = cx.prompt_for_paths(PathPromptOptions {
             files: true,
             directories: false,
@@ -2184,7 +2184,7 @@ impl App {
                                 "Import trace",
                                 ButtonKind::Normal,
                                 true,
-                                cx.listener(|app, _, _, cx| app.select_paths(false, cx)),
+                                cx.listener(|_app, _, _, cx| Self::select_paths(false, cx)),
                             ))
                             .child(button(
                                 "export-open-trace",
@@ -2820,8 +2820,8 @@ impl App {
                             .flex_col()
                             .child(div().px_4().h(px(54.)).flex().items_center().justify_between().border_b_1().border_color(BORDER).child(div().child(div().font_weight(FontWeight::SEMIBOLD).child("Analyser library")).child(note("Metadata is read without executing scripts"))).child(badge(format!("{} INSTALLED", self.state.analysers.len()), MUTED, CANVAS)))
                             .child(library)
-                            .child(div().p_3().flex().items_center().justify_between().child(note("User library / Shared with the CLI")).child(button("add-analyser", "Add analyser", ButtonKind::Primary, !self.state.run_running(), cx.listener(|app, _, _, cx| {
-                                app.select_paths(true, cx);
+                            .child(div().p_3().flex().items_center().justify_between().child(note("User library / Shared with the CLI")).child(button("add-analyser", "Add analyser", ButtonKind::Primary, !self.state.run_running(), cx.listener(|_app, _, _, cx| {
+                                Self::select_paths(true, cx);
                             })))),
                     )
                     .child(
@@ -2960,6 +2960,7 @@ impl App {
         )
     }
 
+    #[allow(clippy::too_many_lines)]
     fn interaction_dialog(&self, cx: &mut Context<'_, Self>) -> Div {
         let Some(request) = self.state.interaction.clone() else {
             return div();
@@ -3020,7 +3021,7 @@ impl App {
                         true,
                         cx.listener(move |app, _, _, cx| {
                             if must_exist {
-                                app.select_interaction_file(cx);
+                                Self::select_interaction_file(cx);
                             } else {
                                 app.select_save_path(true, cx);
                             }
@@ -3247,6 +3248,7 @@ impl App {
             )
     }
 
+    #[allow(clippy::too_many_lines)]
     fn notification_history(&self, cx: &mut Context<'_, Self>) -> Div {
         let mut history = div()
             .max_h(px(260.))
