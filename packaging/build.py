@@ -22,6 +22,8 @@ IDENTIFIER = "io.github.xfoa.cardpeek-ng"
 
 def run(*arguments, **kwargs):
     print("+", " ".join(str(argument) for argument in arguments), flush=True)
+    if kwargs.get("text"):
+        kwargs.setdefault("encoding", "utf-8")
     return subprocess.run(
         [str(argument) for argument in arguments], cwd=ROOT, check=True, **kwargs
     )

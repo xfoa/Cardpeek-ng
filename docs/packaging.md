@@ -39,7 +39,11 @@ The desktop launcher and application icon are installed in the standard system l
 
 Install the build requirements:
 
+On Alma Linux 9, enable the CRB repository first.
+It provides the PC/SC development package.
+
 ```sh
+sudo dnf config-manager --set-enabled crb
 sudo dnf install gcc gcc-c++ make pkgconf-pkg-config pcsc-lite-devel gtk3-devel python3 rpm-build
 ```
 
@@ -104,6 +108,34 @@ python3 packaging/build.py pkg \
 For notarization, first store App Store Connect credentials with `xcrun notarytool store-credentials`.
 Then add `--notary-profile PROFILE`.
 The builder submits the signed package, waits for approval, and staples the ticket.
+
+## Tag releases
+
+The package workflow runs when a tag such as `v1.0.0` is pushed.
+Release tags must contain only three numeric version components.
+Suffixes and leading zeroes are not accepted.
+
+Before creating and pushing the tag:
+
+1. Set the workspace version in `Cargo.toml` to the tag version without the `v` prefix.
+2. Add a non-empty Markdown changelog at `docs/changelogs/v1.0.0.md`.
+   Use the exact tag name as the file name.
+3. Commit and push those changes.
+4. Create and push the tag:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The workflow validates the tag, workspace version, and changelog before building packages.
+It then builds Debian, RPM, MSI, and macOS packages in parallel.
+When all builds pass, it creates a GitHub release for the tag.
+The release uses the changelog as its description and includes all four packages.
+A failed validation or package build prevents release creation.
+
+Run **Packages and releases** manually to test package creation without a tag.
+Manual runs upload workflow artifacts but do not create a GitHub release.
 
 ## Package checks
 
