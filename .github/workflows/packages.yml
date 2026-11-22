@@ -71,7 +71,7 @@ jobs:
       - name: Enable CRB repository
         run: dnf config-manager --set-enabled crb
       - name: Install native development files
-        run: dnf install --assumeyes gcc gcc-c++ make pkgconf-pkg-config pcsc-lite-devel gtk3-devel python3 rpm-build curl
+        run: dnf install --assumeyes gcc gcc-c++ make pkgconf-pkg-config pcsc-lite-devel gtk3-devel libxkbcommon-x11-devel python3 rpm-build
       - name: Check out source
         uses: actions/checkout@v4
       - name: Install Rust

@@ -13,7 +13,6 @@
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
     <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <Property Id="ARPPRODUCTICON" Value="ApplicationIcon" />
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/xfoa/Cardpeek-ng" />
     <Icon Id="ApplicationIcon" SourceFile="@ICON@" />

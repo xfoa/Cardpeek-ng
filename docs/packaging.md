@@ -44,7 +44,7 @@ It provides the PC/SC development package.
 
 ```sh
 sudo dnf config-manager --set-enabled crb
-sudo dnf install gcc gcc-c++ make pkgconf-pkg-config pcsc-lite-devel gtk3-devel python3 rpm-build
+sudo dnf install gcc gcc-c++ make pkgconf-pkg-config pcsc-lite-devel gtk3-devel libxkbcommon-x11-devel python3 rpm-build
 ```
 
 Build the RPM package:
