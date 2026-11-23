@@ -9,12 +9,12 @@ use cardpeek_app::{
 };
 use cardpeek_core::{Protocol, ResultNode, RunId, TraceRecord, TransportKind};
 use gpui::{
-    AnyElement, AppContext, Application, Bounds, ClipboardItem, Context, Div, Entity, FocusHandle,
-    FontWeight, Global, Image, ImageFormat, MouseButton, MouseDownEvent, MouseExitEvent,
-    MouseMoveEvent, PathPromptOptions, Pixels, Point, Render, Rgba, ScrollStrategy, SharedString,
-    Stateful, StatefulInteractiveElement, Styled, Task, TitlebarOptions, UniformListScrollHandle,
-    Window, WindowBounds, WindowOptions, anchored, canvas, deferred, div, fill, img, point,
-    prelude::*, px, rgb, size, uniform_list,
+    AnyElement, AppContext, Bounds, ClipboardItem, Context, Div, Entity, FocusHandle, FontWeight,
+    Global, Image, ImageFormat, MouseButton, MouseDownEvent, MouseExitEvent, MouseMoveEvent,
+    PathPromptOptions, Pixels, Point, Render, Rgba, ScrollStrategy, SharedString, Stateful,
+    StatefulInteractiveElement, Styled, Task, TitlebarOptions, UniformListScrollHandle, Window,
+    WindowBounds, WindowOptions, anchored, canvas, deferred, div, fill, img, point, prelude::*, px,
+    rgb, size, uniform_list,
 };
 
 use crate::DesktopBackend;
@@ -116,7 +116,7 @@ pub fn run(
     preferences: Preferences,
     trace_path: Option<std::path::PathBuf>,
 ) {
-    Application::new().run(move |cx| {
+    gpui_platform::application().run(move |cx| {
         cx.text_system()
             .add_fonts(vec![
                 std::borrow::Cow::Borrowed(include_bytes!("../assets/fa-solid-900.otf")),
@@ -1698,7 +1698,7 @@ impl App {
                     .collect::<Vec<_>>()
             }),
         )
-        .track_scroll(self.tree_scroll.clone())
+        .track_scroll(&self.tree_scroll)
         .absolute()
         .inset_0()
         .w_full()
@@ -3373,7 +3373,7 @@ impl Render for App {
             )
         });
         if dialog_keyboard {
-            window.focus(&self.dialog_focus);
+            window.focus(&self.dialog_focus, cx);
         }
         let content = match self.state.screen {
             Screen::Reader => self.reader_page(cx).into_any_element(),

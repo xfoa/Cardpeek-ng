@@ -16,6 +16,7 @@ cardpeek-replay = { path = "../cardpeek-replay" }
 cardpeek-transport = { path = "../cardpeek-transport" }
 directories.workspace = true
 gpui.workspace = true
+gpui_platform.workspace = true
 thiserror.workspace = true
 unicode-segmentation.workspace = true
 

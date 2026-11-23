@@ -465,14 +465,6 @@ struct PrepaintState {
     selection: Option<PaintQuad>,
 }
 
-impl IntoElement for TextFieldElement {
-    type Element = Self;
-
-    fn into_element(self) -> Self::Element {
-        self
-    }
-}
-
 impl Element for TextFieldElement {
     type RequestLayoutState = ();
     type PrepaintState = PrepaintState;
@@ -612,8 +604,15 @@ impl Element for TextFieldElement {
             window.paint_quad(selection);
         }
         let line = prepaint.line.take().expect("text line was prepared");
-        line.paint(bounds.origin, window.line_height(), window, cx)
-            .expect("text line paints");
+        line.paint(
+            bounds.origin,
+            window.line_height(),
+            gpui::TextAlign::Left,
+            None,
+            window,
+            cx,
+        )
+        .expect("text line paints");
         if focus_handle.is_focused(window)
             && let Some(cursor) = prepaint.cursor.take()
         {
@@ -695,7 +694,7 @@ mod tests {
         let field = window.root(cx).unwrap();
         let focus = cx.read(|cx| field.read(cx).focus_handle(cx));
         window
-            .update(cx, |_, window, _| window.focus(&focus))
+            .update(cx, |_, window, cx| window.focus(&focus, cx))
             .unwrap();
         let submitted = Rc::new(Cell::new(false));
         let observed = submitted.clone();
@@ -754,7 +753,7 @@ mod tests {
         let dialog = window.root(cx).unwrap();
         let focus = cx.read(|cx| dialog.focus_handle(cx));
         window
-            .update(cx, |_, window, _| window.focus(&focus))
+            .update(cx, |_, window, cx| window.focus(&focus, cx))
             .unwrap();
         cx.simulate_keystrokes(window.into(), "enter");
         assert!(confirmed.get());
