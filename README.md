@@ -57,6 +57,8 @@ Cardpeek-ng does not probe cards to choose an analyser, so select the one that m
 ### Reader
 
 The Reader workspace controls the physical card session and shows the current card, capture totals, and session exchanges.
+It also shows a possible card type from the bundled ATR reference list.
+This hint does not identify a card application with certainty or select an analyser.
 From here you can connect or disconnect, reset the reader, and send an individual APDU.
 
 Only send an APDU when you understand what it does.

@@ -1,6 +1,7 @@
 //! GPUI desktop frontend and its application-state adapter.
 
 mod backend;
+pub mod card_type;
 pub mod controller;
 pub mod help;
 pub mod input;

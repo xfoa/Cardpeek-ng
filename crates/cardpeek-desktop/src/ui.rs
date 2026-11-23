@@ -1069,6 +1069,13 @@ impl App {
                             )),
                     )
                     .child(help_detail_row(
+                        "help-card-type",
+                        "Card type",
+                        self.state.card_type().unwrap_or("Unknown from ATR"),
+                        help::CARD_TYPE,
+                        self.state.help_mode,
+                    ))
+                    .child(help_detail_row(
                         "help-connection",
                         "Connection",
                         "Shared PC/SC session",

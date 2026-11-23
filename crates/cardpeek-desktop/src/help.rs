@@ -19,6 +19,10 @@ pub const ATR: HelpEntry = entry(
     "Answer to Reset (ATR)",
     "The identification bytes that a card sends after a reset. The ATR describes communication parameters.",
 );
+pub const CARD_TYPE: HelpEntry = entry(
+    "Card type hint",
+    "The ATR reference list supplies this possible card type. It is not proof of a card application.",
+);
 pub const PROTOCOL: HelpEntry = entry(
     "Card protocol",
     "The rules for card communication. T=0 is byte-oriented. T=1 is block-oriented.",
@@ -125,6 +129,7 @@ mod tests {
         let entries = [
             PCSC,
             ATR,
+            CARD_TYPE,
             PROTOCOL,
             APDU,
             TX,

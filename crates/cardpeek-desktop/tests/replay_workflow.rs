@@ -209,6 +209,33 @@ fn physical_connect_collect_disconnect_and_reconnect() {
 }
 
 #[test]
+fn card_type_tracks_the_current_atr() {
+    let (controller, _) = physical_controller();
+    let mut state = DesktopState::default();
+    wait_for(&controller, &mut state, |state| {
+        state.selected_reader.as_deref() == Some("Test reader")
+    });
+    controller.connect("Test reader".into(), &mut state);
+    wait_for(&controller, &mut state, DesktopState::connected);
+    assert_eq!(state.card_type(), None);
+
+    let session = state.session.as_ref().unwrap().id.clone();
+    state.apply_event(event(
+        &session,
+        EventKind::CardStatusChanged {
+            session: session.clone(),
+            card_present: true,
+            protocol: Protocol::T1,
+            atr: Atr::from_hex("3B8F8001804F0CA000000306030001000000006A").unwrap(),
+        },
+    ));
+    assert_eq!(
+        state.card_type(),
+        Some("NXP/Philips MIFARE Classic 1K (as per PCSC std part3)")
+    );
+}
+
+#[test]
 fn trace_actions_and_replay_do_not_change_the_physical_session() {
     let (controller, connects) = physical_controller();
     let mut state = DesktopState::default();

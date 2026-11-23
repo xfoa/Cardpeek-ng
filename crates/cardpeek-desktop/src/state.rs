@@ -261,6 +261,14 @@ impl DesktopState {
     }
 
     #[must_use]
+    pub fn card_type(&self) -> Option<&'static str> {
+        let session = self.session.as_ref()?;
+        self.card_present()
+            .then(|| crate::card_type::identify(&session.atr))
+            .flatten()
+    }
+
+    #[must_use]
     pub fn selected_analyser_metadata(&self) -> Option<&AnalyserMetadata> {
         self.analysers
             .iter()
