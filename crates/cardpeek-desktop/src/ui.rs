@@ -1489,6 +1489,7 @@ impl App {
             .left_0()
             .w(px(310.))
             .max_h(px(240.))
+            .overflow_y_scroll()
             .rounded_md()
             .border_1()
             .border_color(BORDER)
