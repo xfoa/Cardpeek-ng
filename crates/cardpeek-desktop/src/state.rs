@@ -131,6 +131,8 @@ pub struct DesktopState {
     pub selected_reader: Option<String>,
     pub session: Option<SessionInfo>,
     pub last_session: Option<OperationId>,
+    pub session_counter: u64,
+    pub new_session_operation: Option<OperationId>,
     pub capture_trace: Option<TraceDocument>,
     pub trace_path: Option<PathBuf>,
     pub trace: Option<TraceDocument>,
@@ -181,6 +183,8 @@ impl Default for DesktopState {
             selected_reader: None,
             session: None,
             last_session: None,
+            session_counter: 0,
+            new_session_operation: None,
             capture_trace: None,
             trace_path: None,
             trace: None,
@@ -258,6 +262,16 @@ impl DesktopState {
             && self.session.as_ref().is_some_and(|session| {
                 session.reader.card_present.unwrap_or(false) && !session.atr.as_bytes().is_empty()
             })
+    }
+
+    #[must_use]
+    pub fn new_session_pending(&self) -> bool {
+        self.new_session_operation.is_some()
+    }
+
+    #[must_use]
+    pub fn session_name(&self) -> String {
+        format!("Session {}", self.session_counter.max(1))
     }
 
     #[must_use]
@@ -471,6 +485,18 @@ impl DesktopState {
 
     #[allow(clippy::too_many_lines)]
     pub fn apply_event(&mut self, event: Event) {
+        let new_session_completed = matches!(event.kind, EventKind::OperationCompleted { .. })
+            && self.new_session_operation.as_ref() == Some(&event.operation);
+        let new_session_finished = self.new_session_operation.as_ref() == Some(&event.operation)
+            && matches!(
+                event.kind,
+                EventKind::OperationCompleted { .. }
+                    | EventKind::OperationFailed { .. }
+                    | EventKind::OperationCancelled { .. }
+            );
+        if new_session_finished {
+            self.new_session_operation = None;
+        }
         if matches!(
             event.kind,
             EventKind::OperationCompleted { .. }
@@ -478,6 +504,12 @@ impl DesktopState {
                 | EventKind::OperationCancelled { .. }
         ) {
             self.pending.remove(&event.operation);
+        }
+        if new_session_completed {
+            self.session_counter += 1;
+            self.capture_trace = None;
+            self.session_exchanges.clear();
+            self.notify(format!("{} started.", self.session_name()));
         }
         match event.kind {
             EventKind::SessionStateChanged {
@@ -491,6 +523,7 @@ impl DesktopState {
                     }
                     if state == SessionState::Connected {
                         self.last_session = Some(session);
+                        self.session_counter = 1;
                         self.notify(format!("Connected to {}", reader.name));
                     }
                     if state == SessionState::Connecting {

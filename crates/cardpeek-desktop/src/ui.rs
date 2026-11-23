@@ -463,6 +463,11 @@ impl App {
         cx.notify();
     }
 
+    fn new_session(&mut self, _: &MouseDownEvent, _: &mut Window, cx: &mut Context<'_, Self>) {
+        self.controller.new_session(&mut self.state);
+        cx.notify();
+    }
+
     fn reset(&mut self, _: &MouseDownEvent, _: &mut Window, cx: &mut Context<'_, Self>) {
         self.controller.reset(&mut self.state);
         cx.notify();
@@ -913,6 +918,7 @@ impl App {
     }
 
     fn capture_panel(&self, cx: &mut Context<'_, Self>) -> Div {
+        let new_session_pending = self.state.new_session_pending();
         let resets = self.state.capture_trace.as_ref().map_or(0, |trace| {
             trace
                 .records
@@ -955,6 +961,16 @@ impl App {
                         self.state.help_mode,
                     ))
                     .child(div().flex_1())
+                    .child(button_state(
+                        "new-session",
+                        "New session",
+                        ButtonKind::Normal,
+                        self.state.card_present()
+                            && !self.state.run_running()
+                            && !new_session_pending,
+                        new_session_pending,
+                        cx.listener(Self::new_session),
+                    ))
                     .child(button(
                         "export-capture",
                         "Export current capture",
@@ -1100,7 +1116,7 @@ impl App {
                     .child(help_detail_row(
                         "help-session",
                         "Session",
-                        &session.id.to_string(),
+                        &self.state.session_name(),
                         help::SESSION,
                         self.state.help_mode,
                     )),
@@ -3579,6 +3595,17 @@ fn button(
     enabled: bool,
     on_click: impl Fn(&MouseDownEvent, &mut Window, &mut gpui::App) + 'static,
 ) -> Stateful<Div> {
+    button_state(id, label, kind, enabled, false, on_click)
+}
+
+fn button_state(
+    id: impl Into<gpui::ElementId>,
+    label: impl Into<SharedString>,
+    kind: ButtonKind,
+    enabled: bool,
+    pending: bool,
+    on_click: impl Fn(&MouseDownEvent, &mut Window, &mut gpui::App) + 'static,
+) -> Stateful<Div> {
     let (background, foreground) = match kind {
         ButtonKind::Primary => (
             if enabled { GREEN } else { BORDER },
@@ -3599,8 +3626,8 @@ fn button(
             ButtonKind::Normal => BORDER,
             _ => background,
         })
-        .bg(background)
-        .text_color(foreground)
+        .bg(if pending { GREEN_SOFT } else { background })
+        .text_color(if pending { GREEN_DARK } else { foreground })
         .text_size(px(14.))
         .font_weight(FontWeight::MEDIUM)
         .flex()
@@ -3617,6 +3644,7 @@ fn button(
                         ButtonKind::Danger => rgb(0x843030),
                     })
                 })
+                .active(|style| style.bg(GREEN_SOFT))
                 .on_mouse_down(MouseButton::Left, on_click)
         })
         .child(label.into())
@@ -3783,19 +3811,29 @@ fn help_panel_head(
     entry: HelpEntry,
     enabled: bool,
 ) -> Stateful<Div> {
-    panel_head_with_id(id, "", badge_label).child(
-        div()
-            .id(SharedString::from(format!("{id}-title")))
-            .debug_selector(|| format!("{id}-title"))
-            .when(enabled, |element| {
-                element.help_target(entry).child(help_content(
-                    div().font_weight(FontWeight::SEMIBOLD).child(title),
-                ))
-            })
-            .when(!enabled, |element| {
-                element.font_weight(FontWeight::SEMIBOLD).child(title)
-            }),
-    )
+    div()
+        .id(id)
+        .h(px(54.))
+        .px_4()
+        .flex()
+        .items_center()
+        .justify_between()
+        .border_b_1()
+        .border_color(BORDER)
+        .child(
+            div()
+                .id(SharedString::from(format!("{id}-title")))
+                .debug_selector(|| format!("{id}-title"))
+                .when(enabled, |element| {
+                    element.help_target(entry).child(help_content(
+                        div().font_weight(FontWeight::SEMIBOLD).child(title),
+                    ))
+                })
+                .when(!enabled, |element| {
+                    element.font_weight(FontWeight::SEMIBOLD).child(title)
+                }),
+        )
+        .child(badge(badge_label, MUTED, CANVAS))
 }
 
 fn panel_body() -> Div {

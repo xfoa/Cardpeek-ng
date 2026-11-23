@@ -265,6 +265,19 @@ impl<B: SessionBackend> Controller<B> {
         }
     }
 
+    pub fn new_session(&self, state: &mut DesktopState) {
+        if !state.card_present() || state.run_running() || state.new_session_pending() {
+            return;
+        }
+        if let Some(operation) = self.submit(CommandKind::NewSession) {
+            state
+                .pending
+                .insert(operation.clone(), cardpeek_app::OperationKind::NewSession);
+            state.new_session_operation = Some(operation);
+            state.notify("Starting a new session.");
+        }
+    }
+
     pub fn reset(&self, state: &mut DesktopState) {
         if !state.card_present() {
             state.notify_error("A connected physical card is required.");

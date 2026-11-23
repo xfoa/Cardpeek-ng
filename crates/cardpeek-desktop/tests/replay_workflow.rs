@@ -209,6 +209,61 @@ fn physical_connect_collect_disconnect_and_reconnect() {
 }
 
 #[test]
+fn new_session_resets_without_disconnecting() {
+    let (controller, connects) = physical_controller();
+    let mut state = DesktopState::default();
+    wait_for(&controller, &mut state, |state| {
+        state.selected_reader.as_deref() == Some("Test reader")
+    });
+    controller.connect("Test reader".into(), &mut state);
+    wait_for(&controller, &mut state, DesktopState::connected);
+    assert_eq!(state.session_name(), "Session 1");
+    controller.transmit("00A4040002A000", &mut state);
+    wait_for(&controller, &mut state, |state| {
+        state.session_exchanges.len() == 1
+    });
+    let session = state.session.as_ref().unwrap().id.clone();
+
+    controller.new_session(&mut state);
+    assert!(state.new_session_pending());
+    assert_eq!(
+        state.latest_notification().unwrap().message,
+        "Starting a new session."
+    );
+    wait_for(&controller, &mut state, |state| {
+        state.capture_trace.as_ref().is_some_and(|trace| {
+            trace.records.len() == 1
+                && matches!(
+                    trace.records[0],
+                    cardpeek_core::TraceRecord::Reset {
+                        mode: ResetMode::Warm,
+                        ..
+                    }
+                )
+        })
+    });
+
+    assert!(state.connected());
+    assert!(!state.new_session_pending());
+    assert_eq!(state.session_name(), "Session 2");
+    assert_eq!(
+        state.latest_notification().unwrap().message,
+        "Session 2 started."
+    );
+    assert_eq!(state.session.as_ref().unwrap().id, session);
+    assert_eq!(*connects.lock().unwrap(), 1);
+    assert!(state.pending_connection.is_none());
+    assert!(state.session_exchanges.is_empty());
+
+    controller.new_session(&mut state);
+    wait_for(&controller, &mut state, |state| {
+        state.session_name() == "Session 3" && !state.new_session_pending()
+    });
+    assert_eq!(state.session.as_ref().unwrap().id, session);
+    assert_eq!(*connects.lock().unwrap(), 1);
+}
+
+#[test]
 fn card_type_tracks_the_current_atr() {
     let (controller, _) = physical_controller();
     let mut state = DesktopState::default();

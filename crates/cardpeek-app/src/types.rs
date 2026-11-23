@@ -234,6 +234,8 @@ pub enum CommandKind {
     Disconnect,
     /// Reset the active card.
     Reset(ResetMode),
+    /// Reset the active card and start a fresh capture without disconnecting.
+    NewSession,
     /// Transmit exact APDU bytes.
     Transmit(Vec<u8>),
     /// Discover analysers without executing scripts.
@@ -349,6 +351,8 @@ pub enum OperationKind {
     Disconnect,
     /// Card reset.
     Reset,
+    /// Reset and capture restart without disconnection.
+    NewSession,
     /// APDU transmission.
     Transmit,
     /// Static analyser discovery.

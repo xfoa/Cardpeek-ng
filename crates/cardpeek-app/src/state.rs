@@ -71,6 +71,7 @@ impl SharedState {
             command.kind,
             CommandKind::Disconnect
                 | CommandKind::Reset(_)
+                | CommandKind::NewSession
                 | CommandKind::Transmit(_)
                 | CommandKind::RunAnalyser(_)
                 | CommandKind::CollectAnalyser(_)
@@ -170,6 +171,7 @@ impl SharedState {
                     operation.kind,
                     OperationKind::Disconnect
                         | OperationKind::Reset
+                        | OperationKind::NewSession
                         | OperationKind::Transmit
                         | OperationKind::RunAnalyser
                         | OperationKind::CollectAnalyser
@@ -279,6 +281,7 @@ impl OperationKind {
             CommandKind::Connect(_) => Self::Connect,
             CommandKind::Disconnect => Self::Disconnect,
             CommandKind::Reset(_) => Self::Reset,
+            CommandKind::NewSession => Self::NewSession,
             CommandKind::Transmit(_) => Self::Transmit,
             CommandKind::DiscoverAnalysers(_) => Self::DiscoverAnalysers,
             CommandKind::RunAnalyser(_) => Self::RunAnalyser,

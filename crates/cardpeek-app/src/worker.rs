@@ -273,6 +273,11 @@ impl<B: SessionBackend> SessionRuntime<B> {
                     command.token.check()
                 }
                 CommandKind::Reset(mode) => host.reset(*mode).map(|_| ()),
+                CommandKind::NewSession => host.reset(ResetMode::Warm).map(|atr| {
+                    *host.trace = TraceDocument::new();
+                    host.trace.record_reset(ResetMode::Warm, atr);
+                    self.snapshot_trace(operation, host.trace);
+                }),
                 CommandKind::Transmit(bytes) => ApduCommand::parse(bytes)
                     .map_err(AppError::Core)
                     .and_then(|_| host.transmit(bytes).map(|_| ())),

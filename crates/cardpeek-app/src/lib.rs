@@ -407,6 +407,7 @@ impl<B: SessionBackend> Dispatcher<B> {
             }
             CommandKind::Disconnect
             | CommandKind::Reset(_)
+            | CommandKind::NewSession
             | CommandKind::Transmit(_)
             | CommandKind::RunAnalyser(_)
             | CommandKind::CollectAnalyser(_) => {
