@@ -1,0 +1,890 @@
+{
+  "schema_version": 1,
+  "id": "doc-moneo-synthetic-001",
+  "run_id": "run-moneo-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "MONEO",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "application",
+          "identifier": "A00000006900",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "File Control Information (FCI) Template",
+              "identifier": "6F",
+              "children": [
+                {
+                  "id": "node-0005",
+                  "parent": "node-0004",
+                  "class": "card",
+                  "label": "Unparsed ASN1 data",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "alternative": "(error)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0006",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Rechargement rapide",
+              "identifier": "08",
+              "children": [
+                {
+                  "id": "node-0007",
+                  "parent": "node-0006",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0008",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Numero de sequence de rechargement rapide",
+              "identifier": "0A",
+              "children": [
+                {
+                  "id": "node-0009",
+                  "parent": "node-0008",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "alternative": "1",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0010",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "ICP",
+              "identifier": "0C",
+              "children": [
+                {
+                  "id": "node-0011",
+                  "parent": "node-0010",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0012",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Identifiants",
+              "identifier": "17",
+              "children": [
+                {
+                  "id": "node-0013",
+                  "parent": "node-0012",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 160,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0014",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "PAN",
+                      "size_bits": 80,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9
+                          ]
+                        }
+                      },
+                      "alternative": "00010203040506070809",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0015",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Date d'expiration",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            1
+                          ]
+                        }
+                      },
+                      "alternative": "1/2000",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0016",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Date d'activation",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            2,
+                            3,
+                            4
+                          ]
+                        }
+                      },
+                      "alternative": "04/03/2002",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0017",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Code pays",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            5,
+                            6
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0018",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Code monnaie",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            7,
+                            8,
+                            9
+                          ]
+                        }
+                      },
+                      "alternative": "\u0007\b\t",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0019",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Montants",
+              "identifier": "18",
+              "children": [
+                {
+                  "id": "node-0020",
+                  "parent": "node-0019",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 72,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0021",
+                      "parent": "node-0020",
+                      "class": "item",
+                      "label": "Credit actuel",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            1,
+                            2
+                          ]
+                        }
+                      },
+                      "alternative": "1,02 Euros",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0022",
+                      "parent": "node-0020",
+                      "class": "item",
+                      "label": "Credit maximum",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            3,
+                            4,
+                            5
+                          ]
+                        }
+                      },
+                      "alternative": "304,05 Euros",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0023",
+                      "parent": "node-0020",
+                      "class": "item",
+                      "label": "Montant maximum de transaction",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            6,
+                            7,
+                            8
+                          ]
+                        }
+                      },
+                      "alternative": "607,08 Euros",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0024",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Type de porte-monnaie",
+              "identifier": "19",
+              "children": [
+                {
+                  "id": "node-0025",
+                  "parent": "node-0024",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0026",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Numero de sequence de rechargement",
+              "identifier": "1A",
+              "children": [
+                {
+                  "id": "node-0027",
+                  "parent": "node-0026",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "alternative": "1",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0028",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Numero de sequence d'achat",
+              "identifier": "1B",
+              "children": [
+                {
+                  "id": "node-0029",
+                  "parent": "node-0028",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "alternative": "1",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0030",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Journal des rechargements",
+              "identifier": "1C",
+              "children": [
+                {
+                  "id": "node-0031",
+                  "parent": "node-0030",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 352,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0032",
+                      "parent": "node-0031",
+                      "class": "item",
+                      "label": "Compteur de rechargements",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            1,
+                            2
+                          ]
+                        }
+                      },
+                      "alternative": "258.0",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0033",
+                      "parent": "node-0031",
+                      "class": "item",
+                      "label": "Montant de recharge",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            4,
+                            5,
+                            6
+                          ]
+                        }
+                      },
+                      "alternative": "405,06 Euros",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0034",
+                      "parent": "node-0031",
+                      "class": "item",
+                      "label": "Reste",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            7,
+                            8,
+                            9
+                          ]
+                        }
+                      },
+                      "alternative": "708,09 Euros",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0035",
+                      "parent": "node-0031",
+                      "class": "item",
+                      "label": "Terminal",
+                      "size_bits": 64,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0036",
+                      "parent": "node-0031",
+                      "class": "item",
+                      "label": "Date",
+                      "size_bits": 56,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "07/06/405 08:09:00",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0037",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "Journal des achats",
+              "identifier": "1D",
+              "children": [
+                {
+                  "id": "node-0038",
+                  "parent": "node-0037",
+                  "class": "record",
+                  "label": "record",
+                  "identifier": "1",
+                  "size_bits": 352,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        1,
+                        2,
+                        3
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0039",
+                      "parent": "node-0038",
+                      "class": "item",
+                      "label": "Compteur d'achats",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            1,
+                            2
+                          ]
+                        }
+                      },
+                      "alternative": "258.0",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0040",
+                      "parent": "node-0038",
+                      "class": "item",
+                      "label": "Montant de la transaction",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            5,
+                            6,
+                            7
+                          ]
+                        }
+                      },
+                      "alternative": "506,07 Euros",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0041",
+                      "parent": "node-0038",
+                      "class": "item",
+                      "label": "Terminal",
+                      "size_bits": 80,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            8,
+                            9,
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0042",
+                      "parent": "node-0038",
+                      "class": "item",
+                      "label": "Date",
+                      "size_bits": 56,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            9,
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                          ]
+                        }
+                      },
+                      "alternative": "02/01/900 03:04:05",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0043",
+                      "parent": "node-0038",
+                      "class": "item",
+                      "label": "Reste",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            6,
+                            7,
+                            8
+                          ]
+                        }
+                      },
+                      "alternative": "607,08 Euros",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

@@ -216,8 +216,319 @@ fn install_common_modules<'scope, 'env: 'scope, S: EventSink>(
     module.set("nodes", nodes_module(lua, document, next_node, provenance)?)?;
     module.set("log", log_module(lua, scope, events)?)?;
     module.set("ui", ui_module(lua, scope, events)?)?;
+    module.set("asn1", asn1_module(lua)?)?;
+    module.set("crypto", crypto_module(lua)?)?;
+    module.set("encoding", encoding_module(lua)?)?;
     let loaded: Table = lua.globals().get::<Table>("package")?.get("loaded")?;
     loaded.set("cardpeek", module)
+}
+
+fn asn1_module(lua: &Lua) -> LuaResult<Table> {
+    let module = lua.create_table()?;
+    module.set(
+        "split",
+        lua.create_function(|lua, input: AnyUserData| {
+            let input = input.borrow::<LuaBytes>()?.0.clone();
+            let Some((tag, value, consumed)) = asn1_split(&input) else {
+                return Ok(MultiValue::from_vec(vec![Value::Nil; 3]));
+            };
+            let tail = (consumed < input.len()).then(|| LuaBytes(input.slice(consumed, None)));
+            Ok(MultiValue::from_vec(vec![
+                Value::Integer(i64::from(tag)),
+                Value::UserData(lua.create_userdata(LuaBytes(value))?),
+                tail.map_or(Ok::<Value, LuaError>(Value::Nil), |value| {
+                    Ok(Value::UserData(lua.create_userdata(value)?))
+                })?,
+            ]))
+        })?,
+    )?;
+    module.set(
+        "split_tag",
+        lua.create_function(|lua, input: AnyUserData| {
+            let input = input.borrow::<LuaBytes>()?.0.clone();
+            let Some((tag, consumed)) = asn1_tag(&input) else {
+                return Ok(MultiValue::from_vec(vec![Value::Nil; 2]));
+            };
+            let tail = (consumed < input.len()).then(|| LuaBytes(input.slice(consumed, None)));
+            Ok(MultiValue::from_vec(vec![
+                Value::Integer(i64::from(tag)),
+                tail.map_or(Ok::<Value, LuaError>(Value::Nil), |value| {
+                    Ok(Value::UserData(lua.create_userdata(value)?))
+                })?,
+            ]))
+        })?,
+    )?;
+    module.set(
+        "split_length",
+        lua.create_function(|lua, input: AnyUserData| {
+            let input = input.borrow::<LuaBytes>()?.0.clone();
+            let Some((length, consumed)) = asn1_length(&input, 0) else {
+                return Ok(MultiValue::from_vec(vec![Value::Nil; 2]));
+            };
+            let tail = (consumed < input.len()).then(|| LuaBytes(input.slice(consumed, None)));
+            Ok(MultiValue::from_vec(vec![
+                Value::Integer(i64::try_from(length).unwrap_or(i64::MAX)),
+                tail.map_or(Ok::<Value, LuaError>(Value::Nil), |value| {
+                    Ok(Value::UserData(lua.create_userdata(value)?))
+                })?,
+            ]))
+        })?,
+    )?;
+    module.set(
+        "join",
+        lua.create_function(
+            |_lua, (tag, value, tail): (u32, AnyUserData, Option<AnyUserData>)| {
+                let value = value.borrow::<LuaBytes>()?.0.clone();
+                let encoded = asn1_join(tag, &value).map_err(LuaError::external)?;
+                if let Some(tail) = tail {
+                    let tail = tail.borrow::<LuaBytes>()?.0.clone();
+                    let mut encoded = encoded;
+                    encoded.append(&tail).map_err(LuaError::external)?;
+                    Ok(LuaBytes(encoded))
+                } else {
+                    Ok(LuaBytes(encoded))
+                }
+            },
+        )?,
+    )?;
+    Ok(module)
+}
+
+fn asn1_element(input: &ByteString, index: usize) -> Option<u8> {
+    input.as_bytes()?.get(index).copied()
+}
+
+fn asn1_tag(input: &ByteString) -> Option<(u32, usize)> {
+    let first = asn1_element(input, 0)?;
+    let mut tag = u32::from(first);
+    let mut position = 1;
+    if first & 0x1F == 0x1F {
+        loop {
+            let byte = asn1_element(input, position)?;
+            tag = tag.checked_mul(256)?.checked_add(u32::from(byte))?;
+            position += 1;
+            if byte & 0x80 == 0 {
+                break;
+            }
+        }
+    }
+    Some((tag, position))
+}
+
+fn asn1_length(input: &ByteString, start: usize) -> Option<(usize, usize)> {
+    let first = asn1_element(input, start)?;
+    if first < 0x80 {
+        return Some((usize::from(first), start + 1));
+    }
+    let count = usize::from(first & 0x7F);
+    if count == 0 || count > std::mem::size_of::<usize>() {
+        return None;
+    }
+    let mut length = 0_usize;
+    for index in 0..count {
+        length = length
+            .checked_mul(256)?
+            .checked_add(usize::from(asn1_element(input, start + 1 + index)?))?;
+    }
+    Some((length, start + 1 + count))
+}
+
+fn asn1_split(input: &ByteString) -> Option<(u32, ByteString, usize)> {
+    let (tag, position) = asn1_tag(input)?;
+    let (length, start) = asn1_length(input, position)?;
+    let end = start.checked_add(length)?;
+    if end > input.len() {
+        return None;
+    }
+    Some((tag, input.slice(start, Some(length)), end))
+}
+
+fn asn1_join(tag: u32, value: &ByteString) -> Result<ByteString, CoreError> {
+    if value.width() != 8 {
+        return Err(CoreError::InvalidDocument(
+            "ASN.1 values must use 8-bit elements".into(),
+        ));
+    }
+    let mut bytes = Vec::new();
+    if tag <= 0xFF {
+        bytes.push(u8::try_from(tag).map_err(|_| {
+            CoreError::InvalidDocument("ASN.1 tag is outside the supported range".into())
+        })?);
+    } else {
+        let mut parts = Vec::new();
+        let mut remaining = tag;
+        while remaining > 0 {
+            parts.push((remaining & 0xFF) as u8);
+            remaining >>= 8;
+        }
+        parts.reverse();
+        let last = parts.len() - 1;
+        for part in &mut parts[..last] {
+            *part |= 0x80;
+        }
+        bytes.extend(parts);
+    }
+    let length = value.len();
+    if length < 0x80 {
+        bytes.push(u8::try_from(length).map_err(|_| {
+            CoreError::InvalidDocument("ASN.1 length is outside the supported range".into())
+        })?);
+    } else {
+        let mut parts = Vec::new();
+        let mut remaining = length;
+        while remaining > 0 {
+            parts.push(u8::try_from(remaining & 0xFF).map_err(|_| {
+                CoreError::InvalidDocument("ASN.1 length is outside the supported range".into())
+            })?);
+            remaining >>= 8;
+        }
+        bytes.push(
+            0x80 | u8::try_from(parts.len()).map_err(|_| {
+                CoreError::InvalidDocument("ASN.1 length is outside the supported range".into())
+            })?,
+        );
+        bytes.extend(parts.into_iter().rev());
+    }
+    bytes.extend_from_slice(value.elements());
+    Ok(ByteString::from_bytes(bytes))
+}
+
+fn crypto_module(lua: &Lua) -> LuaResult<Table> {
+    let module = lua.create_table()?;
+    module.set(
+        "sha1",
+        lua.create_function(|_lua, input: AnyUserData| {
+            use sha1::{Digest, Sha1};
+            let input = input.borrow::<LuaBytes>()?.0.clone();
+            let bytes = input.as_bytes().ok_or_else(|| {
+                LuaError::external(CoreError::InvalidDocument(
+                    "SHA-1 input must use 8-bit elements".into(),
+                ))
+            })?;
+            Ok(LuaBytes(ByteString::from_bytes(
+                Sha1::digest(bytes).to_vec(),
+            )))
+        })?,
+    )?;
+    module.set(
+        "des_ede3_cbc",
+        lua.create_function(
+            |_lua, (encrypt, key, iv, input): (bool, AnyUserData, AnyUserData, AnyUserData)| {
+                let key = crypto_bytes(&key, 16)?;
+                let iv = crypto_bytes(&iv, 8)?;
+                let input = crypto_bytes(&input, 0)?;
+                if !input.len().is_multiple_of(8) {
+                    return Err(LuaError::external(CoreError::InvalidDocument(
+                        "Triple DES input must contain complete blocks".into(),
+                    )));
+                }
+                let mut output = input;
+                if encrypt {
+                    des_ede3_encrypt(&key, &iv, &mut output);
+                } else {
+                    des_ede3_decrypt(&key, &iv, &mut output);
+                }
+                Ok(LuaBytes(ByteString::from_bytes(output)))
+            },
+        )?,
+    )?;
+    module.set(
+        "iso9797_mac",
+        lua.create_function(|_lua, (key, input): (AnyUserData, AnyUserData)| {
+            let key = crypto_bytes(&key, 16)?;
+            let input = crypto_bytes(&input, 0)?;
+            Ok(LuaBytes(ByteString::from_bytes(iso9797_mac(&key, &input))))
+        })?,
+    )?;
+    Ok(module)
+}
+
+fn crypto_bytes(input: &AnyUserData, exact: usize) -> LuaResult<Vec<u8>> {
+    let input = input.borrow::<LuaBytes>()?.0.clone();
+    let bytes = input.as_bytes().ok_or_else(|| {
+        LuaError::external(CoreError::InvalidDocument(
+            "cryptographic values must use 8-bit elements".into(),
+        ))
+    })?;
+    if exact != 0 && bytes.len() != exact {
+        return Err(LuaError::external(CoreError::InvalidDocument(format!(
+            "expected {exact} bytes, received {}",
+            bytes.len()
+        ))));
+    }
+    Ok(bytes.to_vec())
+}
+
+fn des_ede3_encrypt(key: &[u8], iv: &[u8], output: &mut [u8]) {
+    use cbc::cipher::{BlockEncryptMut, KeyIvInit, block_padding::NoPadding};
+    type DesEde3Cbc = cbc::Encryptor<des::TdesEde2>;
+    DesEde3Cbc::new_from_slices(key, iv)
+        .expect("validated Triple DES key and IV")
+        .encrypt_padded_mut::<NoPadding>(output, output.len())
+        .expect("complete Triple DES blocks");
+}
+
+fn des_ede3_decrypt(key: &[u8], iv: &[u8], output: &mut [u8]) {
+    use cbc::cipher::{BlockDecryptMut, KeyIvInit, block_padding::NoPadding};
+    type DesEde3Cbc = cbc::Decryptor<des::TdesEde2>;
+    DesEde3Cbc::new_from_slices(key, iv)
+        .expect("validated Triple DES key and IV")
+        .decrypt_padded_mut::<NoPadding>(output)
+        .expect("complete Triple DES blocks");
+}
+
+fn iso9797_mac(key: &[u8], input: &[u8]) -> Vec<u8> {
+    let mut padded = input.to_vec();
+    padded.push(0x80);
+    while !padded.len().is_multiple_of(8) {
+        padded.push(0);
+    }
+    let iv = [0_u8; 8];
+    let mut encrypted = padded;
+    des_ede3_encrypt(key, &iv, &mut encrypted);
+    let start = encrypted.len() - 8;
+    encrypted[start..].to_vec()
+}
+
+fn encoding_module(lua: &Lua) -> LuaResult<Table> {
+    let module = lua.create_table()?;
+    module.set(
+        "decode",
+        lua.create_function(|_lua, (name, input): (String, AnyUserData)| {
+            let input = crypto_bytes(&input, 0)?;
+            let encoding = match name.to_ascii_uppercase().as_str() {
+                "TIS-620" | "ISO-8859-11" => encoding_rs::WINDOWS_874,
+                "ISO-8859-1" => encoding_rs::WINDOWS_1252,
+                "ISO-8859-2" => encoding_rs::ISO_8859_2,
+                "ISO-8859-3" => encoding_rs::ISO_8859_3,
+                "ISO-8859-4" => encoding_rs::ISO_8859_4,
+                "ISO-8859-5" => encoding_rs::ISO_8859_5,
+                "ISO-8859-6" => encoding_rs::ISO_8859_6,
+                "ISO-8859-7" => encoding_rs::ISO_8859_7,
+                "ISO-8859-8" => encoding_rs::ISO_8859_8,
+                "ISO-8859-9" => encoding_rs::WINDOWS_1254,
+                "ISO-8859-10" => encoding_rs::ISO_8859_10,
+                "ISO-8859-13" => encoding_rs::ISO_8859_13,
+                "ISO-8859-14" => encoding_rs::ISO_8859_14,
+                "ISO-8859-15" => encoding_rs::ISO_8859_15,
+                "ISO-8859-16" => encoding_rs::ISO_8859_16,
+                "UTF-8" => encoding_rs::UTF_8,
+                _ => {
+                    return Err(LuaError::external(CoreError::InvalidDocument(format!(
+                        "unsupported character encoding {name}"
+                    ))));
+                }
+            };
+            let (text, _, errors) = encoding.decode(&input);
+            if errors {
+                return Err(LuaError::external(CoreError::InvalidDocument(format!(
+                    "invalid {name} input"
+                ))));
+            }
+            Ok(text.into_owned())
+        })?,
+    )?;
+    Ok(module)
 }
 
 fn common_module(lua: &Lua) -> LuaResult<Table> {
@@ -321,6 +632,13 @@ fn bytes_module(lua: &Lua) -> LuaResult<Table> {
             Ok(LuaBytes::new(ByteString::from_bytes(input.into_bytes())))
         })?,
     )?;
+    module.set(
+        "all",
+        lua.create_function(|_lua, (input, expected): (AnyUserData, u8)| {
+            let input = input.borrow::<LuaBytes>()?.0.clone();
+            Ok(!input.is_empty() && input.elements().iter().all(|value| *value == expected))
+        })?,
+    )?;
     Ok(module)
 }
 
@@ -376,6 +694,22 @@ impl UserData for LuaBytes {
                 Ok(Value::Integer(i64::from(values[index - 1])))
             })
         });
+        methods.add_method("ipairs", |lua, this, ()| {
+            let values = this.0.elements().to_vec();
+            let mut index = 0;
+            lua.create_function_mut(move |_lua, ()| {
+                if index == values.len() {
+                    return Ok(MultiValue::new());
+                }
+                let value = i64::from(values[index]);
+                let result = MultiValue::from_vec(vec![
+                    Value::Integer(i64::try_from(index).unwrap_or(i64::MAX)),
+                    Value::Integer(value),
+                ]);
+                index += 1;
+                Ok(result)
+            })
+        });
         methods.add_meta_method(MetaMethod::ToString, |_lua, this, ()| Ok(this.0.to_hex()));
         methods.add_meta_method(MetaMethod::Len, |_lua, this, ()| Ok(this.0.len()));
         methods.add_meta_method(MetaMethod::Index, |_lua, this, index: Value| match index {
@@ -422,6 +756,35 @@ fn add_root_accessors(
     document: &Rc<RefCell<ResultDocument>>,
 ) -> LuaResult<()> {
     module.set(
+        "find",
+        lua.create_function({
+            let document = document.clone();
+            move |lua, (parent, criteria): (Table, Table)| {
+                let ids = matching_nodes(&document, &parent, &criteria)?;
+                let mut index = 0;
+                lua.create_function_mut(move |lua, ()| {
+                    if index == ids.len() {
+                        return Ok(Value::Nil);
+                    }
+                    let id = ids[index].clone();
+                    index += 1;
+                    node_handle(lua, &id)
+                })
+            }
+        })?,
+    )?;
+    module.set(
+        "find_first",
+        lua.create_function({
+            let document = document.clone();
+            move |lua, (parent, criteria): (Table, Table)| {
+                let ids = matching_nodes(&document, &parent, &criteria)?;
+                ids.first()
+                    .map_or(Ok(Value::Nil), |id| node_handle(lua, id))
+            }
+        })?,
+    )?;
+    module.set(
         "roots",
         lua.create_function({
             let document = document.clone();
@@ -465,12 +828,64 @@ fn node_methods(
     Ok(methods)
 }
 
+fn add_search_methods(
+    lua: &Lua,
+    methods: &Table,
+    document: &Rc<RefCell<ResultDocument>>,
+) -> LuaResult<()> {
+    methods.set(
+        "find",
+        lua.create_function({
+            let document = document.clone();
+            move |lua, (parent, criteria): (Table, Table)| {
+                let ids = matching_nodes(&document, &parent, &criteria)?;
+                let mut index = 0;
+                lua.create_function_mut(move |lua, ()| {
+                    if index == ids.len() {
+                        return Ok(Value::Nil);
+                    }
+                    let id = ids[index].clone();
+                    index += 1;
+                    node_handle(lua, &id)
+                })
+            }
+        })?,
+    )?;
+    methods.set(
+        "find_first",
+        lua.create_function({
+            let document = document.clone();
+            move |lua, (parent, criteria): (Table, Table)| {
+                let ids = matching_nodes(&document, &parent, &criteria)?;
+                ids.first()
+                    .map_or(Ok(Value::Nil), |id| node_handle(lua, id))
+            }
+        })?,
+    )?;
+    methods.set(
+        "remove",
+        lua.create_function({
+            let document = document.clone();
+            move |_lua, handle: Table| {
+                let Some(id) = handle_id(&handle)? else {
+                    return Ok(false);
+                };
+                let id = node_id(&id)?;
+                let mut document = document.borrow_mut();
+                Ok(remove_node(&mut document.roots, &id))
+            }
+        })?,
+    )?;
+    Ok(())
+}
+
 fn add_navigation_methods(
     lua: &Lua,
     methods: &Table,
     document: &Rc<RefCell<ResultDocument>>,
     next_node: &Rc<Cell<u64>>,
 ) -> LuaResult<()> {
+    add_search_methods(lua, methods, document)?;
     methods.set(
         "append",
         lua.create_function({
@@ -696,12 +1111,89 @@ fn optional_string(lua: &Lua, value: Option<&str>) -> LuaResult<Value> {
     })
 }
 
+fn matching_nodes(
+    document: &Rc<RefCell<ResultDocument>>,
+    parent: &Table,
+    criteria: &Table,
+) -> LuaResult<Vec<String>> {
+    let id = handle_id(parent)?;
+    let document = document.borrow();
+    let roots: Vec<&ResultNode> = if let Some(id) = id {
+        let node = find_node(&document.roots, &node_id(&id)?).ok_or_else(|| {
+            LuaError::external(CoreError::InvalidDocument("unknown search parent".into()))
+        })?;
+        vec![node]
+    } else {
+        document.roots.iter().collect()
+    };
+    let mut matches = Vec::new();
+    collect_matching_nodes(&roots, criteria, &mut matches)?;
+    Ok(matches)
+}
+
+fn collect_matching_nodes(
+    nodes: &[&ResultNode],
+    criteria: &Table,
+    output: &mut Vec<String>,
+) -> LuaResult<()> {
+    for node in nodes {
+        if node_matches(node, criteria)? {
+            output.push(node.id.as_str().to_owned());
+        }
+        let children = node.children.iter().collect::<Vec<_>>();
+        collect_matching_nodes(&children, criteria, output)?;
+    }
+    Ok(())
+}
+
+fn node_matches(node: &ResultNode, criteria: &Table) -> LuaResult<bool> {
+    for pair in criteria.clone().pairs::<String, Value>() {
+        let (field, expected) = pair?;
+        let field = match field.as_str() {
+            "class" | "classname" => "class",
+            "id" => "identifier",
+            "alt" => "alternative",
+            "mime-type" => "mime_type",
+            "val" => "value",
+            other => other,
+        };
+        let actual = match field {
+            "class" => node.class.clone(),
+            "label" => node.label.clone(),
+            "identifier" => node.identifier.clone().unwrap_or_default(),
+            "alternative" => node.alternative.clone().unwrap_or_default(),
+            "mime_type" => node.mime_type.clone().unwrap_or_default(),
+            _ => continue,
+        };
+        let expected = match expected {
+            Value::String(value) => value.to_str()?.to_owned(),
+            Value::Integer(value) => value.to_string(),
+            Value::Number(value) if value.fract() == 0.0 => format!("{value:.0}"),
+            _ => return Ok(false),
+        };
+        if actual != expected {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+fn remove_node(nodes: &mut Vec<ResultNode>, id: &NodeId) -> bool {
+    if let Some(index) = nodes.iter().position(|node| &node.id == id) {
+        nodes.remove(index);
+        return true;
+    }
+    nodes
+        .iter_mut()
+        .any(|node| remove_node(&mut node.children, id))
+}
+
 fn set_node_field(node: &mut ResultNode, field: &str, value: Value) -> LuaResult<()> {
     match (field, value) {
         ("class", Value::String(value)) => value.to_str()?.clone_into(&mut node.class),
         ("label", Value::String(value)) => value.to_str()?.clone_into(&mut node.label),
-        ("identifier", value) => node.identifier = nullable_string(value)?,
-        ("alternative", value) => node.alternative = nullable_string(value)?,
+        ("identifier", value) => node.identifier = display_string(value)?,
+        ("alternative", value) => node.alternative = display_string(value)?,
         ("mime_type", value) => node.mime_type = nullable_string(value)?,
         ("value", Value::String(value)) => {
             node.set_value(NodeValue::Text(value.to_str()?.to_owned()));
@@ -720,6 +1212,18 @@ fn set_node_field(node: &mut ResultNode, field: &str, value: Value) -> LuaResult
         }
     }
     Ok(())
+}
+
+fn display_string(value: Value) -> LuaResult<Option<String>> {
+    match value {
+        Value::Nil => Ok(None),
+        Value::String(value) => Ok(Some(value.to_str()?.to_owned())),
+        Value::Integer(value) => Ok(Some(value.to_string())),
+        Value::Number(value) => Ok(Some(value.to_string())),
+        _ => Err(LuaError::external(CoreError::InvalidDocument(
+            "expected text, a number, or nil".into(),
+        ))),
+    }
 }
 
 fn nullable_string(value: Value) -> LuaResult<Option<String>> {
@@ -797,6 +1301,38 @@ fn ui_module<'scope, 'env: 'scope, S: EventSink>(
             }
         })?,
     )?;
+    module.set(
+        "text",
+        scope.create_function(
+            move |_lua, (prompt, default): (String, Option<String>)| match events.interact(
+                cardpeek_analyser::InteractionKind::Text { default },
+                &prompt,
+            ) {
+                Ok(cardpeek_analyser::InteractionResponse::Text(value)) => Ok(Some(value)),
+                Ok(_) => Err(LuaError::external(HostError::new(
+                    "interaction response type mismatch",
+                ))),
+                Err(error) => Err(LuaError::external(error)),
+            },
+        )?,
+    )?;
+    module.set(
+        "file",
+        scope.create_function(move |_lua, (prompt, must_exist): (String, bool)| {
+            match events.interact(
+                cardpeek_analyser::InteractionKind::File { must_exist },
+                &prompt,
+            ) {
+                Ok(cardpeek_analyser::InteractionResponse::File(value)) => {
+                    Ok(Some(value.to_string_lossy().into_owned()))
+                }
+                Ok(_) => Err(LuaError::external(HostError::new(
+                    "interaction response type mismatch",
+                ))),
+                Err(error) => Err(LuaError::external(error)),
+            }
+        })?,
+    )?;
     Ok(module)
 }
 
@@ -838,7 +1374,9 @@ fn card_module<'scope, 'env: 'scope, H: CardHost>(
                 Ok(atr) => {
                     let value = lua.create_table()?;
                     value.set("bytes", LuaBytes(atr.as_byte_string().clone()))?;
-                    value.set("record", record)?;
+                    if let Some(record) = record {
+                        value.set("record", record)?;
+                    }
                     Ok(MultiValue::from_vec(vec![Value::Table(value), Value::Nil]))
                 }
                 Err(error) => host_failure(lua, &error),
@@ -866,7 +1404,9 @@ fn card_module<'scope, 'env: 'scope, H: CardHost>(
                         .map(|record| record.as_str().to_owned());
                     let value = lua.create_table()?;
                     value.set("bytes", LuaBytes(atr.as_byte_string().clone()))?;
-                    value.set("record", record)?;
+                    if let Some(record) = record {
+                        value.set("record", record)?;
+                    }
                     Ok(MultiValue::from_vec(vec![Value::Table(value), Value::Nil]))
                 }
                 Err(error) => host_failure(lua, &error),
@@ -1063,6 +1603,30 @@ mod tests {
         let mut incompatible = collected.capture.clone();
         incompatible.capture_schema = "other/v1".into();
         assert!(decode_capture(&live, &incompatible, &(), &()).is_err());
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn extended_native_modules_support_ported_analysers() {
+        let source = r"
+            local cp = require('cardpeek')
+            local encoded = cp.asn1.join(0x9F4F, cp.bytes.from_hex('9F02065F2A02'))
+            local tag, value, tail = cp.asn1.split(encoded)
+            assert(tag == 0x9F4F and value:to_hex() == '9F02065F2A02' and tail == nil)
+            assert(cp.bytes.all(cp.bytes.from_hex('0000'), 0))
+            local root = cp.nodes.root():append('card', 'Card')
+            local child = root:append('item', 'Test')
+            child:set('identifier', '42')
+            assert(cp.nodes.find_first(root, { id = 42 }):id() == child:id())
+            local decoded = cp.encoding.decode('ISO-8859-1', cp.bytes.from_hex('41E9'))
+            assert(decoded:byte(1) == 65 and decoded:byte(2) == 195 and decoded:byte(3) == 169)
+            assert(#cp.crypto.sha1(cp.bytes.from_string('abc')) == 20)
+            assert(#cp.crypto.des_ede3_cbc(true, cp.bytes.from_hex('0123456789ABCDEFFEDCBA9876543210'), cp.bytes.from_hex('0000000000000000'), cp.bytes.from_hex('0000000000000000')) == 8)
+            assert(#cp.crypto.iso9797_mac(cp.bytes.from_hex('0123456789ABCDEFFEDCBA9876543210'), cp.bytes.from_hex('00')) == 8)
+            assert(child:remove() and #root:children() == 0)
+        ";
+        let (request, root) = request(source);
+        execute(&request, &mut Host, &()).unwrap();
         let _ = fs::remove_dir_all(root);
     }
 

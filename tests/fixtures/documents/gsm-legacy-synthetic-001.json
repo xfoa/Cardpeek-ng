@@ -1,0 +1,1082 @@
+{
+  "schema_version": 1,
+  "id": "doc-gsm-legacy-synthetic-001",
+  "run_id": "run-gsm-legacy-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "GSM",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "folder",
+          "label": "MF",
+          "identifier": "3F00",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "header",
+              "label": "answer to select",
+              "size_bits": 128,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    63,
+                    0,
+                    2,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0005",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "RFU",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0006",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Total memory",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0007",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "File ID",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        63,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0008",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Type of file",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        2
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0009",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "RFU",
+                  "size_bits": 40,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0010",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Length of extra GSM data",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0011",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "File characteristics",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0012",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Number of DFs in this DF",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0013",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Number of EFs in this DF",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0014",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Number of CHVs",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0015",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "RFU",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0016",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "CHV1 status",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0017",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "UNBLOCK CHV1 status",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0018",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "CHV2 status",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0019",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "UNBLOCK CHV2 status",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0020",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "ICCID",
+              "identifier": "2FE2",
+              "children": [
+                {
+                  "id": "node-0021",
+                  "parent": "node-0020",
+                  "class": "header",
+                  "label": "answer to select",
+                  "size_bits": 128,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        10,
+                        47,
+                        226,
+                        4,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0022",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "RFU",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0023",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "File size",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            10
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0024",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "File ID",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            47,
+                            226
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0025",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "File type",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            4
+                          ]
+                        }
+                      },
+                      "alternative": "EF",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0026",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "Command flags",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0027",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "Access conditions",
+                      "size_bits": 24,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "Always,Always,Always,Always,Always",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0028",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "File status",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "invalidated",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0029",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "Length of extra GSM data",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0030",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "File structure",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0031",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "Length of a record",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0032",
+                  "parent": "node-0020",
+                  "class": "body",
+                  "label": "data",
+                  "size_bits": 80,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        152,
+                        18,
+                        52,
+                        86,
+                        120,
+                        144,
+                        18,
+                        52,
+                        86,
+                        120
+                      ]
+                    }
+                  },
+                  "alternative": "(89)214365870921436587",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0033",
+              "parent": "node-0003",
+              "class": "folder",
+              "label": "TELECOM",
+              "identifier": "7F10",
+              "children": [
+                {
+                  "id": "node-0034",
+                  "parent": "node-0033",
+                  "class": "header",
+                  "label": "answer to select",
+                  "size_bits": 128,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        127,
+                        16,
+                        2,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0035",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "RFU",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0036",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "Total memory",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0037",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "File ID",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            127,
+                            16
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0038",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "Type of file",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            2
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0039",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "RFU",
+                      "size_bits": 40,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0040",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "Length of extra GSM data",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0041",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "File characteristics",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0042",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "Number of DFs in this DF",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0043",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "Number of EFs in this DF",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0044",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "Number of CHVs",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0045",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "RFU",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0046",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "CHV1 status",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0047",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "UNBLOCK CHV1 status",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0048",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "CHV2 status",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0049",
+                      "parent": "node-0034",
+                      "class": "item",
+                      "label": "UNBLOCK CHV2 status",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0050",
+              "parent": "node-0003",
+              "class": "folder",
+              "label": "GSM",
+              "identifier": "7F20",
+              "children": [
+                {
+                  "id": "node-0051",
+                  "parent": "node-0050",
+                  "class": "header",
+                  "label": "answer to select",
+                  "size_bits": 128,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        127,
+                        32,
+                        2,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0052",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "RFU",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0053",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "Total memory",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0054",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "File ID",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            127,
+                            32
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0055",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "Type of file",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            2
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0056",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "RFU",
+                      "size_bits": 40,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0057",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "Length of extra GSM data",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0058",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "File characteristics",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0059",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "Number of DFs in this DF",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0060",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "Number of EFs in this DF",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0061",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "Number of CHVs",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0062",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "RFU",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0063",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "CHV1 status",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0064",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "UNBLOCK CHV1 status",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0065",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "CHV2 status",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0066",
+                      "parent": "node-0051",
+                      "class": "item",
+                      "label": "UNBLOCK CHV2 status",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

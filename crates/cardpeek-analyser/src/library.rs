@@ -85,6 +85,12 @@ impl AnalyserLibrary {
         if create {
             for (name, source) in BUNDLED_ANALYSERS {
                 let destination = root.join(name);
+                if let Some(parent) = destination.parent() {
+                    fs::create_dir_all(parent).map_err(|source| LibraryError::Io {
+                        path: parent.to_path_buf(),
+                        source,
+                    })?;
+                }
                 fs::write(&destination, source).map_err(|source| LibraryError::Io {
                     path: destination,
                     source,
@@ -225,8 +231,17 @@ mod tests {
         let directories = tempfile::tempdir().unwrap();
         let root = directories.path().join("config/analysers");
         let library = AnalyserLibrary::at(&root).unwrap();
-        assert_eq!(library.list().unwrap().len(), BUNDLED_ANALYSERS.len());
-        assert_ne!(BUNDLED_ANALYSERS.len(), 0);
+        let analyser_count = BUNDLED_ANALYSERS
+            .iter()
+            .filter(|(name, _)| {
+                !name.contains('/')
+                    && std::path::Path::new(name)
+                        .extension()
+                        .is_some_and(|extension| extension.eq_ignore_ascii_case("lua"))
+            })
+            .count();
+        assert_eq!(library.list().unwrap().len(), analyser_count);
+        assert_ne!(analyser_count, 0);
         for (name, source) in BUNDLED_ANALYSERS {
             assert_eq!(fs::read_to_string(root.join(name)).unwrap(), *source);
         }

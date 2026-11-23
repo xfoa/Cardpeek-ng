@@ -1,0 +1,13 @@
+schema_version = 1
+fixture_id = "vitale-2-synthetic-001"
+description = "Synthetic vitale-2 replay and expected document"
+origin = "synthetic"
+created_by = "Cardpeek-ng contributors"
+source_project = ""
+source_url = ""
+source_revision = ""
+source_version = "vitale-2 1.0.0"
+retrieved_at = ""
+license = "GPL-3.0-or-later"
+contains_live_card_data = false
+sanitisation = "not-applicable"

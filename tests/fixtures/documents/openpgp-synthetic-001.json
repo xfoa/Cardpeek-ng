@@ -1,0 +1,832 @@
+{
+  "schema_version": 1,
+  "id": "doc-openpgp-synthetic-001",
+  "run_id": "run-openpgp-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "OpenPGP Card",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "OpenPGP Application",
+          "identifier": "D27600012401",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Malformed tagged data",
+              "size_bits": 112,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    111,
+                    16,
+                    132,
+                    10,
+                    210,
+                    118,
+                    0,
+                    1,
+                    36,
+                    1,
+                    130,
+                    2,
+                    65,
+                    0
+                  ]
+                }
+              },
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0005",
+              "parent": "node-0003",
+              "class": "block",
+              "label": "Application ID",
+              "size_bits": 128,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    210,
+                    118,
+                    0,
+                    1,
+                    36,
+                    1,
+                    2,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0006",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "RID",
+                  "size_bits": 40,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        210,
+                        118,
+                        0,
+                        1,
+                        36
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0007",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "Application",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        1
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0008",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "Version",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        2,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0009",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "Manufacturer",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "alternative": "test card",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0010",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "Card serial number",
+                  "size_bits": 32,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        1,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0011",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "Reserved/future use",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0012",
+              "parent": "node-0003",
+              "class": "block",
+              "label": "Cardholder data",
+              "size_bits": 96,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    91,
+                    5,
+                    68,
+                    79,
+                    71,
+                    79,
+                    69,
+                    95,
+                    45,
+                    5,
+                    101,
+                    110
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0013",
+                  "parent": "node-0012",
+                  "class": "item",
+                  "label": "Name",
+                  "size_bits": 40,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        68,
+                        79,
+                        71,
+                        79,
+                        69
+                      ]
+                    }
+                  },
+                  "alternative": "DOGOE",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0014",
+                  "parent": "node-0012",
+                  "class": "item",
+                  "label": "Malformed tagged data",
+                  "size_bits": 40,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        95,
+                        45,
+                        5,
+                        101,
+                        110
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0015",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "URL of public key",
+              "size_bits": 152,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    104,
+                    116,
+                    116,
+                    112,
+                    115,
+                    58,
+                    47,
+                    47,
+                    101,
+                    120,
+                    97,
+                    109,
+                    112,
+                    108,
+                    101,
+                    46,
+                    99,
+                    111,
+                    109
+                  ]
+                }
+              },
+              "alternative": "https://example.com",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0016",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Login data",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0017",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Private DO 1",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0018",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Private DO 2",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0019",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Private DO 3",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0020",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Private DO 4",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0021",
+              "parent": "node-0003",
+              "class": "block",
+              "label": "Historical Bytes",
+              "size_bits": 48,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    49,
+                    128,
+                    5,
+                    144,
+                    0
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0022",
+                  "parent": "node-0021",
+                  "class": "item",
+                  "label": "card service data",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        128
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0023",
+                      "parent": "node-0022",
+                      "class": "item",
+                      "label": "application selection by full DF name",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            128
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0024",
+                      "parent": "node-0022",
+                      "class": "item",
+                      "label": "file IO services by READ RECORD command",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            247
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0025",
+                  "parent": "node-0021",
+                  "class": "item",
+                  "label": "card life status",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        5
+                      ]
+                    }
+                  },
+                  "alternative": "operational state",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0026",
+                  "parent": "node-0021",
+                  "class": "item",
+                  "label": "status bytes",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        144,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0027",
+              "parent": "node-0003",
+              "class": "block",
+              "label": "Application related data",
+              "size_bits": 16,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    115,
+                    0
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0028",
+                  "parent": "node-0027",
+                  "class": "block",
+                  "label": "Discretionary data objects",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0029",
+                      "parent": "node-0028",
+                      "class": "item",
+                      "label": "Malformed tagged data",
+                      "size_bits": 0,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": []
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0030",
+              "parent": "node-0003",
+              "class": "block",
+              "label": "Password Status",
+              "size_bits": 64,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    6,
+                    8,
+                    8,
+                    8,
+                    3,
+                    3,
+                    3
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0031",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "Signature PIN",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "alternative": "one PW1 per signature",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0032",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "Max Length PW1 (user)",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        6
+                      ]
+                    }
+                  },
+                  "alternative": "6",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0033",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "Max Length Reset Code",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        8
+                      ]
+                    }
+                  },
+                  "alternative": "8",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0034",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "Max Length PW3 (admin)",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        8
+                      ]
+                    }
+                  },
+                  "alternative": "8",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0035",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "permissible retries PW1",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        8
+                      ]
+                    }
+                  },
+                  "alternative": "8",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0036",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "permissible retries RC",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        3
+                      ]
+                    }
+                  },
+                  "alternative": "3",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0037",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "permissible retries PW3",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        3
+                      ]
+                    }
+                  },
+                  "alternative": "3",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0038",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "additional data",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        3
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0039",
+              "parent": "node-0003",
+              "class": "block",
+              "label": "Security support template",
+              "size_bits": 40,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    147,
+                    3,
+                    0,
+                    0,
+                    1
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0040",
+                  "parent": "node-0039",
+                  "class": "item",
+                  "label": "Digital signature counter",
+                  "size_bits": 24,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        1
+                      ]
+                    }
+                  },
+                  "alternative": "1",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0041",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "Cardholder certificate",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

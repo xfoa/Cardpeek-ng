@@ -1,5 +1,11 @@
 # Lua API contract
 
+The runtime provides native `cardpeek.bytes`, `cardpeek.card`, `cardpeek.nodes`,
+`cardpeek.log`, `cardpeek.ui`, `cardpeek.asn1`, `cardpeek.crypto`, and
+`cardpeek.encoding` modules.
+It does not install legacy Cardpeek globals.
+Ported analysers use these modules directly and keep shared code in native Lua modules.
+
 For authoring instructions and examples, see [Write analyser scripts](../analysers.md).
 
 ## Runtime and startup

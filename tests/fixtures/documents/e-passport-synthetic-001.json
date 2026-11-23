@@ -1,0 +1,718 @@
+{
+  "schema_version": 1,
+  "id": "doc-e-passport-synthetic-001",
+  "run_id": "run-e-passport-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "e-passport",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "ePassport application",
+          "identifier": "A0000002471001",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.COM",
+              "identifier": "011E",
+              "children": [
+                {
+                  "id": "node-0005",
+                  "parent": "node-0004",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 112,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        153,
+                        2,
+                        144,
+                        0,
+                        142,
+                        8,
+                        245,
+                        174,
+                        203,
+                        118,
+                        176,
+                        92,
+                        177,
+                        8
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0006",
+                  "parent": "node-0004",
+                  "class": "body",
+                  "label": "content",
+                  "children": [
+                    {
+                      "id": "node-0007",
+                      "parent": "node-0006",
+                      "class": "card",
+                      "label": "Unparsed ASN1 data",
+                      "size_bits": 48,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            49,
+                            48,
+                            128,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "(error)",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0008",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG1",
+              "identifier": "0101",
+              "children": [
+                {
+                  "id": "node-0009",
+                  "parent": "node-0008",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0010",
+                  "parent": "node-0008",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0011",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG2",
+              "identifier": "0102",
+              "children": [
+                {
+                  "id": "node-0012",
+                  "parent": "node-0011",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0013",
+                  "parent": "node-0011",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0014",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG3",
+              "identifier": "0103",
+              "children": [
+                {
+                  "id": "node-0015",
+                  "parent": "node-0014",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0016",
+                  "parent": "node-0014",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0017",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG4",
+              "identifier": "0104",
+              "children": [
+                {
+                  "id": "node-0018",
+                  "parent": "node-0017",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0019",
+                  "parent": "node-0017",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0020",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG5",
+              "identifier": "0105",
+              "children": [
+                {
+                  "id": "node-0021",
+                  "parent": "node-0020",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0022",
+                  "parent": "node-0020",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0023",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG6",
+              "identifier": "0106",
+              "children": [
+                {
+                  "id": "node-0024",
+                  "parent": "node-0023",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0025",
+                  "parent": "node-0023",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0026",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG7",
+              "identifier": "0107",
+              "children": [
+                {
+                  "id": "node-0027",
+                  "parent": "node-0026",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0028",
+                  "parent": "node-0026",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0029",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG8",
+              "identifier": "0108",
+              "children": [
+                {
+                  "id": "node-0030",
+                  "parent": "node-0029",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0031",
+                  "parent": "node-0029",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0032",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG9",
+              "identifier": "0109",
+              "children": [
+                {
+                  "id": "node-0033",
+                  "parent": "node-0032",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0034",
+                  "parent": "node-0032",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0035",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG10",
+              "identifier": "010A",
+              "children": [
+                {
+                  "id": "node-0036",
+                  "parent": "node-0035",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0037",
+                  "parent": "node-0035",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0038",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG11",
+              "identifier": "010B",
+              "children": [
+                {
+                  "id": "node-0039",
+                  "parent": "node-0038",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0040",
+                  "parent": "node-0038",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0041",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG12",
+              "identifier": "010C",
+              "children": [
+                {
+                  "id": "node-0042",
+                  "parent": "node-0041",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0043",
+                  "parent": "node-0041",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0044",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG13",
+              "identifier": "010D",
+              "children": [
+                {
+                  "id": "node-0045",
+                  "parent": "node-0044",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0046",
+                  "parent": "node-0044",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0047",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG14",
+              "identifier": "010E",
+              "children": [
+                {
+                  "id": "node-0048",
+                  "parent": "node-0047",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0049",
+                  "parent": "node-0047",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0050",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG15",
+              "identifier": "010F",
+              "children": [
+                {
+                  "id": "node-0051",
+                  "parent": "node-0050",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0052",
+                  "parent": "node-0050",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0053",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.DG16",
+              "identifier": "0110",
+              "children": [
+                {
+                  "id": "node-0054",
+                  "parent": "node-0053",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0055",
+                  "parent": "node-0053",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0056",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF.SOD",
+              "identifier": "011D",
+              "children": [
+                {
+                  "id": "node-0057",
+                  "parent": "node-0056",
+                  "class": "header",
+                  "label": "Secure SELECT response",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0058",
+                  "parent": "node-0056",
+                  "class": "body",
+                  "label": "content",
+                  "alternative": "Content not accessible (code 6A82)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

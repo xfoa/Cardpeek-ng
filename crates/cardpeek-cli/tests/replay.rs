@@ -7,6 +7,36 @@ const EXPECTED: &str = include_str!("../../../tests/fixtures/documents/atr-synth
 const GSM_USIM_EXPECTED: &str =
     include_str!("../../../tests/fixtures/documents/gsm-usim-synthetic-001.json");
 
+const PORTED_FIXTURES: &[(&str, &str, &str)] = &[
+    ("openpgp", "openpgp-synthetic-001", "Exported 41 nodes"),
+    ("emv", "emv-synthetic-001", "Exported 21 nodes"),
+    ("thai-eid", "thai-eid-synthetic-001", "Exported 28 nodes"),
+    ("moneo", "moneo-synthetic-001", "Exported 43 nodes"),
+    ("mifare", "mifare-synthetic-001", "Exported 91 nodes"),
+    (
+        "belgian-eid",
+        "belgian-eid-synthetic-001",
+        "Exported 26 nodes",
+    ),
+    ("vitale-2", "vitale-2-synthetic-001", "Exported 21 nodes"),
+    ("calypso", "calypso-synthetic-001", "Exported 224 nodes"),
+    (
+        "tachograph",
+        "tachograph-synthetic-001",
+        "Exported 40 nodes",
+    ),
+    (
+        "gsm-legacy",
+        "gsm-legacy-synthetic-001",
+        "Exported 66 nodes",
+    ),
+    (
+        "e-passport",
+        "e-passport-synthetic-001",
+        "Exported 58 nodes",
+    ),
+];
+
 fn fixture(name: &str) -> String {
     format!("{}/../../tests/fixtures/{name}", env!("CARGO_MANIFEST_DIR"))
 }
@@ -89,7 +119,36 @@ fn discovers_analysers_without_executing_them() {
         .arg(analysers())
         .assert()
         .success()
-        .stdout("ID        VERSION  TITLE             DESCRIPTION\natr       1.0.0    Card read         Read the current Answer to Reset\ngsm-usim  1.0.0    GSM SIM and USIM  Inspect GSM SIM and USIM files with optional PIN1 verification\n");
+        .stdout(contains("atr"))
+        .stdout(contains("belgian-eid"))
+        .stdout(contains("calypso"))
+        .stdout(contains("e-passport"))
+        .stdout(contains("emv"))
+        .stdout(contains("gsm-legacy"))
+        .stdout(contains("gsm-usim"))
+        .stdout(contains("mifare"))
+        .stdout(contains("moneo"))
+        .stdout(contains("openpgp"))
+        .stdout(contains("tachograph"))
+        .stdout(contains("thai-eid"))
+        .stdout(contains("vitale-2"));
+}
+
+fn copy_analyser_resources(destination: &std::path::Path) {
+    fn copy(source: &std::path::Path, destination: &std::path::Path) {
+        for entry in std::fs::read_dir(source).unwrap() {
+            let source_path = entry.unwrap().path();
+            let destination_path = destination.join(source_path.strip_prefix(source).unwrap());
+            if source_path.is_dir() {
+                std::fs::create_dir(&destination_path).unwrap();
+                copy(&source_path, &destination_path);
+            } else {
+                std::fs::copy(source_path, destination_path).unwrap();
+            }
+        }
+    }
+    std::fs::create_dir(destination).unwrap();
+    copy(std::path::Path::new(&analysers()), destination);
 }
 
 #[test]
@@ -259,6 +318,17 @@ fn manages_and_uses_the_platform_analyser_library() {
         }
     }
     assert!(bundled > 0);
+    for resource in [
+        "lib/util.lua",
+        "lib/tlv.lua",
+        "calypso/c250.lua",
+        "etc/smartcard_list.txt",
+    ] {
+        assert_eq!(
+            std::fs::read(library.join(resource)).unwrap(),
+            std::fs::read(std::path::Path::new(&analysers()).join(resource)).unwrap()
+        );
+    }
     let custom = directory.path().join("custom.lua");
     std::fs::write(
         &custom,
@@ -319,4 +389,99 @@ fn manages_and_uses_the_platform_analyser_library() {
         .assert()
         .success();
     assert!(!library.join("atr.lua").exists());
+}
+
+#[test]
+fn replays_every_ported_analyser_against_synthetic_fixtures() {
+    fn fixture_path(name: &str) -> String {
+        fixture(name)
+    }
+    for (analyser, fixture, expected_nodes) in PORTED_FIXTURES {
+        let directory = tempfile::tempdir().unwrap();
+        let resources = directory.path().join("analysers");
+        copy_analyser_resources(&resources);
+        if *analyser == "e-passport" {
+            let path = resources.join("e_passport.lua");
+            let source = std::fs::read_to_string(&path).unwrap();
+            let old = "local function prompt(prompt)\n  local ok, value = pcall(cp.ui.text, prompt, '')\n  return ok and value or ''\nend";
+            let new = "local answers = { '123456789', '010101', '010101' }\nlocal function prompt(_) return table.remove(answers, 1) end";
+            std::fs::write(&path, source.replace(old, new)).unwrap();
+        }
+
+        let output = directory.path().join("result.json");
+        Command::cargo_bin("cardpeek")
+            .unwrap()
+            .arg("replay")
+            .arg(fixture_path(&format!("traces/{fixture}.json")))
+            .arg("--analysers")
+            .arg(&resources)
+            .arg(analyser)
+            .arg("--output")
+            .arg(&output)
+            .assert()
+            .success()
+            .stdout(contains(*expected_nodes));
+        assert_eq!(
+            std::fs::read_to_string(output).unwrap(),
+            std::fs::read_to_string(fixture_path(&format!("documents/{fixture}.json"))).unwrap(),
+            "unexpected document for {analyser}"
+        );
+    }
+}
+
+#[test]
+fn calypso_family_modules_load_with_native_api() {
+    let directory = tempfile::tempdir().unwrap();
+    let resources = directory.path().join("analysers");
+    copy_analyser_resources(&resources);
+    let source = r"-- @id module-check
+    -- @title Calypso module check
+    -- @description Load all Calypso family modules
+    -- @version 1.0.0
+            local cp = require('cardpeek')
+            local modules = { 'c56n1', 'c131', 'c250', 'c250n502', 'c250n64', 'c250n901', 'c250n921', 'c376', 'c376n2' }
+            for _, name in ipairs(modules) do
+              local ok, result = pcall(require, 'calypso.' .. name)
+              assert(ok, name .. ': ' .. tostring(result))
+              assert(type(result) == 'function', name .. ' did not return a decoder')
+            end
+        ";
+    let path = resources.join("module_check.lua");
+    std::fs::write(&path, source).unwrap();
+    let trace = directory.path().join("trace.json");
+    std::fs::write(
+            &trace,
+            r#"{"schema_version":1,"records":[{"kind":"reset","mode":"cold","atr":{"width":8,"elements":[59,0]},"id":"reset-1"}]}"#,
+        )
+        .unwrap();
+    Command::cargo_bin("cardpeek")
+        .unwrap()
+        .arg("replay")
+        .arg(trace)
+        .arg("--analysers")
+        .arg(&resources)
+        .arg("module-check")
+        .arg("--output")
+        .arg(directory.path().join("result.json"))
+        .assert()
+        .success();
+}
+
+#[test]
+fn ported_analysers_do_not_publish_authentication_secrets() {
+    let mifare = std::fs::read_to_string(fixture("documents/mifare-synthetic-001.json")).unwrap();
+    assert!(mifare.contains("KeyA:(redacted)"));
+    assert!(mifare.contains("keyB:(redacted)"));
+    assert!(!mifare.contains("FFFFFFFFFFFF"));
+    let passport =
+        std::fs::read_to_string(fixture("documents/e-passport-synthetic-001.json")).unwrap();
+    assert!(!passport.contains("123456789"));
+    assert!(!passport.contains("010101"));
+    let passport_source = std::fs::read_to_string(format!(
+        "{}/../../analysers/e_passport.lua",
+        env!("CARGO_MANIFEST_DIR")
+    ))
+    .unwrap();
+    assert!(!passport_source.contains("MRZ data:"));
+    assert!(!passport_source.contains("CARDPEEK_TEST_MRZ"));
 }

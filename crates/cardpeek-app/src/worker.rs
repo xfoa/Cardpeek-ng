@@ -637,9 +637,19 @@ impl EventSink for WorkerEvents {
             cardpeek_analyser::InteractionKind::Notice => InteractionKind::Notice {
                 prompt: prompt.into(),
             },
+            cardpeek_analyser::InteractionKind::Text { default } => InteractionKind::TextInput {
+                prompt: prompt.into(),
+                default,
+            },
             cardpeek_analyser::InteractionKind::Secret => InteractionKind::SecretInput {
                 prompt: prompt.into(),
             },
+            cardpeek_analyser::InteractionKind::File { must_exist } => {
+                InteractionKind::FileSelection {
+                    prompt: prompt.into(),
+                    must_exist,
+                }
+            }
         };
         let response = self
             .context
@@ -652,12 +662,15 @@ impl EventSink for WorkerEvents {
             InteractionResponse::Acknowledged => {
                 Ok(cardpeek_analyser::InteractionResponse::Acknowledged)
             }
+            InteractionResponse::Text(value) => {
+                Ok(cardpeek_analyser::InteractionResponse::Text(value))
+            }
             InteractionResponse::Secret(value) => {
                 Ok(cardpeek_analyser::InteractionResponse::Secret(value))
             }
-            _ => Err(cardpeek_analyser::HostError::new(
-                "interaction response type mismatch",
-            )),
+            InteractionResponse::File(value) => {
+                Ok(cardpeek_analyser::InteractionResponse::File(value))
+            }
         }
     }
 }

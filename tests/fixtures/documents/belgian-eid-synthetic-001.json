@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "id": "doc-belgian-eid-synthetic-001",
+  "run_id": "run-belgian-eid-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "Belgian eID",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "folder",
+          "label": "MF",
+          "identifier": ".3F00",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "EF_DIR",
+              "identifier": ".2F00",
+              "size_bits": 24,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    1,
+                    1,
+                    65
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0005",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "TLV (Universal)",
+                  "identifier": "1",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        65
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0006",
+              "parent": "node-0003",
+              "class": "folder",
+              "label": "DF_BELPIC",
+              "identifier": ".DF00",
+              "children": [
+                {
+                  "id": "node-0007",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_ODF",
+                  "identifier": ".5031",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0008",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_TokenInfo",
+                  "identifier": ".5032",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0009",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_AODF",
+                  "identifier": ".5034",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0010",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_PrKDF",
+                  "identifier": ".5035",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0011",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_CDF",
+                  "identifier": ".5037",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0012",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_Cert#2",
+                  "identifier": ".5038",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0013",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_Cert#3",
+                  "identifier": ".5039",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0014",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_Cert#4",
+                  "identifier": ".503A",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0015",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_Cert#6",
+                  "identifier": ".503B",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0016",
+                  "parent": "node-0006",
+                  "class": "file",
+                  "label": "EF_Cert#8",
+                  "identifier": ".503C",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0017",
+              "parent": "node-0003",
+              "class": "folder",
+              "label": "DF_ID",
+              "identifier": ".DF01",
+              "children": [
+                {
+                  "id": "node-0018",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_ID#RN",
+                  "identifier": ".4031",
+                  "size_bits": 24,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        1,
+                        1,
+                        49
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0019",
+                      "parent": "node-0018",
+                      "class": "item",
+                      "label": "Card number",
+                      "identifier": "1",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            49
+                          ]
+                        }
+                      },
+                      "alternative": "1",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0020",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_SGN#RN",
+                  "identifier": ".4032",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0021",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_ID#Address",
+                  "identifier": ".4033",
+                  "size_bits": 24,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        1,
+                        1,
+                        65
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0022",
+                      "parent": "node-0021",
+                      "class": "item",
+                      "label": "Street and number",
+                      "identifier": "1",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            65
+                          ]
+                        }
+                      },
+                      "alternative": "A",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0023",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_SGN#Address",
+                  "identifier": ".4034",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0024",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_ID#Photo",
+                  "identifier": ".4035",
+                  "size_bits": 32,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        255,
+                        216,
+                        255,
+                        217
+                      ]
+                    }
+                  },
+                  "mime_type": "image/jpeg",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0025",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_PuK#7",
+                  "identifier": ".4038",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0026",
+                  "parent": "node-0017",
+                  "class": "file",
+                  "label": "EF_Preferences",
+                  "identifier": ".4039",
+                  "alternative": "No content (code 9000)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

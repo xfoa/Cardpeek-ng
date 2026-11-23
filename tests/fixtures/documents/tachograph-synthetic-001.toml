@@ -1,0 +1,13 @@
+schema_version = 1
+fixture_id = "tachograph-synthetic-001"
+description = "Synthetic tachograph replay and expected document"
+origin = "synthetic"
+created_by = "Cardpeek-ng contributors"
+source_project = ""
+source_url = ""
+source_revision = ""
+source_version = "tachograph 1.0.0"
+retrieved_at = ""
+license = "GPL-3.0-or-later"
+contains_live_card_data = false
+sanitisation = "not-applicable"

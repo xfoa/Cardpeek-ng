@@ -1,0 +1,355 @@
+{
+  "schema_version": 1,
+  "id": "doc-vitale-2-synthetic-001",
+  "run_id": "run-vitale-2-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "VITALE 2",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "Application",
+          "identifier": "#D250000002564954414C45",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "header",
+              "label": "answer to select",
+              "size_bits": 0,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": []
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0005",
+                  "parent": "node-0004",
+                  "class": "card",
+                  "label": "Unparsed ASN1 data",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "alternative": "(error)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0006",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "POINTERS",
+              "identifier": ".2001",
+              "children": [
+                {
+                  "id": "node-0007",
+                  "parent": "node-0006",
+                  "class": "header",
+                  "label": "answer to select",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0008",
+                      "parent": "node-0007",
+                      "class": "card",
+                      "label": "Unparsed ASN1 data",
+                      "size_bits": 0,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": []
+                        }
+                      },
+                      "alternative": "(error)",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0009",
+                  "parent": "node-0006",
+                  "class": "body",
+                  "label": "content",
+                  "children": [
+                    {
+                      "id": "node-0010",
+                      "parent": "node-0009",
+                      "class": "item",
+                      "label": "TLV (Private)",
+                      "identifier": "E0",
+                      "children": [
+                        {
+                          "id": "node-0011",
+                          "parent": "node-0010",
+                          "class": "item",
+                          "label": "TLV (Context-specific)",
+                          "identifier": "A0",
+                          "children": [
+                            {
+                              "id": "node-0012",
+                              "parent": "node-0011",
+                              "class": "item",
+                              "label": "TLV (Context-specific)",
+                              "identifier": "82",
+                              "size_bits": 120,
+                              "value": {
+                                "kind": "bytes",
+                                "value": {
+                                  "width": 8,
+                                  "elements": [
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    210,
+                                    80,
+                                    0,
+                                    0,
+                                    2,
+                                    86,
+                                    73,
+                                    84,
+                                    65,
+                                    76,
+                                    69
+                                  ]
+                                }
+                              },
+                              "children": [],
+                              "extensions": {}
+                            }
+                          ],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0013",
+                          "parent": "node-0010",
+                          "class": "item",
+                          "label": "TLV (Context-specific)",
+                          "identifier": "80",
+                          "size_bits": 96,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                80,
+                                79,
+                                73,
+                                78,
+                                84,
+                                69,
+                                82,
+                                83,
+                                0,
+                                1,
+                                32,
+                                1
+                              ]
+                            }
+                          },
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0014",
+              "parent": "node-0003",
+              "class": "file",
+              "label": "POINTERS",
+              "identifier": ".2001",
+              "children": [
+                {
+                  "id": "node-0015",
+                  "parent": "node-0014",
+                  "class": "header",
+                  "label": "answer to select",
+                  "size_bits": 0,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": []
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0016",
+                      "parent": "node-0015",
+                      "class": "card",
+                      "label": "Unparsed ASN1 data",
+                      "size_bits": 0,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": []
+                        }
+                      },
+                      "alternative": "(error)",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0017",
+                  "parent": "node-0014",
+                  "class": "body",
+                  "label": "content",
+                  "children": [
+                    {
+                      "id": "node-0018",
+                      "parent": "node-0017",
+                      "class": "item",
+                      "label": "TLV (Private)",
+                      "identifier": "E0",
+                      "children": [
+                        {
+                          "id": "node-0019",
+                          "parent": "node-0018",
+                          "class": "item",
+                          "label": "TLV (Context-specific)",
+                          "identifier": "A0",
+                          "children": [
+                            {
+                              "id": "node-0020",
+                              "parent": "node-0019",
+                              "class": "item",
+                              "label": "TLV (Context-specific)",
+                              "identifier": "82",
+                              "size_bits": 120,
+                              "value": {
+                                "kind": "bytes",
+                                "value": {
+                                  "width": 8,
+                                  "elements": [
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    210,
+                                    80,
+                                    0,
+                                    0,
+                                    2,
+                                    86,
+                                    73,
+                                    84,
+                                    65,
+                                    76,
+                                    69
+                                  ]
+                                }
+                              },
+                              "children": [],
+                              "extensions": {}
+                            }
+                          ],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0021",
+                          "parent": "node-0018",
+                          "class": "item",
+                          "label": "TLV (Context-specific)",
+                          "identifier": "80",
+                          "size_bits": 96,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                80,
+                                79,
+                                73,
+                                78,
+                                84,
+                                69,
+                                82,
+                                83,
+                                0,
+                                1,
+                                32,
+                                1
+                              ]
+                            }
+                          },
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

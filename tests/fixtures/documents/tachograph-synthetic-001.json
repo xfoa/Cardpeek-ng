@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "id": "doc-tachograph-synthetic-001",
+  "run_id": "run-tachograph-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "Tachograph",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "file",
+          "label": "EF_ICC",
+          "identifier": ".0002",
+          "children": [
+            {
+              "id": "node-0023",
+              "parent": "node-0003",
+              "class": "record",
+              "label": "CardIccIdentification",
+              "children": [
+                {
+                  "id": "node-0024",
+                  "parent": "node-0023",
+                  "class": "item",
+                  "label": "clockStop",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0025",
+                  "parent": "node-0023",
+                  "class": "item",
+                  "label": "cardExtendedSerialNumber",
+                  "size_bits": 64,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0026",
+                  "parent": "node-0023",
+                  "class": "item",
+                  "label": "cardApprovalNumber",
+                  "size_bits": 64,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "alternative": "........",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0027",
+                  "parent": "node-0023",
+                  "class": "item",
+                  "label": "cardPersonaliserID",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0028",
+                  "parent": "node-0023",
+                  "class": "item",
+                  "label": "embedderIcAssemblerId",
+                  "size_bits": 40,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0029",
+                  "parent": "node-0023",
+                  "class": "item",
+                  "label": "icIdentifier",
+                  "size_bits": 16,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0004",
+          "parent": "node-0001",
+          "class": "file",
+          "label": "EF_IC",
+          "identifier": ".0005",
+          "children": [
+            {
+              "id": "node-0030",
+              "parent": "node-0004",
+              "class": "record",
+              "label": "CardChipIdentification",
+              "children": [
+                {
+                  "id": "node-0031",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "icSerialNumber",
+                  "size_bits": 32,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0032",
+                  "parent": "node-0030",
+                  "class": "item",
+                  "label": "icManufacturingReferences",
+                  "size_bits": 32,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        0,
+                        0,
+                        0,
+                        0
+                      ]
+                    }
+                  },
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0005",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "DF_Tachograph",
+          "identifier": "#FF544143484F",
+          "children": [
+            {
+              "id": "node-0006",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Application_Identification",
+              "identifier": ".0501",
+              "children": [
+                {
+                  "id": "node-0033",
+                  "parent": "node-0006",
+                  "class": "record",
+                  "label": "DriverCardApplicationIdentification",
+                  "children": [
+                    {
+                      "id": "node-0034",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "typeOfTachographCardId",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            1
+                          ]
+                        }
+                      },
+                      "alternative": "Driver card",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0035",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "cardStructureVersion",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            1
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0036",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "noOfEventsPerType",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "0",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0037",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "noOfFaultsPerType",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "0",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0038",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "activityStructureLength",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "0",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0039",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "noOfCardVehicleRecords",
+                      "size_bits": 16,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "0",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0040",
+                      "parent": "node-0033",
+                      "class": "item",
+                      "label": "noOfCardPlaceRecords",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            0
+                          ]
+                        }
+                      },
+                      "alternative": "0",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0007",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Card_Certificate",
+              "identifier": ".C100",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0008",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_CA_Certificate",
+              "identifier": ".C108",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0009",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Card_Certificate_GOST",
+              "identifier": ".C200",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0010",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Key_Identificators",
+              "identifier": ".C201",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0011",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_CA_Certificate_GOST",
+              "identifier": ".C208",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0012",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Identification",
+              "identifier": ".0520",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0013",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Card_Download",
+              "identifier": ".050E",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0014",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Driving_Licence_info",
+              "identifier": ".0521",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0015",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Events_Data",
+              "identifier": ".0502",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0016",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Faults_Data",
+              "identifier": ".0503",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0017",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Driver_Activity_Data",
+              "identifier": ".0504",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0018",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Vehicles_Used",
+              "identifier": ".0505",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0019",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Places",
+              "identifier": ".0506",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0020",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Current_Usage",
+              "identifier": ".0507",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0021",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Control_Activity_Data",
+              "identifier": ".0508",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0022",
+              "parent": "node-0005",
+              "class": "file",
+              "label": "EF_Specific_Conditions",
+              "identifier": ".0522",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

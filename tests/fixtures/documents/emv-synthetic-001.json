@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "id": "doc-emv-synthetic-001",
+  "run_id": "run-emv-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "EMV",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "application",
+          "identifier": "#325041592E5359532E4444463031",
+          "children": [
+            {
+              "id": "node-0004",
+              "parent": "node-0003",
+              "class": "item",
+              "label": "File Control Information (FCI) Template",
+              "identifier": "6F",
+              "children": [
+                {
+                  "id": "node-0005",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "Dedicated File (DF) Name",
+                  "identifier": "84",
+                  "size_bits": 112,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        50,
+                        80,
+                        65,
+                        89,
+                        46,
+                        83,
+                        89,
+                        83,
+                        46,
+                        68,
+                        68,
+                        70,
+                        48,
+                        49
+                      ]
+                    }
+                  },
+                  "alternative": "2PAY.SYS.DDF01",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0006",
+                  "parent": "node-0004",
+                  "class": "item",
+                  "label": "FCI Proprietary Template",
+                  "identifier": "A5",
+                  "children": [
+                    {
+                      "id": "node-0007",
+                      "parent": "node-0006",
+                      "class": "item",
+                      "label": "Application Label",
+                      "identifier": "50",
+                      "size_bits": 80,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            83,
+                            65,
+                            77,
+                            80,
+                            76,
+                            69,
+                            32,
+                            65,
+                            80,
+                            80
+                          ]
+                        }
+                      },
+                      "alternative": "SAMPLE APP",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0008",
+                      "parent": "node-0006",
+                      "class": "item",
+                      "label": "Application Template",
+                      "identifier": "61",
+                      "children": [
+                        {
+                          "id": "node-0009",
+                          "parent": "node-0008",
+                          "class": "item",
+                          "label": "Application Identifier (AID)",
+                          "identifier": "4F",
+                          "size_bits": 56,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                160,
+                                0,
+                                0,
+                                0,
+                                3,
+                                16,
+                                16
+                              ]
+                            }
+                          },
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0010",
+                      "parent": "node-0006",
+                      "class": "item",
+                      "label": "FCI Issuer Discretionary Data",
+                      "identifier": "BF0C",
+                      "children": [
+                        {
+                          "id": "node-0011",
+                          "parent": "node-0010",
+                          "class": "card",
+                          "label": "Unparsed ASN1 data",
+                          "size_bits": 0,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": []
+                            }
+                          },
+                          "alternative": "(error)",
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0012",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "application",
+          "identifier": "#A0000000031010",
+          "children": [
+            {
+              "id": "node-0013",
+              "parent": "node-0012",
+              "class": "header",
+              "label": "answer to select",
+              "size_bits": 248,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    111,
+                    25,
+                    132,
+                    7,
+                    160,
+                    0,
+                    0,
+                    0,
+                    3,
+                    16,
+                    16,
+                    165,
+                    14,
+                    80,
+                    9,
+                    83,
+                    65,
+                    77,
+                    80,
+                    76,
+                    69,
+                    32,
+                    86,
+                    73,
+                    83,
+                    65,
+                    159,
+                    56,
+                    1,
+                    159,
+                    56
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0014",
+                  "parent": "node-0013",
+                  "class": "item",
+                  "label": "File Control Information (FCI) Template",
+                  "identifier": "6F",
+                  "children": [
+                    {
+                      "id": "node-0015",
+                      "parent": "node-0014",
+                      "class": "item",
+                      "label": "Dedicated File (DF) Name",
+                      "identifier": "84",
+                      "size_bits": 56,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            160,
+                            0,
+                            0,
+                            0,
+                            3,
+                            16,
+                            16
+                          ]
+                        }
+                      },
+                      "alternative": "....... (A0000000031010)",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0016",
+                      "parent": "node-0014",
+                      "class": "item",
+                      "label": "FCI Proprietary Template",
+                      "identifier": "A5",
+                      "children": [
+                        {
+                          "id": "node-0017",
+                          "parent": "node-0016",
+                          "class": "item",
+                          "label": "Application Label",
+                          "identifier": "50",
+                          "size_bits": 72,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                83,
+                                65,
+                                77,
+                                80,
+                                76,
+                                69,
+                                32,
+                                86,
+                                73
+                              ]
+                            }
+                          },
+                          "alternative": "SAMPLE VI",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0018",
+                          "parent": "node-0016",
+                          "class": "card",
+                          "label": "Unparsed ASN1 data",
+                          "size_bits": 24,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                83,
+                                65,
+                                159
+                              ]
+                            }
+                          },
+                          "alternative": "(error)",
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0019",
+                  "parent": "node-0013",
+                  "class": "item",
+                  "label": "TLV (Universal)",
+                  "identifier": "38",
+                  "children": [
+                    {
+                      "id": "node-0020",
+                      "parent": "node-0019",
+                      "class": "card",
+                      "label": "Unparsed ASN1 data",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            159
+                          ]
+                        }
+                      },
+                      "alternative": "(error)",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0021",
+                  "parent": "node-0013",
+                  "class": "card",
+                  "label": "Unparsed ASN1 data",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        56
+                      ]
+                    }
+                  },
+                  "alternative": "(error)",
+                  "children": [],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

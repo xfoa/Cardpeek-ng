@@ -14,7 +14,7 @@ end
 
 function decode(cardpeek, captured)
     local root = cardpeek.nodes.root()
-    local card = root:append("card", "Synthetic card")
+    local card = root:append("card", "Card")
     local atr_node = card:append("atr", "Answer to Reset")
     local atr = captured[1]
     atr_node:set("value", atr.bytes)

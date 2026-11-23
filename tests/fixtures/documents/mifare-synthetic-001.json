@@ -1,0 +1,1054 @@
+{
+  "schema_version": 1,
+  "id": "doc-mifare-synthetic-001",
+  "run_id": "run-mifare-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "Mifare",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 16,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "block",
+          "label": "UID",
+          "size_bits": 32,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                1,
+                2,
+                3,
+                4
+              ]
+            }
+          },
+          "alternative": "16909060",
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0004",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "0",
+          "children": [
+            {
+              "id": "node-0005",
+              "parent": "node-0004",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "size_bits": 128,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15
+                  ]
+                }
+              },
+              "alternative": "000102030405060708090A0B0C0D0E0F (................)",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0006",
+              "parent": "node-0004",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "size_bits": 128,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15
+                  ]
+                }
+              },
+              "alternative": "000102030405060708090A0B0C0D0E0F (................)",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0007",
+              "parent": "node-0004",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "size_bits": 128,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15
+                  ]
+                }
+              },
+              "alternative": "000102030405060708090A0B0C0D0E0F (................)",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0008",
+              "parent": "node-0004",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "size_bits": 128,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    255,
+                    7,
+                    128,
+                    105,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              },
+              "alternative": "KeyA:(redacted) Access:FF078069 keyB:(redacted)",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0009",
+              "parent": "node-0004",
+              "class": "block",
+              "label": "permissions",
+              "children": [
+                {
+                  "id": "node-0010",
+                  "parent": "node-0009",
+                  "class": "item",
+                  "label": "block 0",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "text",
+                    "value": "0"
+                  },
+                  "alternative": "read:AB write:AB inc:AB dec:AB",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0011",
+                  "parent": "node-0009",
+                  "class": "item",
+                  "label": "block 1",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "text",
+                    "value": "0"
+                  },
+                  "alternative": "read:AB write:AB inc:AB dec:AB",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0012",
+                  "parent": "node-0009",
+                  "class": "item",
+                  "label": "block 2",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "text",
+                    "value": "0"
+                  },
+                  "alternative": "read:AB write:AB inc:AB dec:AB",
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0013",
+                  "parent": "node-0009",
+                  "class": "item",
+                  "label": "block 3",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "text",
+                    "value": "1"
+                  },
+                  "alternative": "",
+                  "children": [
+                    {
+                      "id": "node-0014",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "key A",
+                      "alternative": "read:-- write:A-",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0015",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Access bits",
+                      "alternative": "read:A- write:A-",
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0016",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Key B",
+                      "alternative": "read:A- write:A-",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0017",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "1",
+          "children": [
+            {
+              "id": "node-0018",
+              "parent": "node-0017",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0019",
+              "parent": "node-0017",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0020",
+              "parent": "node-0017",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0021",
+              "parent": "node-0017",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0022",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "2",
+          "children": [
+            {
+              "id": "node-0023",
+              "parent": "node-0022",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0024",
+              "parent": "node-0022",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0025",
+              "parent": "node-0022",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0026",
+              "parent": "node-0022",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0027",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "3",
+          "children": [
+            {
+              "id": "node-0028",
+              "parent": "node-0027",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0029",
+              "parent": "node-0027",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0030",
+              "parent": "node-0027",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0031",
+              "parent": "node-0027",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0032",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "4",
+          "children": [
+            {
+              "id": "node-0033",
+              "parent": "node-0032",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0034",
+              "parent": "node-0032",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0035",
+              "parent": "node-0032",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0036",
+              "parent": "node-0032",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0037",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "5",
+          "children": [
+            {
+              "id": "node-0038",
+              "parent": "node-0037",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0039",
+              "parent": "node-0037",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0040",
+              "parent": "node-0037",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0041",
+              "parent": "node-0037",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0042",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "6",
+          "children": [
+            {
+              "id": "node-0043",
+              "parent": "node-0042",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0044",
+              "parent": "node-0042",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0045",
+              "parent": "node-0042",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0046",
+              "parent": "node-0042",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0047",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "7",
+          "children": [
+            {
+              "id": "node-0048",
+              "parent": "node-0047",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0049",
+              "parent": "node-0047",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0050",
+              "parent": "node-0047",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0051",
+              "parent": "node-0047",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0052",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "8",
+          "children": [
+            {
+              "id": "node-0053",
+              "parent": "node-0052",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0054",
+              "parent": "node-0052",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0055",
+              "parent": "node-0052",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0056",
+              "parent": "node-0052",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0057",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "9",
+          "children": [
+            {
+              "id": "node-0058",
+              "parent": "node-0057",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0059",
+              "parent": "node-0057",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0060",
+              "parent": "node-0057",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0061",
+              "parent": "node-0057",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0062",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "10",
+          "children": [
+            {
+              "id": "node-0063",
+              "parent": "node-0062",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0064",
+              "parent": "node-0062",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0065",
+              "parent": "node-0062",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0066",
+              "parent": "node-0062",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0067",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "11",
+          "children": [
+            {
+              "id": "node-0068",
+              "parent": "node-0067",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0069",
+              "parent": "node-0067",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0070",
+              "parent": "node-0067",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0071",
+              "parent": "node-0067",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0072",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "12",
+          "children": [
+            {
+              "id": "node-0073",
+              "parent": "node-0072",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0074",
+              "parent": "node-0072",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0075",
+              "parent": "node-0072",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0076",
+              "parent": "node-0072",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0077",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "13",
+          "children": [
+            {
+              "id": "node-0078",
+              "parent": "node-0077",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0079",
+              "parent": "node-0077",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0080",
+              "parent": "node-0077",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0081",
+              "parent": "node-0077",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0082",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "14",
+          "children": [
+            {
+              "id": "node-0083",
+              "parent": "node-0082",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0084",
+              "parent": "node-0082",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0085",
+              "parent": "node-0082",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0086",
+              "parent": "node-0082",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0087",
+          "parent": "node-0001",
+          "class": "record",
+          "label": "sector",
+          "identifier": "15",
+          "children": [
+            {
+              "id": "node-0088",
+              "parent": "node-0087",
+              "class": "block",
+              "label": "block",
+              "identifier": "0",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0089",
+              "parent": "node-0087",
+              "class": "block",
+              "label": "block",
+              "identifier": "1",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0090",
+              "parent": "node-0087",
+              "class": "block",
+              "label": "block",
+              "identifier": "2",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0091",
+              "parent": "node-0087",
+              "class": "block",
+              "label": "block",
+              "identifier": "3",
+              "alternative": "unaccessible",
+              "children": [],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

@@ -7,7 +7,7 @@
     {
       "id": "node-0001",
       "class": "card",
-      "label": "Synthetic card",
+      "label": "Card",
       "children": [
         {
           "id": "node-0002",

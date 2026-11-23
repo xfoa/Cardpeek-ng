@@ -235,14 +235,24 @@ pub enum LogLevel {
 }
 
 /// Interactive question supplied by an analyser.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum InteractionKind {
     /// A yes or no question.
     Question,
     /// A message with one acknowledgement action.
     Notice,
+    /// Visible text input with an optional initial value.
+    Text {
+        /// Initial input value.
+        default: Option<String>,
+    },
     /// Secret text input.
     Secret,
+    /// File selection.
+    File {
+        /// Whether the selected file must already exist.
+        must_exist: bool,
+    },
 }
 
 /// Response to an interactive analyser question.
@@ -252,8 +262,12 @@ pub enum InteractionResponse {
     Bool(bool),
     /// Acknowledgement of a notice.
     Acknowledged,
+    /// Visible text input.
+    Text(String),
     /// Secret text input.
     Secret(String),
+    /// Selected file path.
+    File(PathBuf),
 }
 
 /// Bounded event delivery supplied by the application.

@@ -25,8 +25,18 @@ The full license is in [`LICENSE`](LICENSE).
 
 ## Third-party Cardpeek material
 
-Cardpeek-ng does not support Cardpeek Lua analysers, XML documents, or trace captures.
-No Cardpeek analyser, source file, or captured notice is included.
+The `analysers` directory contains native Cardpeek-ng reimplementations based on the
+original Cardpeek Lua analysers and their shared data tables.
+The original sources came from <https://github.com/l1l1/cardpeek>,
+revision `de8cee209b870f3d7aa1c6bd55e84738765dc1e6`, retrieved on 2026-11-23.
+They are distributed under GPL-3.0-or-later.
+The original copyright notices are preserved in the relevant files.
+The Cardpeek-ng changes include native API conversion, safety changes, and 2026-11-23 modifications.
+
+The original analyser authors and contributors include Alain Pannetrat (`L1L1`),
+Andreas Heiduk, David Huang, Darius Matboo, Adam Laurie, Tyson Key, and Andrew Kozlic.
+The Calypso data tables retain their original public-information and experimental-status notices.
+No endorsement by those authors is implied.
 
 Before importing any third-party Cardpeek material:
 
@@ -39,6 +49,7 @@ Before importing any third-party Cardpeek material:
 7. Add third-party license texts required for distribution.
 8. Update this notice file and the relevant package documentation.
 9. Write new analysers against the Cardpeek-ng Lua API.
+10. Reimplement legacy API calls instead of adding a compatibility layer.
 
 Do not remove or replace upstream notices.
 Do not imply endorsement by upstream authors.

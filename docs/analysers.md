@@ -20,6 +20,12 @@ Do not write secret values to logs, result documents, or fixtures.
 
 Cardpeek-ng does not support analysers written for the original Cardpeek API.
 Do not use the legacy `card`, `bytes`, `nodes`, or `ui` globals.
+The bundled original Cardpeek analysers have been reimplemented with the native API.
+No legacy compatibility layer is installed.
+
+The bundled analysers are ATR, GSM/USIM, Belgian eID, Calypso, ePassport, EMV,
+legacy GSM, MIFARE Classic, Moneo, OpenPGP, Tachograph, Thai eID, and Vitale 2.
+Shared Lua modules and data files are bundled in new personal analyser libraries.
 
 ## Create a first analyser
 
@@ -252,6 +258,45 @@ if failure ~= nil then
 end
 ```
 
+## Use structured data and conversion modules
+
+### BER-TLV
+
+The `cardpeek.asn1` module provides `split`, `split_tag`, `split_length`, and `join`.
+`split` returns tag, value, and remaining bytes.
+Malformed or incomplete input returns `nil` values.
+`join` encodes a tag and an 8-bit value.
+
+The shared `lib.tlv` module builds labelled result trees from these values.
+It is a native Lua module, not a legacy global.
+
+### Cryptography
+
+The `cardpeek.crypto` module provides SHA-1, two-key Triple DES CBC, and ISO 9797 MAC.
+Use `sha1(data)`, `des_ede3_cbc(encrypt, key, iv, data)`, and `iso9797_mac(key, data)`.
+Keys and data must use 8-bit elements.
+Triple DES data must contain complete blocks.
+Apply the required padding in the analyser.
+
+### Character encodings
+
+Use `cardpeek.encoding.decode(name, data)` for UTF-8, ISO-8859 variants, and TIS-620.
+Invalid input or an unsupported encoding raises a Lua error.
+
+### Byte iteration and tests
+
+`data:ipairs()` returns zero-based index and value pairs.
+`cardpeek.bytes.all(data, value)` reports whether a nonempty value contains only the selected element.
+Use these functions for bitfield and transport decoders.
+
+### Node queries and removal
+
+`cardpeek.nodes.find(parent, criteria)` returns an iterator over recursive matches.
+`cardpeek.nodes.find_first(parent, criteria)` returns the first match or `nil`.
+Criteria use `class`, `label`, `identifier`, `alternative`, and `mime_type`.
+The aliases `classname`, `id`, `alt`, and `mime-type` are accepted.
+`node:remove()` removes a node from its parent.
+
 ### Transmit an APDU
 
 An Application Protocol Data Unit (APDU) contains a card command or response.
@@ -379,6 +424,8 @@ local pin = cardpeek.ui.secret("Enter PIN1")
 Question calls return a boolean.
 Notice calls wait for the user to select OK.
 Secret calls return text.
+Use `cardpeek.ui.text(prompt, default)` for visible text input.
+Use `cardpeek.ui.file(prompt, must_exist)` for file selection.
 These calls require an interactive frontend.
 Replay and offline decoding do not prompt the user.
 Never put a returned secret in a log or result document.
