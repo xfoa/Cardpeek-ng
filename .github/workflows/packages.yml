@@ -53,6 +53,8 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.100"
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
       - name: Build Debian package
         run: python3 packaging/build.py deb
       - name: Upload Debian package
@@ -78,6 +80,8 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 --silent --show-error --fail https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.100
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
       - name: Build RPM package
         run: python3 packaging/build.py rpm
       - name: Upload RPM package
@@ -98,6 +102,8 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.100"
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
       - name: Install WiX
         run: |
           dotnet tool install --global wix --version 4.0.6
@@ -122,6 +128,8 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.100"
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
       - name: Build macOS package
         run: python3 packaging/build.py pkg
       - name: Upload macOS package
