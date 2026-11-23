@@ -179,6 +179,11 @@ struct ContextMenu {
 }
 
 #[derive(Clone, Default)]
+struct ActiveCardHover(Option<&'static str>);
+
+impl Global for ActiveCardHover {}
+
+#[derive(Clone, Default)]
 struct ActiveHelpTooltip {
     entry: Option<HelpEntry>,
     source: Option<SharedString>,
@@ -195,6 +200,41 @@ trait HelpTarget: StatefulInteractiveElement + Styled + ParentElement + Sized {
 }
 
 impl<T: StatefulInteractiveElement + Styled + ParentElement + Sized> HelpTarget for T {}
+
+fn card_hover_region(id: &'static str) -> impl IntoElement {
+    canvas(
+        |bounds, _, _| bounds,
+        move |_, bounds, window, _| {
+            window.on_mouse_event(move |event: &MouseMoveEvent, _, window, cx| {
+                let active = cx.default_global::<ActiveCardHover>();
+                let hovered = event.position.x >= bounds.left()
+                    && event.position.x < bounds.right()
+                    && event.position.y >= bounds.top() - px(1.)
+                    && event.position.y <= bounds.bottom();
+                let next = if hovered {
+                    Some(id)
+                } else if active.0 == Some(id) {
+                    None
+                } else {
+                    active.0
+                };
+                if active.0 != next {
+                    active.0 = next;
+                    window.refresh();
+                }
+            });
+            window.on_mouse_event(move |_: &MouseExitEvent, _, window, cx| {
+                let active = cx.default_global::<ActiveCardHover>();
+                if active.0 == Some(id) {
+                    active.0 = None;
+                    window.refresh();
+                }
+            });
+        },
+    )
+    .absolute()
+    .inset_0()
+}
 
 fn help_indicator(entry: HelpEntry, source: SharedString) -> impl IntoElement {
     canvas(
@@ -1079,6 +1119,38 @@ impl App {
         list
     }
 
+    fn card_detail_row(
+        &self,
+        id: &'static str,
+        label: &'static str,
+        value: &str,
+        entry: HelpEntry,
+        cx: &mut Context<'_, Self>,
+    ) -> Stateful<Div> {
+        let source = format!("card-detail-{id}");
+        let source_for_menu = source.clone();
+        let copy_text = format!("{label}\t{value}");
+        help_detail_row(id, label, value, entry, self.state.help_mode)
+            .when(
+                self.context_menu_source.as_deref() == Some(source.as_str())
+                    || cx.default_global::<ActiveCardHover>().0 == Some(id),
+                |element| element.bg(BORDER),
+            )
+            .child(card_hover_region(id))
+            .on_mouse_down(
+                MouseButton::Right,
+                cx.listener(move |app, event: &MouseDownEvent, _, cx| {
+                    app.context_menu_source = Some(source_for_menu.clone());
+                    app.context_menu = Some(ContextMenu {
+                        position: event.position,
+                        text: copy_text.clone(),
+                        tree_text: None,
+                    });
+                    cx.notify();
+                }),
+            )
+    }
+
     fn card_panel(&self, cx: &mut Context<'_, Self>) -> Div {
         let connected = self.state.connected();
         let Some(session) = self.state.session.as_ref().filter(|_| connected) else {
@@ -1124,46 +1196,71 @@ impl App {
                                 self.state.help_mode,
                             )),
                     )
-                    .child(help_detail_row(
+                    .child(self.card_detail_row(
                         "help-card-type",
                         "Card type",
                         self.state.card_type().unwrap_or("Unknown from ATR"),
                         help::CARD_TYPE,
-                        self.state.help_mode,
+                        cx,
                     ))
-                    .child(help_detail_row(
+                    .child(self.card_detail_row(
                         "help-connection",
                         "Connection",
                         "Shared PC/SC session",
                         help::PCSC,
-                        self.state.help_mode,
+                        cx,
                     ))
-                    .child(help_detail_row(
+                    .child(self.card_detail_row(
                         "help-protocol",
                         "Protocol",
                         protocol,
                         help::PROTOCOL,
-                        self.state.help_mode,
+                        cx,
                     ))
-                    .child(help_detail_row(
+                    .child(self.card_detail_row(
                         "help-atr",
                         "ATR",
                         &spaced_hex(session.atr.as_bytes()),
                         help::ATR,
-                        self.state.help_mode,
+                        cx,
                     ))
-                    .child(detail_row("Reader", &session.reader.name))
+                    .child(
+                        detail_row("Reader", &session.reader.name)
+                            .relative()
+                            .debug_selector(|| "card-reader".into())
+                            .when(
+                                self.context_menu_source.as_deref() == Some("card-detail-reader")
+                                    || cx.default_global::<ActiveCardHover>().0 == Some("Reader"),
+                                |element| element.bg(BORDER),
+                            )
+                            .child(card_hover_region("Reader"))
+                            .on_mouse_down(
+                                MouseButton::Right,
+                                cx.listener({
+                                    let copy_text = format!("Reader\t{}", session.reader.name);
+                                    move |app, event: &MouseDownEvent, _, cx| {
+                                        app.context_menu_source = Some("card-detail-reader".into());
+                                        app.context_menu = Some(ContextMenu {
+                                            position: event.position,
+                                            text: copy_text.clone(),
+                                            tree_text: None,
+                                        });
+                                        cx.notify();
+                                    }
+                                }),
+                            ),
+                    )
                     .child(
                         div()
                             .flex()
                             .items_center()
                             .gap_2()
-                            .child(div().flex_1().child(help_detail_row(
+                            .child(div().flex_1().child(self.card_detail_row(
                                 "help-session",
                                 "Session",
                                 &self.state.session_name(),
                                 help::SESSION,
-                                self.state.help_mode,
+                                cx,
                             )))
                             .child(button(
                                 "edit-session-name",
@@ -4316,9 +4413,43 @@ fn progress_percent(progress: Option<&Progress>) -> u64 {
 
 #[cfg(test)]
 mod tests {
+    use cardpeek_app::{OperationId, SessionInfo, SessionState};
+    use cardpeek_core::{Atr, ReaderInfo};
+    use cardpeek_transport::SessionCapabilities;
     use gpui::{Modifiers, TestAppContext, point, size};
 
     use super::*;
+
+    struct AdjacentCardRows;
+
+    impl Render for AdjacentCardRows {
+        fn render(&mut self, _: &mut Window, cx: &mut Context<'_, Self>) -> impl IntoElement {
+            div()
+                .size_full()
+                .child(
+                    help_detail_row(
+                        "help-card-type",
+                        "Card type",
+                        "Test",
+                        help::CARD_TYPE,
+                        false,
+                    )
+                    .when(
+                        cx.default_global::<ActiveCardHover>().0 == Some("help-card-type"),
+                        |element| element.bg(BORDER),
+                    )
+                    .child(card_hover_region("help-card-type")),
+                )
+                .child(
+                    help_detail_row("help-connection", "Connection", "Test", help::PCSC, false)
+                        .when(
+                            cx.default_global::<ActiveCardHover>().0 == Some("help-connection"),
+                            |element| element.bg(BORDER),
+                        )
+                        .child(card_hover_region("help-connection")),
+                )
+        }
+    }
 
     #[derive(Clone, Copy)]
     struct HelpTargetView {
@@ -4344,6 +4475,108 @@ mod tests {
                 )
                 .children(render_help_overlay(true, cx))
         }
+    }
+
+    #[gpui::test]
+    fn card_rows_highlight_only_one_row_at_their_boundary(cx: &mut TestAppContext) {
+        let window = cx.update(|cx| {
+            cx.open_window(WindowOptions::default(), |_, cx| {
+                cx.new(|_| AdjacentCardRows)
+            })
+            .unwrap()
+        });
+        let mut visual = gpui::VisualTestContext::from_window(window.into(), cx);
+        visual.simulate_resize(size(px(640.), px(480.)));
+        let card_type = visual.debug_bounds("help-card-type").unwrap();
+        let connection = visual.debug_bounds("help-connection").unwrap();
+        assert_eq!(card_type.bottom(), connection.top());
+        visual.simulate_mouse_move(
+            point(card_type.center().x, card_type.bottom()),
+            None,
+            Modifiers::none(),
+        );
+        visual.read_global(|active: &ActiveCardHover, _| {
+            assert_eq!(active.0, Some("help-connection"));
+        });
+        visual.simulate_mouse_move(card_type.center(), None, Modifiers::none());
+        visual.read_global(|active: &ActiveCardHover, _| {
+            assert_eq!(active.0, Some("help-card-type"));
+        });
+    }
+
+    #[gpui::test]
+    fn card_panel_tracks_one_hovered_row_and_clears_it_on_exit(cx: &mut TestAppContext) {
+        let directory = tempfile::tempdir().unwrap();
+        let controller = Rc::new(crate::Controller::new(
+            DesktopBackend::new(None, None),
+            cardpeek_analyser::AnalyserLibrary::at(directory.path()).unwrap(),
+        ));
+        let window = cx.update(|cx| {
+            cx.open_window(WindowOptions::default(), |_, cx| {
+                cx.new(|cx| {
+                    let mut app = App::new(
+                        controller,
+                        Preferences::load(directory.path().join("preferences")),
+                        None,
+                        cx,
+                    );
+                    app.state.session = Some(SessionInfo {
+                        id: OperationId::new("test-session"),
+                        reader: ReaderInfo {
+                            name: "Test reader".into(),
+                            transport: TransportKind::Pcsc,
+                            card_present: Some(true),
+                        },
+                        protocol: Protocol::T1,
+                        capabilities: SessionCapabilities {
+                            extended_apdus: true,
+                        },
+                        atr: Atr::new(vec![0x3b, 0x00]),
+                        state: SessionState::Connected,
+                    });
+                    app
+                })
+            })
+            .unwrap()
+        });
+        let mut visual = gpui::VisualTestContext::from_window(window.into(), cx);
+        visual.simulate_resize(size(px(1280.), px(820.)));
+        for (selector, expected) in [
+            ("help-card-type", "help-card-type"),
+            ("help-protocol", "help-protocol"),
+            ("help-atr", "help-atr"),
+            ("card-reader", "Reader"),
+            ("help-session", "help-session"),
+        ] {
+            let row = visual.debug_bounds(selector).unwrap();
+            visual.simulate_mouse_move(row.center(), None, Modifiers::none());
+            visual.read_global(|active: &ActiveCardHover, _| {
+                assert_eq!(active.0, Some(expected));
+            });
+        }
+        let card_type = visual.debug_bounds("help-card-type").unwrap();
+        let connection = visual.debug_bounds("help-connection").unwrap();
+        for offset in [-1., 0., 1.] {
+            visual.simulate_mouse_move(
+                point(card_type.center().x, card_type.bottom() + px(offset)),
+                None,
+                Modifiers::none(),
+            );
+            visual.read_global(|active: &ActiveCardHover, _| {
+                assert!(matches!(
+                    active.0,
+                    Some("help-card-type" | "help-connection")
+                ));
+            });
+        }
+        visual.simulate_mouse_move(connection.center(), None, Modifiers::none());
+        visual.read_global(|active: &ActiveCardHover, _| {
+            assert_eq!(active.0, Some("help-connection"));
+        });
+        visual.simulate_mouse_move(point(px(1.), px(1.)), None, Modifiers::none());
+        visual.read_global(|active: &ActiveCardHover, _| {
+            assert_eq!(active.0, None);
+        });
     }
 
     #[gpui::test]
