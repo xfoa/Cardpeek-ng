@@ -24,7 +24,7 @@ use crate::input::{Confirm, TextField, TextFieldEvent, bind_keys};
 use crate::preferences::Preferences;
 use crate::state::{
     AnalysisInput, DesktopState, ExportKind, ExportTraceSource, NotificationLevel, Screen,
-    node_value, spaced_hex, trace_record_matches,
+    SessionDialog, node_value, spaced_hex, trace_record_matches,
 };
 
 pub type DesktopController = Rc<Controller<DesktopBackend>>;
@@ -269,6 +269,7 @@ pub struct App {
     apdu: Entity<TextField>,
     export: Option<Entity<TextField>>,
     interaction: Option<Entity<TextField>>,
+    session_name: Option<Entity<TextField>>,
     interaction_id: Option<String>,
     analyser_menu_open: bool,
     input_menu_open: bool,
@@ -368,6 +369,7 @@ impl App {
             apdu,
             export: None,
             interaction: None,
+            session_name: None,
             interaction_id: None,
             analyser_menu_open: false,
             input_menu_open: false,
@@ -420,6 +422,29 @@ impl App {
                 self.interaction = Some(field);
             }
         }
+        if self.state.session_dialog == Some(SessionDialog::EditName) {
+            if self.session_name.is_none() {
+                let field = cx.new(|cx| {
+                    TextField::new(
+                        cx,
+                        self.state.edited_session_name.clone(),
+                        "Session name",
+                        false,
+                    )
+                });
+                cx.subscribe(&field, |app, _, event, cx| match event {
+                    TextFieldEvent::Changed(value) => {
+                        app.state.edited_session_name.clone_from(value);
+                        cx.notify();
+                    }
+                    TextFieldEvent::Submitted => app.save_session_name(cx),
+                })
+                .detach();
+                self.session_name = Some(field);
+            }
+        } else {
+            self.session_name = None;
+        }
         if self.state.show_export {
             if let Some(field) = &self.export {
                 let destination = self.state.export_destination.clone();
@@ -464,7 +489,21 @@ impl App {
     }
 
     fn new_session(&mut self, _: &MouseDownEvent, _: &mut Window, cx: &mut Context<'_, Self>) {
-        self.controller.new_session(&mut self.state);
+        self.state.session_dialog = Some(SessionDialog::NewSession);
+        cx.notify();
+    }
+
+    fn edit_session_name(&mut self, cx: &mut Context<'_, Self>) {
+        self.state.session_dialog = Some(SessionDialog::EditName);
+        self.state.edited_session_name = self.state.session_name();
+        self.session_name = None;
+        self.sync_external_inputs(cx);
+        cx.notify();
+    }
+
+    fn save_session_name(&mut self, cx: &mut Context<'_, Self>) {
+        let name = self.state.edited_session_name.clone();
+        self.state.rename_session(&name);
         cx.notify();
     }
 
@@ -863,7 +902,7 @@ impl App {
                     .w_full()
                     .items_start()
                     .child(div().flex_1().child(self.reader_connection_panel(cx)))
-                    .child(div().flex_1().child(self.card_panel())),
+                    .child(div().flex_1().child(self.card_panel(cx))),
             )
             .child(self.capture_panel(cx))
             .child(
@@ -1039,7 +1078,7 @@ impl App {
         list
     }
 
-    fn card_panel(&self) -> Div {
+    fn card_panel(&self, cx: &mut Context<'_, Self>) -> Div {
         let connected = self.state.connected();
         let Some(session) = self.state.session.as_ref().filter(|_| connected) else {
             return panel()
@@ -1113,13 +1152,26 @@ impl App {
                         self.state.help_mode,
                     ))
                     .child(detail_row("Reader", &session.reader.name))
-                    .child(help_detail_row(
-                        "help-session",
-                        "Session",
-                        &self.state.session_name(),
-                        help::SESSION,
-                        self.state.help_mode,
-                    )),
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap_2()
+                            .child(div().flex_1().child(help_detail_row(
+                                "help-session",
+                                "Session",
+                                &self.state.session_name(),
+                                help::SESSION,
+                                self.state.help_mode,
+                            )))
+                            .child(button(
+                                "edit-session-name",
+                                "Edit",
+                                ButtonKind::Quiet,
+                                !self.state.new_session_pending() && !self.state.run_running(),
+                                cx.listener(|app, _, _, cx| app.edit_session_name(cx)),
+                            )),
+                    ),
             )
     }
 
@@ -2859,6 +2911,12 @@ impl App {
     }
 
     fn dialogs(&self, cx: &mut Context<'_, Self>) -> Option<AnyElement> {
+        if self.state.session_dialog == Some(SessionDialog::NewSession) {
+            return Self::new_session_dialog(cx).into_any_element().into();
+        }
+        if self.state.session_dialog == Some(SessionDialog::EditName) {
+            return self.session_name_dialog(cx).into_any_element().into();
+        }
         if self.state.interaction.is_some() {
             return self.interaction_dialog(cx).into_any_element().into();
         }
@@ -2869,6 +2927,76 @@ impl App {
             return self.remove_dialog(cx).into_any_element().into();
         }
         None
+    }
+
+    fn new_session_dialog(cx: &mut Context<'_, Self>) -> Div {
+        modal(
+            "Start a new session?",
+            "The reader will stay connected. The card will be reset.",
+            div().p_5().child(notice_box(
+                "The current capture will be replaced",
+                "Export the current capture first if you need to keep it.",
+                AMBER,
+                AMBER_SOFT,
+            )),
+            div()
+                .child(button(
+                    "cancel-new-session",
+                    "Cancel",
+                    ButtonKind::Normal,
+                    true,
+                    cx.listener(|app, _, _, cx| {
+                        app.state.session_dialog = None;
+                        cx.notify();
+                    }),
+                ))
+                .child(button(
+                    "confirm-new-session",
+                    "Start new session",
+                    ButtonKind::Primary,
+                    true,
+                    cx.listener(|app, _, _, cx| {
+                        app.state.session_dialog = None;
+                        app.controller.new_session(&mut app.state);
+                        cx.notify();
+                    }),
+                )),
+        )
+    }
+
+    fn session_name_dialog(&self, cx: &mut Context<'_, Self>) -> Div {
+        let mut body = div()
+            .p_5()
+            .flex()
+            .flex_col()
+            .gap_2()
+            .child(field_label("Session name"));
+        if let Some(field) = &self.session_name {
+            body = body.child(field.clone());
+        }
+        modal(
+            "Edit session name",
+            "This name labels the current capture session.",
+            body,
+            div()
+                .child(button(
+                    "cancel-session-name",
+                    "Cancel",
+                    ButtonKind::Normal,
+                    true,
+                    cx.listener(|app, _, _, cx| {
+                        app.state.session_dialog = None;
+                        cx.notify();
+                    }),
+                ))
+                .child(button(
+                    "save-session-name",
+                    "Save name",
+                    ButtonKind::Primary,
+                    !self.state.edited_session_name.trim().is_empty(),
+                    cx.listener(|app, _, _, cx| app.save_session_name(cx)),
+                )),
+        )
     }
 
     fn remove_dialog(&self, cx: &mut Context<'_, Self>) -> Div {

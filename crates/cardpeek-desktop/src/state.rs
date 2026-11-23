@@ -125,6 +125,12 @@ pub enum ExportTraceSource {
     OpenTrace,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SessionDialog {
+    NewSession,
+    EditName,
+}
+
 #[derive(Debug)]
 pub struct DesktopState {
     pub readers: Vec<cardpeek_core::ReaderInfo>,
@@ -132,7 +138,10 @@ pub struct DesktopState {
     pub session: Option<SessionInfo>,
     pub last_session: Option<OperationId>,
     pub session_counter: u64,
+    pub session_name: Option<String>,
     pub new_session_operation: Option<OperationId>,
+    pub session_dialog: Option<SessionDialog>,
+    pub edited_session_name: String,
     pub capture_trace: Option<TraceDocument>,
     pub trace_path: Option<PathBuf>,
     pub trace: Option<TraceDocument>,
@@ -184,7 +193,10 @@ impl Default for DesktopState {
             session: None,
             last_session: None,
             session_counter: 0,
+            session_name: None,
             new_session_operation: None,
+            session_dialog: None,
+            edited_session_name: String::new(),
             capture_trace: None,
             trace_path: None,
             trace: None,
@@ -271,7 +283,20 @@ impl DesktopState {
 
     #[must_use]
     pub fn session_name(&self) -> String {
-        format!("Session {}", self.session_counter.max(1))
+        self.session_name
+            .clone()
+            .unwrap_or_else(|| format!("Session {}", self.session_counter.max(1)))
+    }
+
+    pub fn rename_session(&mut self, name: &str) {
+        let name = name.trim();
+        if name.is_empty() {
+            self.notify_error("The session name cannot be empty.");
+            return;
+        }
+        self.session_name = Some(name.into());
+        self.session_dialog = None;
+        self.notify("Session name updated.");
     }
 
     #[must_use]
@@ -507,6 +532,7 @@ impl DesktopState {
         }
         if new_session_completed {
             self.session_counter += 1;
+            self.session_name = None;
             self.capture_trace = None;
             self.session_exchanges.clear();
             self.notify(format!("{} started.", self.session_name()));
@@ -524,6 +550,7 @@ impl DesktopState {
                     if state == SessionState::Connected {
                         self.last_session = Some(session);
                         self.session_counter = 1;
+                        self.session_name = None;
                         self.notify(format!("Connected to {}", reader.name));
                     }
                     if state == SessionState::Connecting {

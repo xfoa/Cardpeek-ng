@@ -224,6 +224,8 @@ fn new_session_resets_without_disconnecting() {
     });
     let session = state.session.as_ref().unwrap().id.clone();
 
+    state.rename_session("  Front door card  ");
+    assert_eq!(state.session_name(), "Front door card");
     controller.new_session(&mut state);
     assert!(state.new_session_pending());
     assert_eq!(
