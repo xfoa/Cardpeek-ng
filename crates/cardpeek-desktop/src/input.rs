@@ -11,7 +11,7 @@ use gpui::{
 };
 use unicode_segmentation::UnicodeSegmentation;
 
-actions!(cardpeek_dialog, [Confirm]);
+actions!(cardpeek_dialog, [Cancel, Confirm]);
 actions!(
     cardpeek_text,
     [
@@ -34,6 +34,7 @@ actions!(
 pub fn bind_keys(cx: &mut App) {
     cx.bind_keys([
         KeyBinding::new("enter", Confirm, Some("CardpeekDialog")),
+        KeyBinding::new("escape", Cancel, Some("CardpeekDialog")),
         KeyBinding::new("backspace", Backspace, None),
         KeyBinding::new("delete", Delete, None),
         KeyBinding::new("enter", Enter, None),

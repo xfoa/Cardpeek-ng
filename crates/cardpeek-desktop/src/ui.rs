@@ -11,16 +11,16 @@ use cardpeek_core::{Protocol, ResultNode, RunId, TraceRecord, TransportKind};
 use gpui::{
     AnyElement, AppContext, Application, Bounds, ClipboardItem, Context, Div, Entity, FocusHandle,
     FontWeight, Global, Image, ImageFormat, MouseButton, MouseDownEvent, MouseExitEvent,
-    MouseMoveEvent, PathPromptOptions, Pixels, Point, Render, Rgba, ScrollStrategy, SharedString,
-    Stateful, StatefulInteractiveElement, Styled, Task, TitlebarOptions, UniformListScrollHandle,
-    Window, WindowBounds, WindowOptions, anchored, canvas, deferred, div, fill, img, point,
-    prelude::*, px, rgb, size, uniform_list,
+    MouseMoveEvent, Pixels, Point, Render, Rgba, ScrollStrategy, SharedString, Stateful,
+    StatefulInteractiveElement, Styled, Task, TitlebarOptions, UniformListScrollHandle, Window,
+    WindowBounds, WindowOptions, anchored, canvas, deferred, div, fill, img, point, prelude::*, px,
+    rgb, size, uniform_list,
 };
 
 use crate::DesktopBackend;
 use crate::controller::Controller;
 use crate::help::{self, HelpEntry};
-use crate::input::{Confirm, TextField, TextFieldEvent, bind_keys};
+use crate::input::{Cancel, Confirm, TextField, TextFieldEvent, bind_keys};
 use crate::preferences::Preferences;
 use crate::state::{
     AnalysisInput, DesktopState, ExportKind, ExportTraceSource, NotificationLevel, Screen,
@@ -263,6 +263,7 @@ pub struct App {
     controller: DesktopController,
     state: DesktopState,
     dialog_focus: FocusHandle,
+    file_picker_directory: PathBuf,
     _preferences: Preferences,
     search: Entity<TextField>,
     trace_search: Entity<TextField>,
@@ -363,6 +364,10 @@ impl App {
             controller,
             state,
             dialog_focus: cx.focus_handle(),
+            file_picker_directory: directories::BaseDirs::new().map_or_else(
+                || PathBuf::from("."),
+                |directories| directories.home_dir().to_path_buf(),
+            ),
             _preferences: preferences,
             search,
             trace_search,
@@ -544,34 +549,39 @@ impl App {
         cx.notify();
     }
 
-    fn select_paths(multiple: bool, cx: &mut Context<'_, Self>) {
-        let receiver = cx.prompt_for_paths(PathPromptOptions {
-            files: true,
-            directories: false,
-            multiple,
-            prompt: None,
-        });
+    fn remember_file_picker_directory(&mut self, path: &Path) {
+        if let Some(directory) = path.parent() {
+            self.file_picker_directory = directory.to_path_buf();
+        }
+    }
+
+    fn select_paths(&mut self, multiple: bool, cx: &mut Context<'_, Self>) {
+        let dialog = rfd::AsyncFileDialog::new().set_directory(&self.file_picker_directory);
         cx.spawn(
             move |app: gpui::WeakEntity<Self>, cx: &mut gpui::AsyncApp| {
                 let mut cx = cx.clone();
                 async move {
-                    let result = receiver.await;
-                    app.update(&mut cx, |app, _cx| match result {
-                        Ok(Ok(Some(paths))) if multiple => {
-                            app.controller.select_analyser_files(paths);
-                        }
-                        Ok(Ok(Some(paths))) => {
-                            if let Some(path) = paths.into_iter().next() {
+                    let paths = if multiple {
+                        dialog.pick_files().await.map(|files| {
+                            files.iter().map(|file| file.path().to_path_buf()).collect()
+                        })
+                    } else {
+                        dialog
+                            .pick_file()
+                            .await
+                            .map(|file| vec![file.path().to_path_buf()])
+                    };
+                    app.update(&mut cx, |app, _cx| {
+                        if let Some(paths) = paths {
+                            if let Some(path) = paths.first() {
+                                app.remember_file_picker_directory(path);
+                            }
+                            if multiple {
+                                app.controller.select_analyser_files(paths);
+                            } else if let Some(path) = paths.into_iter().next() {
                                 app.controller.select_trace_file(path);
                             }
                         }
-                        Ok(Ok(None)) => {}
-                        Ok(Err(error)) => app
-                            .state
-                            .notify_error(format!("Cannot open file picker: {error}")),
-                        Err(_) => app
-                            .state
-                            .notify_error("The file picker closed unexpectedly."),
                     })
                     .ok();
                 }
@@ -582,24 +592,25 @@ impl App {
 
     fn select_save_path(&mut self, interaction: bool, cx: &mut Context<'_, Self>) {
         let suggested_name = self.state.export_destination.clone();
-        let directory = Path::new(&suggested_name)
-            .parent()
-            .filter(|path| !path.as_os_str().is_empty())
-            .map_or_else(PathBuf::new, Path::to_path_buf);
-        let receiver = cx.prompt_for_new_path(&directory, Some(&suggested_name));
+        let file_name = Path::new(&suggested_name).file_name().map_or_else(
+            || suggested_name.clone(),
+            |name| name.to_string_lossy().into_owned(),
+        );
+        let receiver = cx.prompt_for_new_path(&self.file_picker_directory, Some(&file_name));
         cx.spawn(
             move |app: gpui::WeakEntity<Self>, cx: &mut gpui::AsyncApp| {
                 let mut cx = cx.clone();
                 async move {
                     let result = receiver.await;
                     app.update(&mut cx, |app, cx| match result {
-                        Ok(Ok(Some(path))) if interaction => {
-                            app.state.interaction_file = Some(path);
-                            cx.notify();
-                        }
                         Ok(Ok(Some(path))) => {
-                            app.state.export_destination = path.display().to_string();
-                            app.sync_external_inputs(cx);
+                            app.remember_file_picker_directory(&path);
+                            if interaction {
+                                app.state.interaction_file = Some(path);
+                            } else {
+                                app.state.export_destination = path.display().to_string();
+                                app.sync_external_inputs(cx);
+                            }
                             cx.notify();
                         }
                         Ok(Ok(None)) => {}
@@ -617,29 +628,19 @@ impl App {
         .detach();
     }
 
-    fn select_interaction_file(cx: &mut Context<'_, Self>) {
-        let receiver = cx.prompt_for_paths(PathPromptOptions {
-            files: true,
-            directories: false,
-            multiple: false,
-            prompt: None,
-        });
+    fn select_interaction_file(&mut self, cx: &mut Context<'_, Self>) {
+        let dialog = rfd::AsyncFileDialog::new().set_directory(&self.file_picker_directory);
         cx.spawn(|app: gpui::WeakEntity<Self>, cx: &mut gpui::AsyncApp| {
             let mut cx = cx.clone();
             async move {
-                let result = receiver.await;
-                app.update(&mut cx, |app, cx| match result {
-                    Ok(Ok(Some(paths))) => {
-                        app.state.interaction_file = paths.into_iter().next();
+                let file = dialog.pick_file().await;
+                app.update(&mut cx, |app, cx| {
+                    if let Some(file) = file {
+                        let path = file.path().to_path_buf();
+                        app.remember_file_picker_directory(&path);
+                        app.state.interaction_file = Some(path);
                         cx.notify();
                     }
-                    Ok(Ok(None)) => {}
-                    Ok(Err(error)) => app
-                        .state
-                        .notify_error(format!("Cannot open file picker: {error}")),
-                    Err(_) => app
-                        .state
-                        .notify_error("The file picker closed unexpectedly."),
                 })
                 .ok();
             }
@@ -2259,7 +2260,7 @@ impl App {
                                 "Import trace",
                                 ButtonKind::Normal,
                                 true,
-                                cx.listener(|_app, _, _, cx| Self::select_paths(false, cx)),
+                                cx.listener(|app, _, _, cx| app.select_paths(false, cx)),
                             ))
                             .child(button(
                                 "export-open-trace",
@@ -2895,8 +2896,8 @@ impl App {
                             .flex_col()
                             .child(div().px_4().h(px(54.)).flex().items_center().justify_between().border_b_1().border_color(BORDER).child(div().child(div().font_weight(FontWeight::SEMIBOLD).child("Analyser library")).child(note("Metadata is read without executing scripts"))).child(badge(format!("{} INSTALLED", self.state.analysers.len()), MUTED, CANVAS)))
                             .child(library)
-                            .child(div().p_3().flex().items_center().justify_between().child(note("User library / Shared with the CLI")).child(button("add-analyser", "Add analyser", ButtonKind::Primary, !self.state.run_running(), cx.listener(|_app, _, _, cx| {
-                                Self::select_paths(true, cx);
+                            .child(div().p_3().flex().items_center().justify_between().child(note("User library / Shared with the CLI")).child(button("add-analyser", "Add analyser", ButtonKind::Primary, !self.state.run_running(), cx.listener(|app, _, _, cx| {
+                                app.select_paths(true, cx);
                             })))),
                     )
                     .child(
@@ -3172,7 +3173,7 @@ impl App {
                         true,
                         cx.listener(move |app, _, _, cx| {
                             if must_exist {
-                                Self::select_interaction_file(cx);
+                                app.select_interaction_file(cx);
                             } else {
                                 app.select_save_path(true, cx);
                             }
@@ -3219,6 +3220,25 @@ impl App {
             body,
             footer,
         )
+    }
+
+    fn cancel_dialog(&mut self, cx: &mut Context<'_, Self>) {
+        if self.state.session_dialog.is_some() {
+            self.state.session_dialog = None;
+        } else if self.state.interaction.is_some() {
+            self.controller.cancel(&self.state);
+            self.state.interaction = None;
+            self.state.interaction_operation = None;
+            self.interaction = None;
+            self.interaction_id = None;
+        } else if self.state.show_export {
+            self.state.show_export = false;
+        } else if self.state.pending_remove.is_some() {
+            self.state.pending_remove = None;
+        } else {
+            return;
+        }
+        cx.notify();
     }
 
     fn confirm_interaction(&mut self, cx: &mut Context<'_, Self>) {
@@ -3517,12 +3537,17 @@ impl App {
 
 impl Render for App {
     fn render(&mut self, window: &mut Window, cx: &mut Context<'_, Self>) -> impl IntoElement {
-        let dialog_keyboard = self.state.interaction.as_ref().is_some_and(|request| {
-            matches!(
-                request.kind,
-                InteractionKind::Question { .. } | InteractionKind::Notice { .. }
-            )
-        });
+        let dialog_open = self.state.session_dialog.is_some()
+            || self.state.interaction.is_some()
+            || self.state.show_export
+            || self.state.pending_remove.is_some();
+        let dialog_keyboard = dialog_open
+            && !self.state.interaction.as_ref().is_some_and(|request| {
+                matches!(
+                    request.kind,
+                    InteractionKind::TextInput { .. } | InteractionKind::SecretInput { .. }
+                )
+            });
         if dialog_keyboard {
             window.focus(&self.dialog_focus);
         }
@@ -3536,12 +3561,17 @@ impl Render for App {
             .relative()
             .size_full()
             .track_focus(&self.dialog_focus)
-            .when(dialog_keyboard, |element| {
+            .when(dialog_open, |element| {
                 element.key_context("CardpeekDialog").on_action(cx.listener(
-                    |app, _: &Confirm, _, cx| {
-                        app.confirm_interaction(cx);
+                    |app, _: &Cancel, _, cx| {
+                        app.cancel_dialog(cx);
                     },
                 ))
+            })
+            .when(dialog_keyboard, |element| {
+                element.on_action(cx.listener(|app, _: &Confirm, _, cx| {
+                    app.confirm_interaction(cx);
+                }))
             })
             .overflow_hidden()
             .bg(CANVAS)
@@ -4408,5 +4438,86 @@ mod tests {
             });
             assert!(visual.debug_bounds("immediate-help-tooltip").is_some());
         }
+    }
+
+    #[gpui::test]
+    fn file_picker_starts_at_home_and_remembers_the_selected_directory(cx: &mut TestAppContext) {
+        let directory = tempfile::tempdir().unwrap();
+        let selected_directory = directory.path().join("selected");
+        std::fs::create_dir(&selected_directory).unwrap();
+        let controller = Rc::new(crate::Controller::new(
+            DesktopBackend::new(None, None),
+            cardpeek_analyser::AnalyserLibrary::at(directory.path()).unwrap(),
+        ));
+        let app = cx.new(|cx| {
+            App::new(
+                controller,
+                Preferences::load(directory.path().join("preferences")),
+                None,
+                cx,
+            )
+        });
+        app.update(cx, |app, _| {
+            let expected_home = directories::BaseDirs::new().map_or_else(
+                || PathBuf::from("."),
+                |directories| directories.home_dir().to_path_buf(),
+            );
+            assert_eq!(app.file_picker_directory, expected_home);
+
+            app.remember_file_picker_directory(&selected_directory.join("trace.json"));
+            assert_eq!(app.file_picker_directory, selected_directory);
+        });
+    }
+
+    #[gpui::test]
+    fn escape_cancels_dialogs_with_and_without_text_input(cx: &mut TestAppContext) {
+        cx.update(bind_keys);
+        let directory = tempfile::tempdir().unwrap();
+        let controller = Rc::new(crate::Controller::new(
+            DesktopBackend::new(None, None),
+            cardpeek_analyser::AnalyserLibrary::at(directory.path()).unwrap(),
+        ));
+        let window = cx.update(|cx| {
+            cx.open_window(WindowOptions::default(), |_, cx| {
+                cx.new(|cx| {
+                    App::new(
+                        controller,
+                        Preferences::load(directory.path().join("preferences")),
+                        None,
+                        cx,
+                    )
+                })
+            })
+            .unwrap()
+        });
+        window
+            .update(cx, |app, _, cx| {
+                app.state.session_dialog = Some(SessionDialog::NewSession);
+                cx.notify();
+            })
+            .unwrap();
+        cx.simulate_keystrokes(window.into(), "escape");
+        window
+            .update(cx, |app, _, cx| {
+                assert_eq!(app.state.session_dialog, None);
+
+                app.state.interaction = Some(cardpeek_app::InteractionRequest {
+                    id: cardpeek_app::InteractionId::new("test-interaction"),
+                    kind: InteractionKind::TextInput {
+                        prompt: "Enter text".into(),
+                        default: None,
+                    },
+                });
+                app.sync_external_inputs(cx);
+                cx.notify();
+            })
+            .unwrap();
+        cx.simulate_keystrokes(window.into(), "escape");
+        window
+            .update(cx, |app, _, _| {
+                assert_eq!(app.state.interaction, None);
+                assert!(app.interaction.is_none());
+            })
+            .unwrap();
     }
 }
