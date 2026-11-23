@@ -23,7 +23,7 @@
 --
 
 local cp = require('cardpeek')
-local util = require('lib.util')
+local util = require('shared.lib.util')
 local function band(a,b) return a & b end
 local function bor(a,b) return a | b end
 local function rshift(a,b) return a >> b end
@@ -31,7 +31,7 @@ local function lshift(a,b) return a << b end
 local function set_attribute(node,name,value) if name~='size' then node:set(name=='alt' and 'alternative' or name=='val' and 'value' or name=='id' and 'identifier' or name,value) end return node end
 local function question(prompt) pcall(cp.ui.notice,prompt) end
 local function secret(prompt) local ok,value=pcall(cp.ui.secret,prompt); return ok and value or '' end
-local apdu = require('lib.apdu')
+local apdu = require('shared.lib.apdu')
 
 local CLA = 0xA0
 

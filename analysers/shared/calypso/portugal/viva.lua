@@ -29,9 +29,9 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 -- 
 --********************************************************************--
 
-local card_num = require('lib.calypso_card_num')
+local card_num = require('shared.calypso.card-number')
 
-local lisbon = require('etc.lisbon-network')
+local lisbon = require('shared.calypso.portugal.lisbon-network')
 
 SECONDS_DAY = 86400
 

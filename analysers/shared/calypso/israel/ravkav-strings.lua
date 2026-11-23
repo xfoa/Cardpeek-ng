@@ -522,10 +522,10 @@ RAVKAV_BUS_LOCATIONS = {
      --ERROR   backtrace: called from require()
      --ERROR   backtrace: called at calypso/c376.lua
      --ERROR   backtrace: called from dofile()
-     --ERROR   backtrace: called from calypso_process() in [string "calypso.lua"][255]
-     --ERROR   backtrace: called at [string "calypso.lua"]
+     --ERROR   backtrace: called from calypso_process() in [string "shared.calypso.lua"][255]
+     --ERROR   backtrace: called at [string "shared.calypso.lua"]
 
-     --require('etc.ravkav-strings') halts when the file is too big (3.5 MB)
+     --require('shared.calypso.israel.ravkav-strings') halts when the file is too big (3.5 MB)
 
      --for now use GTFS stops.txt
 

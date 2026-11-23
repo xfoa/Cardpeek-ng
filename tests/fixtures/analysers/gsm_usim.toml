@@ -11,4 +11,4 @@ retrieved_at = ""
 license = "GPL-3.0-or-later"
 contains_live_card_data = false
 sanitisation = "not-applicable"
-procedure = "Converted from temp/cardpeek/dot_cardpeek_dir/scripts/gsm_usim.lua; removed authentication and card lifecycle APIs; uses gsm-usim-synthetic-001.json"
+procedure = "Converted from the original Cardpeek GSM/USIM analyser; removed authentication and card lifecycle APIs; uses gsm-usim-synthetic-001.json"

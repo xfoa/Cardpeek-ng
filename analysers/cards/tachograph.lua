@@ -24,13 +24,13 @@
 --
 
 local cp = require('cardpeek')
-local util = require('lib.util')
+local util = require('shared.lib.util')
 local function band(a,b) return a & b end
 local function rshift(a,b) return a >> b end
 local function question(prompt,choices) if #choices==1 then pcall(cp.ui.notice,prompt); return 1 end local ok,answer=pcall(cp.ui.question,prompt); return ok and answer and 1 or #choices end
 local function select_file(prompt,_,name) local ok,value=pcall(cp.ui.file,prompt,false); return ok and value or nil,ok and value or nil end
 local function encoding_open(from) return { iconv=function(_,value) return cp.encoding.decode(from,cp.bytes.from_string(value)) end } end
-local apdu = require('lib.apdu')
+local apdu = require('shared.lib.apdu')
 local function legacy_set(node,name,value)
   local fields={val='value',alt='alternative',id='identifier',classname='class'}
   if name~='size' then node:set(fields[name] or name,value) end

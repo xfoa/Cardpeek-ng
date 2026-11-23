@@ -1,5 +1,5 @@
 local cp = require('cardpeek')
-local util = require('lib.util')
+local util = require('shared.lib.util')
 
 return function(root)
   local atr, failure = cp.card.atr()

@@ -9,8 +9,8 @@
 -- Licensed under GPL-3.0-or-later. See the project NOTICE.md.
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local apdu = require('lib.apdu')
+local util = require('shared.lib.util')
+local apdu = require('shared.lib.apdu')
 
 local function text(node)
   local data = node:get('value')

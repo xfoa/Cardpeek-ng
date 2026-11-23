@@ -115,7 +115,7 @@ impl AnalyserLibrary {
         discover(&self.root).map_err(LibraryError::from)
     }
 
-    /// Imports every valid Lua analyser directly inside a source directory.
+    /// Imports every valid Lua analyser from the source directory's `cards` subdirectory.
     ///
     /// # Errors
     ///
@@ -158,7 +158,7 @@ impl AnalyserLibrary {
             let file_name = source
                 .file_name()
                 .ok_or_else(|| LibraryError::InvalidSource(source.to_path_buf()))?;
-            let destination = self.root.join(file_name);
+            let destination = self.root.join("cards").join(file_name);
             if destination.exists() {
                 return Err(LibraryError::DestinationExists(destination));
             }
@@ -174,6 +174,12 @@ impl AnalyserLibrary {
         }
         let mut installed = Vec::with_capacity(imported.len());
         for (mut metadata, source, destination) in imported {
+            if let Some(parent) = destination.parent() {
+                fs::create_dir_all(parent).map_err(|source| LibraryError::Io {
+                    path: parent.to_path_buf(),
+                    source,
+                })?;
+            }
             fs::copy(source, &destination).map_err(|source| LibraryError::Io {
                 path: destination.clone(),
                 source,
@@ -208,8 +214,9 @@ mod tests {
     use super::*;
 
     fn write_analyser(directory: &Path, name: &str, id: &str) {
+        fs::create_dir_all(directory.join("cards")).unwrap();
         fs::write(
-            directory.join(name),
+            directory.join("cards").join(name),
             format!(
                 "-- @id {id}\n-- @title Test {id}\n-- @description Test analyser\n-- @version 1.0.0\n"
             ),
@@ -234,7 +241,8 @@ mod tests {
         let analyser_count = BUNDLED_ANALYSERS
             .iter()
             .filter(|(name, _)| {
-                !name.contains('/')
+                name.starts_with("cards/")
+                    && !name["cards/".len()..].contains('/')
                     && std::path::Path::new(name)
                         .extension()
                         .is_some_and(|extension| extension.eq_ignore_ascii_case("lua"))
@@ -246,6 +254,10 @@ mod tests {
             assert_eq!(fs::read_to_string(root.join(name)).unwrap(), *source);
         }
         for analyser in library.list().unwrap() {
+            assert_eq!(
+                analyser.path.file_stem().and_then(|name| name.to_str()),
+                Some(analyser.id.as_str())
+            );
             library.remove(&analyser.id).unwrap();
         }
         let reopened = AnalyserLibrary::at(&root).unwrap();
@@ -268,7 +280,7 @@ mod tests {
         assert_eq!(reopened.list().unwrap().len(), 2);
         assert_eq!(reopened.remove("one").unwrap().id, "one");
         assert_eq!(reopened.list().unwrap()[0].id, "two");
-        assert!(!root.join("one.lua").exists());
+        assert!(!root.join("cards/one.lua").exists());
     }
 
     #[test]
@@ -278,17 +290,17 @@ mod tests {
         fs::create_dir(&source).unwrap();
         write_analyser(&source, "replacement.lua", "one");
         let library = empty_library();
-        write_analyser(library.root(), "installed.lua", "one");
-        let original = fs::read(library.root().join("installed.lua")).unwrap();
+        write_analyser(library.root(), "one.lua", "one");
+        let original = fs::read(library.root().join("cards/one.lua")).unwrap();
         assert!(matches!(
             library.import_directory(&source),
             Err(LibraryError::DuplicateAnalyser(id)) if id == "one"
         ));
         assert_eq!(
-            fs::read(library.root().join("installed.lua")).unwrap(),
+            fs::read(library.root().join("cards/one.lua")).unwrap(),
             original
         );
-        assert!(!library.root().join("replacement.lua").exists());
+        assert!(!library.root().join("cards/replacement.lua").exists());
     }
 
     #[test]

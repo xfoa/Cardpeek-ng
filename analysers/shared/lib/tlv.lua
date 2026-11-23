@@ -1,9 +1,9 @@
 local cp = require('cardpeek')
-local util = require('lib.util')
+local util = require('shared.lib.util')
 
 local M = {}
-local country = require('lib.country_codes')
-local currency = require('lib.currency_codes')
+local country = require('shared.lib.country-codes')
+local currency = require('shared.lib.currency-codes')
 
 local function set_number(node, data)
   node:set('value', data)

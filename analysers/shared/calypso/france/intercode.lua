@@ -33,10 +33,10 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 --------------------------------------------------------------------------
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local en = require('lib.en1545')
+local util = require('shared.lib.util')
+local en = require('shared.lib.en1545')
 
-local card_num = require('lib.calypso_card_num')
+local card_num = require('shared.calypso.card-number')
 
 intercode_Contract = {}
 intercode_Contract_types = {} -- list of contract types (detected by BestContracts structure)

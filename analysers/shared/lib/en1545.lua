@@ -1,7 +1,7 @@
 local cp = require('cardpeek')
-local util = require('lib.util')
-local country = require('lib.country_codes')
-local networks = require('lib.network_codes')
+local util = require('shared.lib.util')
+local country = require('shared.lib.country-codes')
+local networks = require('shared.lib.network-codes')
 
 local M = {}
 local EPOCH = os.time({ hour = 0, min = 0, year = 1997, month = 1, sec = 0, day = 1 })

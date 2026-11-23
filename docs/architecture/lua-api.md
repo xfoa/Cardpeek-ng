@@ -20,7 +20,9 @@ Optional `@capabilities` values are `live`, `decode`, and `replay`.
 A decoder also declares `@capture-schema`.
 Discovery records these capabilities without executing Lua.
 Scripts without the new headers default to live collection and replay.
-The runtime provides explicit script and resource roots.
+Analyser entry points are directly inside the library's `cards/` directory.
+The library root is the Lua module and data-file root.
+Shared modules, card-family modules, and data files stay below `shared/`.
 Module loading and file access follow the trusted-script policy.
 The first release does not provide `dofile` compatibility behaviour.
 Each run receives fresh Lua state, fresh document identifiers, and stable sequential node identifiers.

@@ -1204,9 +1204,9 @@ fn offline_replay_missing_command_identifies_analyser_segment_and_command() {
         "cardpeek-replay-test-{}-{unique}",
         std::process::id()
     ));
-    std::fs::create_dir_all(&root).unwrap();
+    std::fs::create_dir_all(root.join("cards")).unwrap();
     std::fs::write(
-        root.join("missing.lua"),
+        root.join("cards/missing.lua"),
         "-- @id missing\n-- @title Missing\n-- @description Missing command\n-- @version 1\nlocal cp = require('cardpeek')\nlocal response, failure = cp.card.transmit(cp.bytes.from_hex('00C00000'))\nassert(failure == nil, failure and failure.message)\n",
     )
     .unwrap();

@@ -49,9 +49,9 @@ fn analysers() -> String {
 fn replay_waits_for_operations_with_more_than_128_events() {
     let directory = tempfile::tempdir().unwrap();
     let analysers = directory.path().join("analysers");
-    std::fs::create_dir(&analysers).unwrap();
+    std::fs::create_dir_all(analysers.join("cards")).unwrap();
     std::fs::write(
-        analysers.join("many.lua"),
+        analysers.join("cards/many.lua"),
         r"-- @id many
 -- @title Many exchanges
 -- @description Exercise long replay operations
@@ -303,13 +303,13 @@ fn manages_and_uses_the_platform_analyser_library() {
         .stdout(contains("atr"))
         .stdout(contains("gsm-usim"));
     let mut bundled = 0;
-    for source in std::fs::read_dir(analysers()).unwrap() {
+    for source in std::fs::read_dir(format!("{}/cards", analysers())).unwrap() {
         let source = source.unwrap().path();
         if source
             .extension()
             .is_some_and(|extension| extension == "lua")
         {
-            let destination = library.join(source.file_name().unwrap());
+            let destination = library.join("cards").join(source.file_name().unwrap());
             assert_eq!(
                 std::fs::read(destination).unwrap(),
                 std::fs::read(source).unwrap()
@@ -319,17 +319,18 @@ fn manages_and_uses_the_platform_analyser_library() {
     }
     assert!(bundled > 0);
     for resource in [
-        "lib/util.lua",
-        "lib/tlv.lua",
-        "calypso/c250.lua",
-        "etc/smartcard_list.txt",
+        "shared/lib/util.lua",
+        "shared/lib/tlv.lua",
+        "shared/calypso/france/intercode.lua",
+        "shared/data/smartcard_list.txt",
     ] {
         assert_eq!(
             std::fs::read(library.join(resource)).unwrap(),
             std::fs::read(std::path::Path::new(&analysers()).join(resource)).unwrap()
         );
     }
-    let custom = directory.path().join("custom.lua");
+    let custom = directory.path().join("cards/custom.lua");
+    std::fs::create_dir_all(custom.parent().unwrap()).unwrap();
     std::fs::write(
         &custom,
         "-- @id custom\n-- @title Custom\n-- @description Test import\n-- @version 1.0.0\n",
@@ -344,7 +345,7 @@ fn manages_and_uses_the_platform_analyser_library() {
         .assert()
         .success()
         .stdout(contains("Imported custom"));
-    assert!(library.join("custom.lua").is_file());
+    assert!(library.join("cards/custom.lua").is_file());
 
     let mut command = Command::cargo_bin("cardpeek").unwrap();
     command
@@ -378,8 +379,8 @@ fn manages_and_uses_the_platform_analyser_library() {
         .assert()
         .success()
         .stdout(contains("Removed atr"));
-    assert!(!library.join("atr.lua").exists());
-    assert!(library.join("gsm_usim.lua").is_file());
+    assert!(!library.join("cards/atr.lua").exists());
+    assert!(library.join("cards/gsm-usim.lua").is_file());
 
     let mut command = Command::cargo_bin("cardpeek").unwrap();
     command
@@ -388,7 +389,7 @@ fn manages_and_uses_the_platform_analyser_library() {
         .arg("list")
         .assert()
         .success();
-    assert!(!library.join("atr.lua").exists());
+    assert!(!library.join("cards/atr.lua").exists());
 }
 
 #[test]
@@ -401,7 +402,7 @@ fn replays_every_ported_analyser_against_synthetic_fixtures() {
         let resources = directory.path().join("analysers");
         copy_analyser_resources(&resources);
         if *analyser == "e-passport" {
-            let path = resources.join("e_passport.lua");
+            let path = resources.join("cards/e-passport.lua");
             let source = std::fs::read_to_string(&path).unwrap();
             let old = "local function prompt(prompt)\n  local ok, value = pcall(cp.ui.text, prompt, '')\n  return ok and value or ''\nend";
             let new = "local answers = { '123456789', '010101', '010101' }\nlocal function prompt(_) return table.remove(answers, 1) end";
@@ -439,14 +440,24 @@ fn calypso_family_modules_load_with_native_api() {
     -- @description Load all Calypso family modules
     -- @version 1.0.0
             local cp = require('cardpeek')
-            local modules = { 'c56n1', 'c131', 'c250', 'c250n502', 'c250n64', 'c250n901', 'c250n921', 'c376', 'c376n2' }
+            local modules = {
+              'shared.calypso.belgium.mobib',
+              'shared.calypso.portugal.viva',
+              'shared.calypso.france.intercode',
+              'shared.calypso.france.grenoble-tag',
+              'shared.calypso.france.montpellier-tam',
+              'shared.calypso.france.paris-navigo',
+              'shared.calypso.france.bordeaux-tbc',
+              'shared.calypso.israel.ravkav',
+              'shared.calypso.israel.ravkav-dan'
+            }
             for _, name in ipairs(modules) do
-              local ok, result = pcall(require, 'calypso.' .. name)
+              local ok, result = pcall(require, name)
               assert(ok, name .. ': ' .. tostring(result))
               assert(type(result) == 'function', name .. ' did not return a decoder')
             end
         ";
-    let path = resources.join("module_check.lua");
+    let path = resources.join("cards/module-check.lua");
     std::fs::write(&path, source).unwrap();
     let trace = directory.path().join("trace.json");
     std::fs::write(
@@ -478,7 +489,7 @@ fn ported_analysers_do_not_publish_authentication_secrets() {
     assert!(!passport.contains("123456789"));
     assert!(!passport.contains("010101"));
     let passport_source = std::fs::read_to_string(format!(
-        "{}/../../analysers/e_passport.lua",
+        "{}/../../analysers/cards/e-passport.lua",
         env!("CARGO_MANIFEST_DIR")
     ))
     .unwrap();

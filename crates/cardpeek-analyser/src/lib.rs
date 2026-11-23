@@ -53,10 +53,13 @@ pub struct AnalyserMetadata {
 }
 
 impl AnalyserMetadata {
-    /// Returns the directory used for analyser resources.
+    /// Returns the analyser library root used for modules and data files.
     #[must_use]
     pub fn resource_root(&self) -> &Path {
-        self.path.parent().unwrap_or_else(|| Path::new("."))
+        self.path
+            .parent()
+            .and_then(Path::parent)
+            .unwrap_or_else(|| Path::new("."))
     }
 }
 
@@ -95,21 +98,23 @@ pub enum DiscoveryError {
 
 /// Discovers Lua analysers without executing them.
 ///
-/// Only files directly inside `root` are examined. Metadata uses leading line
-/// comments: `@id`, `@title`, `@description`, and `@version`.
+/// Only Lua files directly inside the `cards` subdirectory are examined.
+/// Metadata uses leading line comments: `@id`, `@title`, `@description`, and
+/// `@version`.
 ///
 /// # Errors
 ///
 /// Returns an error when the directory or a Lua header cannot be read or validated.
 pub fn discover(root: &Path) -> Result<Vec<AnalyserMetadata>, DiscoveryError> {
-    let entries = fs::read_dir(root).map_err(|source| DiscoveryError::Io {
-        path: root.to_path_buf(),
+    let directory = root.join("cards");
+    let entries = fs::read_dir(&directory).map_err(|source| DiscoveryError::Io {
+        path: directory.clone(),
         source,
     })?;
     let mut paths = Vec::new();
     for entry in entries {
         let entry = entry.map_err(|source| DiscoveryError::Io {
-            path: root.to_path_buf(),
+            path: directory.clone(),
             source,
         })?;
         let path = entry.path();
@@ -424,5 +429,27 @@ mod tests {
     #[test]
     fn missing_metadata_is_rejected() {
         assert!(parse_metadata(Path::new("bad.lua"), "-- @id bad\n").is_err());
+    }
+
+    #[test]
+    fn discovery_uses_only_card_entry_points_and_library_resource_root() {
+        let directory = tempfile::tempdir().unwrap();
+        let root = directory.path();
+        fs::create_dir(root.join("cards")).unwrap();
+        fs::create_dir_all(root.join("shared/lib")).unwrap();
+        fs::write(
+            root.join("cards/example.lua"),
+            "-- @id example\n-- @title Example\n-- @description Example analyser\n-- @version 1\n",
+        )
+        .unwrap();
+        fs::write(
+            root.join("shared/lib/dependency.lua"),
+            "-- @id dependency\n-- @title Dependency\n-- @description Not an entry point\n-- @version 1\n",
+        )
+        .unwrap();
+        let discovered = discover(root).unwrap();
+        assert_eq!(discovered.len(), 1);
+        assert_eq!(discovered[0].id, "example");
+        assert_eq!(discovered[0].resource_root(), root);
     }
 }

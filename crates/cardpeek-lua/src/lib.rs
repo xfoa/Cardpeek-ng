@@ -1507,8 +1507,8 @@ mod tests {
             .as_nanos();
         let root =
             std::env::temp_dir().join(format!("cardpeek-lua-{}-{unique}", std::process::id()));
-        fs::create_dir_all(&root).unwrap();
-        let path = root.join("test.lua");
+        fs::create_dir_all(root.join("cards")).unwrap();
+        let path = root.join("cards/test.lua");
         fs::write(&path, source).unwrap();
         (
             ExecutionRequest {

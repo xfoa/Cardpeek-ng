@@ -27,10 +27,10 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 ---------------------------------------------------------------------
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local en = require('lib.en1545')
-require('etc.paris-metro')
-require('etc.paris-rer')
+local util = require('shared.lib.util')
+local en = require('shared.lib.en1545')
+require('shared.calypso.france.paris-metro')
+require('shared.calypso.france.paris-rer')
 
 SERVICE_PROVIDERS = {
   [2] = "SNCF",  

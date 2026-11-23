@@ -24,8 +24,8 @@
 
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local tlv = require('lib.tlv')
+local util = require('shared.lib.util')
+local tlv = require('shared.lib.tlv')
 local function band(a,b) return a & b end
 local function bxor(a,b) return a ~ b end
 local function rshift(a,b) return a >> b end
@@ -37,7 +37,7 @@ end
 local function parse_tlv(parent,data,reference) return tlv.parse(parent,data,reference) end
 local function notice(prompt) pcall(cp.ui.notice,prompt) end
 local function readline(prompt) return cp.ui.text(prompt,'') end
-local apdu = require('lib.apdu')
+local apdu = require('shared.lib.apdu')
 
 local SSC
 local KM_ENC

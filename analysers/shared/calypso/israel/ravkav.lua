@@ -21,23 +21,33 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 --
 --********************************************************************--
 --
--- This file, c376n2.lua, was authored and contributed to cardpeek by
--- Anthony Berkow (C) 2013
+-- This file is based on c376n2.lua, which was authored and contributed
+-- to cardpeek by Anthony Berkow (C) 2013
 --
 -- Some minor alterations of the original file were performed for
 -- integration with calypso.lua
 --
+-- Jan 2015:
+-- This file c376n3.lua was created to take into account some specific
+-- isses discovered with a new type of RavKav card with network id = 3
+-- and which does not return a FCI.
+-- This induced a change in RavKav_getRecordInfo()
+--
 -- 2017:
 -- Updated
+-- c376n3.lua moved to c376.lua to improve recognizability. All RavKav
+-- cards are interoperable across all c376 networks. Issuers except n2
+-- address file records by path/number/short EF instead of using FCI
+-- record identifiers. Per ISO 7816-4 sections 5.1.2, 5.1.3, 5.1.4, 5.1.5
 --
 --********************************************************************--
 
-require('lib.apdu')
-require('lib.tlv')
+require('shared.lib.apdu')
+require('shared.lib.tlv')
 
-require('lib.country_codes')
-local card_num = require('lib.calypso_card_num')
-require('etc.ravkav-strings')
+require('shared.lib.country-codes')
+local card_num = require('shared.calypso.card-number')
+require('shared.calypso.israel.ravkav-strings')
 
 --Classes
 ISO_CLS_STD     = 0x00  --Structure and coding of command and response according to ISO/IEC 7816 5.4.1 (plus optional secure messaging and logical channel)
@@ -156,6 +166,12 @@ function RavKav_getRecordInfo(ctx)
     if RECINFO_REF then
         numRecords = RavKav_getFieldAsNumber(RECINFO_REF, "Record count" )
         recordLen  = RavKav_getFieldAsNumber(RECINFO_REF, "Record size"  )
+    else
+        local iter
+        for iter in cp.nodes.find(ctx,{label="record"}) do
+            numRecords = numRecords + 1
+        end
+        recordLen = 29
     end
     return numRecords, recordLen
 end
@@ -429,7 +445,7 @@ function RavKav_parseGeneralInfo(APP_REF)
 	cp.log.debug( "Parsing general info (environment)...")
     local ENV_REF = cp.nodes.find_first(APP_REF, {label="Environment"})
     if ENV_REF then
-        local numRecords = RavKav_getRecordInfo(ENV_REF)
+        local numRecords = 2 -- RavKav_getRecordInfo(ENV_REF)
         local nRec
         for nRec = 1, numRecords do
             -- only the first record contains valid data

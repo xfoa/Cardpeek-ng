@@ -406,7 +406,7 @@ fn library_removal_refreshes_selection() {
     wait_for(&controller, &mut state, |state| {
         state.analysers.len() == 12 && state.selected_analyser.as_deref() == Some("belgian-eid")
     });
-    assert!(!library.root().join("atr.lua").exists());
+    assert!(!library.root().join("cards/atr.lua").exists());
 }
 
 #[test]

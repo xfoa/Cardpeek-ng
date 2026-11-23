@@ -24,13 +24,13 @@
 
 
 local cp = require('cardpeek')
-local util = require('lib.util')
+local util = require('shared.lib.util')
 local function band(a,b) return a & b end
 local function bxor(a,b) return a ~ b end
 local function rshift(a,b) return a >> b end
 local function convert(data,width) return data:convert(width) end
 local function last_atr() local atr,failure=cp.card.atr(); assert(not failure,failure and failure.message); return atr.bytes end
-local apdu = require('lib.apdu')
+local apdu = require('shared.lib.apdu')
 
 MIFARE_STD_KEYS= {
     ["default"] = {

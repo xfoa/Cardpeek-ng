@@ -29,8 +29,8 @@ Shared Lua modules and data files are bundled in new personal analyser libraries
 
 ## Create a first analyser
 
-Create a directory for local development.
-Add a file named `atr.lua` with this content:
+Create a `cards/` directory for local development.
+Add a file named `cards/atr.lua` with this content:
 
 ```lua
 -- Read the Answer to Reset (ATR).
@@ -112,7 +112,7 @@ Change `@capture-schema` when the capture layout becomes incompatible.
 Change `@version` for each analyser release.
 Offline decoding requires an exact match for the analyser identifier, version, and capture schema.
 
-Discovery examines only Lua files directly inside the selected directory.
+Discovery examines only Lua files directly inside the selected library's `cards/` directory.
 The library rejects duplicate identifiers and duplicate destination names.
 
 ## Select an execution model
@@ -160,7 +160,7 @@ The current card API exposes a source record identifier for ATR results.
 It does not expose a source record identifier in APDU responses.
 Every captured value must reference an existing trace record in the selected segment.
 
-The bundled [ATR analyser](../analysers/atr.lua) shows the complete pattern.
+The bundled [ATR analyser](../analysers/cards/atr.lua) shows the complete pattern.
 Its top-level condition also supports live execution through the CLI.
 Keep this fallback when a capture-capable analyser must support the CLI `run` command.
 The CLI `run` and `replay` commands execute the script at top level.
@@ -267,7 +267,7 @@ The `cardpeek.asn1` module provides `split`, `split_tag`, `split_length`, and `j
 Malformed or incomplete input returns `nil` values.
 `join` encodes a tag and an 8-bit value.
 
-The shared `lib.tlv` module builds labelled result trees from these values.
+The shared `shared.lib.tlv` module builds labelled result trees from these values.
 It is a native Lua module, not a legacy global.
 
 ### Cryptography
@@ -432,9 +432,12 @@ Never put a returned secret in a log or result document.
 
 ## Load local modules
 
-Lua module searches start in the directory that contains the analyser.
+The analyser library root is the module search root.
 The runtime searches for `?.lua` and `?/init.lua` below that directory.
-Keep module names relative to that directory.
+Keep dependencies in `shared/`.
+Use `shared/lib/` for shared modules, `shared/data/` for reference data, and a card-family directory for analyser-specific modules.
+Do not put dependencies in `cards/`.
+Discovery examines only entry points directly inside `cards/`.
 
 ```lua
 local codec = require("example_codec")
@@ -486,10 +489,12 @@ This method does not change the personal library.
 Install an analyser when it is ready for regular use:
 
 ```sh
-cargo run -p cardpeek-cli -- analysers import /path/to/analysers
+cargo run -p cardpeek-cli -- analysers import /path/to/analyser-library
 ```
 
-The import command examines Lua files directly inside the source directory.
+The import command examines Lua files directly inside the source directory's `cards/` subdirectory.
+It copies only selected entry points.
+Copy any required modules and data files separately.
 The desktop Library workspace can also import Lua files.
 The desktop application and CLI use the same personal library.
 
@@ -504,7 +509,7 @@ To update one, remove its identifier and import the new file:
 
 ```sh
 cargo run -p cardpeek-cli -- analysers remove atr-example
-cargo run -p cardpeek-cli -- analysers import /path/to/analysers
+cargo run -p cardpeek-cli -- analysers import /path/to/analyser-library
 ```
 
 A new personal library receives the bundled analysers.

@@ -51,7 +51,7 @@ enum Command {
     Analysers(AnalyserCommand),
     /// Discover analysers without executing their scripts.
     Discover {
-        /// Directory containing Lua analysers. Defaults to the user library.
+        /// Analyser library root. Defaults to the user library.
         analysers: Option<PathBuf>,
     },
     /// List native PC/SC readers and card-presence state.
@@ -73,7 +73,7 @@ enum Command {
     Run {
         /// Exact reader name from the readers command.
         reader: String,
-        /// Directory containing Lua analysers. Defaults to the user library.
+        /// Analyser library root. Defaults to the user library.
         #[arg(long)]
         analysers: Option<PathBuf>,
         /// Analyser identifier from static discovery.
@@ -92,7 +92,7 @@ enum Command {
     Replay {
         /// Native JSON trace to replay.
         trace: PathBuf,
-        /// Directory containing Lua analysers. Defaults to the user library.
+        /// Analyser library root. Defaults to the user library.
         #[arg(long)]
         analysers: Option<PathBuf>,
         /// Analyser identifier from static discovery.
@@ -109,7 +109,7 @@ enum AnalyserCommand {
     List,
     /// Import every Lua analyser directly inside a directory.
     Import {
-        /// Source directory containing Lua analysers.
+        /// Analyser library root with entry points in its cards directory.
         directory: PathBuf,
     },
     /// Remove an installed analyser by its stable identifier.

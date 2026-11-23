@@ -27,9 +27,9 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 ---------------------------------------------------------------------
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local en = require('lib.en1545')
-require('etc.gironde-transgironde')
+local util = require('shared.lib.util')
+local en = require('shared.lib.en1545')
+require('shared.calypso.france.bordeaux-lines')
 
 SERVICE_PROVIDERS = {
   [21] = "TBC",

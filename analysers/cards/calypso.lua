@@ -40,8 +40,8 @@ SEL_BY_LFI  = 2
 sel_method  = SEL_BY_LFI
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local apdu = require('lib.apdu')
+local util = require('shared.lib.util')
+local apdu = require('shared.lib.apdu')
 
 local function is_all(bs,byte)
 	local i,v
@@ -246,17 +246,35 @@ function calypso_process(cardenv)
 	end
 
 	country, network = calypso_guess_network(cardenv)
-	 if country then
-	   country = math.floor(country)
-	   network = network and math.floor(network) or nil
-    local ok, family = pcall(require, 'calypso.c' .. country)
-    if not ok then cp.log.error(family) end
-    if ok and type(family) == 'function' then family(cardenv) end
-    if network then
-      ok, family = pcall(require, 'calypso.c' .. country .. 'n' .. network)
-      if ok and type(family) == 'function' then family(cardenv) end
-    end
-  end
+	if country then
+		country = math.floor(country)
+		network = network and math.floor(network) or nil
+		local countries = {
+			[56] = 'shared.calypso.belgium.mobib',
+			[131] = 'shared.calypso.portugal.viva',
+			[250] = 'shared.calypso.france.intercode',
+			[376] = 'shared.calypso.israel.ravkav'
+		}
+		local networks = {
+			[250] = {
+				[64] = 'shared.calypso.france.montpellier-tam',
+				[502] = 'shared.calypso.france.grenoble-tag',
+				[901] = 'shared.calypso.france.paris-navigo',
+				[921] = 'shared.calypso.france.bordeaux-tbc'
+			},
+			[376] = {
+				[2] = 'shared.calypso.israel.ravkav-dan'
+			}
+		}
+		local ok, family = pcall(require, countries[country])
+		if not ok then cp.log.error(family) end
+		if ok and type(family) == 'function' then family(cardenv) end
+		if networks[country] and networks[country][network] then
+			ok, family = pcall(require, networks[country][network])
+			if not ok then cp.log.error(family) end
+			if ok and type(family) == 'function' then family(cardenv) end
+		end
+	end
 end
 
 local CARD = apdu.start('CALYPSO')

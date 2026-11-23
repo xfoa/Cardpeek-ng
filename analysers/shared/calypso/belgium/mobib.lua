@@ -28,11 +28,11 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local en = require('lib.en1545')
+local util = require('shared.lib.util')
+local en = require('shared.lib.en1545')
 
-require('etc.brussels-metro')
-require('etc.brussels-bus')
+require('shared.calypso.belgium.brussels-metro')
+require('shared.calypso.belgium.brussels-bus')
 
 function mobib_BIRTHDATE(source)
 	local source_digits = source:convert(4)

@@ -8,9 +8,9 @@
 -- Licensed under GPL-3.0-or-later. See the project NOTICE.md.
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local apdu = require('lib.apdu')
-local tlv = require('lib.tlv')
+local util = require('shared.lib.util')
+local apdu = require('shared.lib.apdu')
+local tlv = require('shared.lib.tlv')
 
 local printable = tlv.parsers.printable
 

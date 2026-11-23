@@ -32,10 +32,10 @@
 -- Nov 16 2014: Many improvements from Andrew Kozlic (Many new AIDs, parses AIP, GPO Format 1, AFLs, and more.)
 
 local cp = require('cardpeek')
-local util = require('lib.util')
-local apdu = require('lib.apdu')
-local tlv = require('lib.tlv')
-local currency = require('lib.currency_codes')
+local util = require('shared.lib.util')
+local apdu = require('shared.lib.apdu')
+local tlv = require('shared.lib.tlv')
+local currency = require('shared.lib.currency-codes')
 
 local tlv_types = { 'TLV (Universal)', 'TLV (Application-specific)', 'TLV (Context-specific)', 'TLV (Private)' }
 local function band(a,b) return a & b end
