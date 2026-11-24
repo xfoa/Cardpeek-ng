@@ -125,6 +125,7 @@ fn index_entries(source: &str) -> std::collections::HashMap<usize, Vec<Entry<'_>
     indexed
 }
 
+#[cfg(test)]
 fn identify_in<'a>(source: &'a str, atr: &[u8]) -> Option<&'a str> {
     identify_entries(index_entries(source).get(&atr.len())?, atr)
 }

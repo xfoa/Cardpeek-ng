@@ -1112,6 +1112,31 @@ impl App {
             )
     }
 
+    fn card_summary(&self, protocol: &'static str) -> Div {
+        div()
+            .flex()
+            .items_center()
+            .gap_4()
+            .pb_4()
+            .border_b_1()
+            .border_color(BORDER)
+            .child(smart_card())
+            .child(
+                div()
+                    .flex_1()
+                    .child("Current card")
+                    .child(note("Physical session details")),
+            )
+            .child(help_badge(
+                "help-protocol-badge",
+                protocol,
+                GREEN_DARK,
+                GREEN_SOFT,
+                help::PROTOCOL,
+                self.state.help_mode,
+            ))
+    }
+
     fn card_panel(&self, cx: &mut Context<'_, Self>) -> Div {
         let connected = self.state.connected();
         let Some(session) = self.state.session.as_ref().filter(|_| connected) else {
@@ -1133,30 +1158,7 @@ impl App {
             .child(panel_head("Current physical card", "CARD PRESENT"))
             .child(
                 panel_body()
-                    .child(
-                        div()
-                            .flex()
-                            .items_center()
-                            .gap_4()
-                            .pb_4()
-                            .border_b_1()
-                            .border_color(BORDER)
-                            .child(smart_card())
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .child("Current card")
-                                    .child(note("Physical session details")),
-                            )
-                            .child(help_badge(
-                                "help-protocol-badge",
-                                protocol,
-                                GREEN_DARK,
-                                GREEN_SOFT,
-                                help::PROTOCOL,
-                                self.state.help_mode,
-                            )),
-                    )
+                    .child(self.card_summary(protocol))
                     .child(self.card_detail_row(
                         "help-card-type",
                         "Card type",
