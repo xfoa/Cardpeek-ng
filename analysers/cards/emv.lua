@@ -34,8 +34,8 @@
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
 local apdu = require('shared.lib.apdu')
-local tlv = require('shared.lib.tlv')
-local currency = require('shared.lib.currency-codes')
+local tlv = require('cardpeek').tlv
+local currency = require('shared.data.currency-codes')
 
 local tlv_types = { 'TLV (Universal)', 'TLV (Application-specific)', 'TLV (Context-specific)', 'TLV (Private)' }
 local function band(a,b) return a & b end
@@ -76,7 +76,7 @@ local function warm_reset() local atr, failure = cp.card.reset('warm'); assert(n
 --------------------------------------------------------------------------
 
 function build_empty_pdol_data_block(pdol)
-    local data = util.bytes(8);
+    local data = cp.bytes.pack(8);
     local o_tag
     local o_len
 
@@ -86,23 +86,23 @@ function build_empty_pdol_data_block(pdol)
 
         if o_tag==0x9F66 and o_len==4 then
             --  Terminal Transaction Qualifiers (VISA)
-            data = util.concat(data, util.bytes(8, "30 00 00 00"))
+            data = cp.bytes.concat(data, cp.bytes.pack(8, "30 00 00 00"))
         elseif o_tag==0x9F1A and o_len==2 then
             -- Terminal country code
-            data = util.concat(data, util.bytes(8, "0250"))
+            data = cp.bytes.concat(data, cp.bytes.pack(8, "0250"))
         elseif o_tag==0x5F2A and o_len==2 then
             -- Transaction currency code
-            data = util.concat(data, util.bytes(8, "0978"))
+            data = cp.bytes.concat(data, cp.bytes.pack(8, "0978"))
         elseif o_tag==0x9A and o_len==3 then
             -- Transaction date
-            data = util.concat(data, util.bytes(8, os.date("%y%m%d")))
+            data = cp.bytes.concat(data, cp.bytes.pack(8, os.date("%y%m%d")))
         elseif o_tag==0x9F37 and o_len==4 then
             -- Unpredictable number
-            data = util.concat(data, util.bytes(8, "DEADBEEF"))
+            data = cp.bytes.concat(data, cp.bytes.pack(8, "DEADBEEF"))
         else
             -- When in doubt Zeroize
             while o_len > 0 do
-                data = util.concat(data, util.bytes(8, 0))
+                data = cp.bytes.concat(data, cp.bytes.pack(8, 0))
                 o_len = o_len-1 
             end
         end
@@ -115,29 +115,29 @@ local function get_processing_options(pdol)
     local pdol_data
     if pdol and #pdol>0 then
        pdol_data = build_empty_pdol_data_block(pdol)
-	   command = util.bytes(8,"80 A8 00 00",#pdol_data+2,0x83,#pdol_data,pdol_data,"00")
+	   command = cp.bytes.pack(8,"80 A8 00 00",#pdol_data+2,0x83,#pdol_data,pdol_data,"00")
 	else
-	   command = util.bytes(8,"80 A8 00 00 02 83 00 00")
+	   command = cp.bytes.pack(8,"80 A8 00 00 02 83 00 00")
 	end
 	return util.transmit(command)
 end
 
 -- override apdu.get_data() for EMV
 function apdu.get_data(data)
-        local command = util.bytes(8,"80 CA",band(rshift(data,8),0xFF),band(data,0xFF),0)
+        local command = cp.bytes.pack(8,"80 CA",band(rshift(data,8),0xFF),band(data,0xFF),0)
         return util.transmit(command)
 end
 
 -- override verify() for EMV plaintext PIN
 local function verify(pin)
         -- use 4 bit nibbles
-        local block = util.bytes(4, "00 20 00 80 08")
-        block = util.concat(block, util.bytes(4, 0x2, #pin, pin))
+        local block = cp.bytes.pack(4, "00 20 00 80 08")
+        block = cp.bytes.concat(block, cp.bytes.pack(4, 0x2, #pin, pin))
         while #block < 26 do
-            block = util.concat(block, util.bytes(4, 0xf))
+            block = cp.bytes.concat(block, cp.bytes.pack(4, 0xf))
         end
         -- convert to 8 bit for APDU processing
-        local command = util.bytes(8, tostring(block))
+        local command = cp.bytes.pack(8, tostring(block))
         return util.transmit(command)
 end
 
@@ -173,16 +173,16 @@ function ui_parse_CVM(node,data)
 	append_node(node,{	classname="item", 
 			      	label="X", 
 				size=4,
-				val=util.sub(data,0,3)})
+				val=cp.bytes.sub(data,0,3)})
 
 	append_node(node,{	classname="item", 
 				label="Y", 
 				size=4,
-				val=util.sub(data,4,7)})
+				val=cp.bytes.sub(data,4,7)})
 
 	for i= 4,(#data/2)-1 do
-		left = util.get(data,i*2)
-		right = util.get(data,i*2+1)
+		left = cp.bytes.get(data,i*2)
+		right = cp.bytes.get(data,i*2+1)
 
 		if left == 0 and right == 0 then
 			-- Amex pads the list with zeroes at the end
@@ -194,7 +194,7 @@ function ui_parse_CVM(node,data)
 						   label="CVM",
 						   id=i-3,
 						   size=2,
-						   val=util.sub(data,i*2,i*2+1)})
+						   val=cp.bytes.sub(data,i*2,i*2+1)})
 
 		if band(left,0x40) == 0x40 then
 			out = "Apply succeeding CV rule if this rule is unsuccessful: "
@@ -314,24 +314,24 @@ function ui_parse_AFL(node,data)
         ref = append_node(node,{ classname="item",
                                   label="Item",
                                   id=i/4 + 1,
-                                  val=util.sub(data,i,i+3),
+                                  val=cp.bytes.sub(data,i,i+3),
                                   size=4 })
         append_node(ref,{ classname="item",
                            label="Short File Identifier (SFI)",
                            id='88',
-                           val=rshift(util.get(data,i),3),
+                           val=rshift(cp.bytes.get(data,i),3),
                            size=1 })
         append_node(ref,{ classname="item",
                            label="First record",
-                           val=util.get(data,i+1),
+                           val=cp.bytes.get(data,i+1),
                            size=1 })
         append_node(ref,{ classname="item",
                            label="Last record",
-                           val=util.get(data,i+2),
+                           val=cp.bytes.get(data,i+2),
                            size=1 })
         append_node(ref,{ classname="item",
                            label="Number of records involved in offline data authentication",
-                           val=util.get(data,i+3),
+                           val=cp.bytes.get(data,i+3),
                            size=1 })
         
     end
@@ -711,7 +711,7 @@ function emv_process_pse(cardenv)
 	    rec = 1
 	    AID_LIST = {}
 	    repeat 
-            response = apdu.read_record(util.get(sfi,0),rec)
+            response = apdu.read_record(cp.bytes.get(sfi,0),rec)
         sw, resp = response.status, response.data
 	        if sw == 0x9000 then
 	            RECORD = append_node(FILE, {classname="record", label="record", id=tostring(rec)})
@@ -827,7 +827,7 @@ function emv_process_application_logs(application, log_sfi, log_max)
 						      size=log_items[i][2] })
 		     end
 
-		     data = util.sub(resp,item_pos,item_pos+log_items[i][2]-1)
+		     data = cp.bytes.sub(resp,item_pos,item_pos+log_items[i][2]-1)
 	             set_attribute(ITEM,"val",data)
 
 		     if log_items[i][1]==0x9F02 then
@@ -857,7 +857,7 @@ function emv_process_application(cardenv,aid)
 	local ref
 	local ref2
 	local pdol
-	local AFL = util.bytes(8);
+	local AFL = cp.bytes.pack(8);
 	local extra
 	local j -- counter
 	local tag_name
@@ -924,8 +924,8 @@ function emv_process_application(cardenv,aid)
 		elseif ref2 then
 		    -- Parse a Format 1 GET PROCESSING OPTIONS response message.
 		    AFL = get_attribute(ref2, "val")
-		    AIP = util.sub(AFL,0,1)
-		    AFL = util.sub(AFL,2)
+		    AIP = cp.bytes.sub(AFL,0,1)
+		    AFL = cp.bytes.sub(AFL,2)
             if find_first(GPO,{id="82"}) then 
 		        tlv.one(ref2, 0x82, AIP, EMV_REFERENCE)
 	        end
@@ -1042,15 +1042,15 @@ function emv_process_application(cardenv,aid)
 	-- Process Application File Locator
 	local AFL_info = {}
 	for i=0,#AFL-1,4 do 
-	    sfi_index=rshift(util.get(AFL,i),3)
+	    sfi_index=rshift(cp.bytes.get(AFL,i),3)
 	    if AFL_info[sfi_index] == nil then
-	       AFL_info[sfi_index] = {['max'] = util.get(AFL,i+2)}
+	       AFL_info[sfi_index] = {['max'] = cp.bytes.get(AFL,i+2)}
 	    else
-	       AFL_info[sfi_index]['max'] = math.max(util.get(AFL,i+2), AFL_info[sfi_index]['max'])
+	       AFL_info[sfi_index]['max'] = math.max(cp.bytes.get(AFL,i+2), AFL_info[sfi_index]['max'])
 	    end
-	    for j=util.get(AFL,i+1),util.get(AFL,i+2) do
+	    for j=cp.bytes.get(AFL,i+1),cp.bytes.get(AFL,i+2) do
 	        -- Include in offline data authentication.
-	        AFL_info[sfi_index][j] = AFL_info[sfi_index][j] or (j < util.get(AFL,i+1)+util.get(AFL,i+3))
+	        AFL_info[sfi_index][j] = AFL_info[sfi_index][j] or (j < cp.bytes.get(AFL,i+1)+cp.bytes.get(AFL,i+3))
 	    end
 	end
 
@@ -1065,7 +1065,7 @@ function emv_process_application(cardenv,aid)
 		   max_rec_index = math.max(max_rec_index, AFL_info[sfi_index]['max'])
 		end
 
-		if (logformat==nil or util.get(LOG,0)~=sfi_index) then
+		if (logformat==nil or cp.bytes.get(LOG,0)~=sfi_index) then
 
 	    		for rec_index=1,255 do
 				cp.log.info(string.format("Reading SFI %i, record %i",sfi_index, rec_index))
@@ -1099,9 +1099,9 @@ function emv_process_application(cardenv,aid)
 
 	-- Read logs if they exist
 	if logformat=="EMV" then
-           emv_process_application_logs(APP,util.get(LOG,0),util.get(LOG,1))
+           emv_process_application_logs(APP,cp.bytes.get(LOG,0),cp.bytes.get(LOG,1))
 	elseif logformat=="VISA" then
-	   visa_process_application_logs(APP,util.get(LOG,0),util.get(LOG,1))
+	   visa_process_application_logs(APP,cp.bytes.get(LOG,0),cp.bytes.get(LOG,1))
 	end
 
 
@@ -1207,7 +1207,7 @@ function emv_process_cplc(cardenv)
 	   pos = 0
 	   for i=1,#CPLC_DATA do
 	       ref2 = append_node(CPLC,{classname="item", label=CPLC_DATA[i][1], id=pos});
-	       tlv_value = util.sub(cplc_data,pos,pos+CPLC_DATA[i][2]-1)
+	       tlv_value = cp.bytes.sub(cplc_data,pos,pos+CPLC_DATA[i][2]-1)
                set_attribute(ref2,"val",tlv_value)
 	       tlv_ui_func = CPLC_DATA[i][3]
 	       if tlv_ui_func then

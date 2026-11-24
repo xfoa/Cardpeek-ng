@@ -43,9 +43,6 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 --********************************************************************--
 
 require('shared.lib.apdu')
-require('shared.lib.tlv')
-
-require('shared.lib.country-codes')
 local card_num = require('shared.calypso.card-number')
 require('shared.calypso.israel.ravkav-strings')
 
@@ -77,7 +74,7 @@ LID_LIST = {
 
 function ravkav_parse_serial_number(node,data)
 	legacy_set(node,"val", data)
-	legacy_set(node,"alt", string.format("%010d",util.number(data)))
+	legacy_set(node,"alt", string.format("%010d",cp.bytes.number(data)))
 end
 
 function ravkav_parse_ats(node,data)
@@ -188,9 +185,9 @@ end
 
 -- Note: this function can work with either bits or bytes depending on the data format
 function RavKav_parseBits(data, bitOffset, nBits, REC, a_label, func, a_id)
-	local valData = util.sub(data, bitOffset, bitOffset + nBits - 1)
+	local valData = cp.bytes.sub(data, bitOffset, bitOffset + nBits - 1)
 	local value = func(valData)
-	local intVal = util.number(valData)
+	local intVal = cp.bytes.number(valData)
 	local NEW_REF = nil
 	if REC then
 	    NEW_REF = append_node(REC, {classname="item", label=a_label, id=a_id, size=nBits })
@@ -202,13 +199,13 @@ end
 
 function RavKav_rkDaysToSeconds(dateDaysPart)
     bytes.pad_left(dateDaysPart, 32, 0)
-    return EPOCH + util.number(dateDaysPart) * 24 * 3600
+    return EPOCH + cp.bytes.number(dateDaysPart) * 24 * 3600
 end
 
 -- The bits in dateDaysPart have been inverted.
 function RavKav_rkInvertedDaysToSeconds(dateDaysPart)
     bytes.pad_left(dateDaysPart, 32, 0)
-    return EPOCH + bxor(util.number(dateDaysPart), 0x3fff) * 24 * 3600
+    return EPOCH + bxor(cp.bytes.number(dateDaysPart), 0x3fff) * 24 * 3600
 end
 
 -- Return the date (in seconds) corresponding to the last day of the month for the given date (in seconds).
@@ -241,81 +238,81 @@ function RavKav_INVERTED_DATE(source)
 end
 
 function RavKav_PERCENT(source)
-    return string.format("%u %%", util.number(source))
+    return string.format("%u %%", cp.bytes.number(source))
 end
 
 -- source is in BCD!
 function RavKav_COUNTRY(source)
-    local countryId = util.number(source)
+    local countryId = cp.bytes.number(source)
     countryId = tonumber(string.format("%X", countryId))
     return iso_country_code_name(countryId)
 end
 
 function RavKav_ISSUER(source)
-    local issuerId = util.number(source)
+    local issuerId = cp.bytes.number(source)
     local issuer = RAVKAV_ISSUERS[issuerId]
     if issuer then return issuer end
     return tostring(issuerId)
 end
 
 function RavKav_COMPANY(source)
-    local companyId = util.number(source)
+    local companyId = cp.bytes.number(source)
     local company = RAVKAV_COMPANIES[companyId]
     if company then return company end
     return tostring(companyId)
 end
 
 function RavKav_PROFILE(source)
-    local profileId = util.number(source)
+    local profileId = cp.bytes.number(source)
     local profile = RAVKAV_PROFILES[profileId]
     if profile then return profile end
     return tostring(profileId)
 end
 
 function RavKav_ROUTE(source)
-    local routeSystemId = util.number(source)
+    local routeSystemId = cp.bytes.number(source)
     local route = RAVKAV_ROUTES[routeSystemId]
     if route then return route end
     return tostring(routeSystemId)
 end
 
 function RavKav_LINE_TYPE(source)
-    local lineTypeId = util.number(source)
+    local lineTypeId = cp.bytes.number(source)
     local lineType = RAVKAV_LINE_TYPES[lineTypeId]
     if lineType then return lineType end
     return tostring(lineTypeId)
 end
 
 function RavKav_RAIL_LOCATION(source)
-    local railLocationId = util.number(source)
+    local railLocationId = cp.bytes.number(source)
     local railLocation = RAVKAV_RAIL_LOCATIONS[railLocationId]
     if railLocation then return railLocation end
     return tostring(railLocationId)
 end
 
 function RavKav_RAIL_LOCATION2(source)
-    local railLocation2Id = util.number(source)
+    local railLocation2Id = cp.bytes.number(source)
     local railLocation2 = RAVKAV_RAIL_LOCATIONS2[railLocation2Id]
     if railLocation2 then return railLocation2 end
     return tostring(railLocation2Id)
 end
 
 function RavKav_BUS_LOCATION(source)
-    local busLocationId = util.number(source)
+    local busLocationId = cp.bytes.number(source)
     local busLocation = RAVKAV_BUS_LOCATIONS[busLocationId]
     if busLocation then return busLocation end
     return tostring(busLocationId)
 end
 
 function RavKav_VALIDITY_TYPE(source)
-    local validityType = util.number(source)
+    local validityType = cp.bytes.number(source)
     local validity = RAVKAV_VALIDITY_TYPES[validityType]
     if validity then return validity end
     return tostring(validityType)
 end
 
 function RavKav_INTERCHANGE_AREA(source)
-    local interchangesAreaId = util.number(source)
+    local interchangesAreaId = cp.bytes.number(source)
     local interchangesArea = RAVKAV_INTERCHANGE_AREAS[interchangesAreaId]
     if interchangesArea then return interchangesArea end
     return tostring(interchangesAreaId)
@@ -323,7 +320,7 @@ end
 
 --Predefined contract IDs
 function RavKav_CONTRACT_TYPE(source)
-    local contractType = util.number(source)
+    local contractType = cp.bytes.number(source)
     local contract = RAVKAV_CONTRACT_TYPES[contractType]
     if contract then return contract end
     return tostring(contractType)
@@ -331,8 +328,8 @@ end
 
 -- Returns CSV list of which bits are set
 function RavKav_ZONES(source)
-    local zonesPart = util.sub(source, 0, 11) --12 bits
-    local zones = util.number(zonesPart)
+    local zonesPart = cp.bytes.sub(source, 0, 11) --12 bits
+    local zones = cp.bytes.number(zonesPart)
     local haveZones = false
     local zoneList = ""
     local i
@@ -380,7 +377,7 @@ end
 
 function RavKav_getFieldAsNumber(SRC_REF, label, id)
     local REF, data, text = RavKav_getField(SRC_REF, label, id)
-    if data then return util.number(data) end
+    if data then return cp.bytes.number(data) end
     return 0
 end
 
@@ -389,7 +386,7 @@ function RavKav_getFieldsAsNumberAry(SRC_REF, a_label, a_id)
     local ary = {}
     for node in cp.nodes.find(SRC_REF, { label=a_label, id=a_id }) do
         local data = legacy_get(node,"val")
-        if data then table.insert(ary, util.number(data)) end
+        if data then table.insert(ary, cp.bytes.number(data)) end
     end
     return ary
 end
@@ -792,7 +789,7 @@ function RavKav_parseContract(CONTRACTS_REF, nRec, counter)
             balance = string.format("%d trip(s)", counter)          --tripsRemaining
         end
 	    local NEW_REF = append_node(CONTRACT_REC_REF, {classname="item", label="Balance", size=24})
-        legacy_set(NEW_REF,"val", util.bytes(8, string.format("%06X", counter)))
+        legacy_set(NEW_REF,"val", cp.bytes.pack(8, string.format("%06X", counter)))
         legacy_set(NEW_REF,"alt", balance)
     end
 
@@ -842,7 +839,7 @@ function RavKav_parseContract(CONTRACTS_REF, nRec, counter)
                 local validUntilSeconds = RavKav_calculateMonthEnd(validFromSeconds, validMonths - 1)   --month end date
 
                 local NEW_REF = append_node(CONTRACT_REC_REF, {classname="item", label="Valid to", size=14}) --month end date
-                legacy_set(NEW_REF,"val", util.bytes(8, string.format("%04X", validUntilSeconds)))
+                legacy_set(NEW_REF,"val", cp.bytes.pack(8, string.format("%04X", validUntilSeconds)))
                 legacy_set(NEW_REF,"alt", os.date("%x", validUntilSeconds))
 
                 if contractValid then
@@ -853,7 +850,7 @@ function RavKav_parseContract(CONTRACTS_REF, nRec, counter)
 	            cp.log.debug( string.format("Contract[%d]: Valid until the end of the service", nRec))
 
                 local NEW_REF = append_node(CONTRACT_REC_REF, {classname="item", label="Valid to", size=2})
-                legacy_set(NEW_REF,"val", util.bytes(8, string.format("%01X", validUntilOption)))
+                legacy_set(NEW_REF,"val", cp.bytes.pack(8, string.format("%01X", validUntilOption)))
                 legacy_set(NEW_REF,"alt", "The end of the service (04:30 of next day)")
 
                 if contractValid then
@@ -867,7 +864,7 @@ function RavKav_parseContract(CONTRACTS_REF, nRec, counter)
             cp.log.debug( string.format("Contract[%d]: Validity cancelled", nRec))
 
             local NEW_REF = append_node(CONTRACT_REC_REF, {classname="item", label="Valid to", size=2})
-            legacy_set(NEW_REF,"val", util.bytes(8, string.format("%01X", validUntilOption)))
+            legacy_set(NEW_REF,"val", cp.bytes.pack(8, string.format("%01X", validUntilOption)))
             legacy_set(NEW_REF,"alt", "Validity cancelled")
         end
     end
@@ -940,10 +937,10 @@ function RavKav_parseContract(CONTRACTS_REF, nRec, counter)
 
     local cv_ref = append_node(CONTRACT_REC_REF, {classname="item", label="Contract valid", size=1})
     if contractValid then
-        legacy_set(cv_ref,"val", util.bytes(1, 1))
+        legacy_set(cv_ref,"val", cp.bytes.pack(1, 1))
         legacy_set(cv_ref,"alt", "True")
     else
-        legacy_set(cv_ref,"val", util.bytes(1, 0))
+        legacy_set(cv_ref,"val", cp.bytes.pack(1, 0))
         legacy_set(cv_ref,"alt", "False")
     end
 end
@@ -1101,7 +1098,7 @@ function RavKav_summariseEvent(EVENTS_REF, nRec, LT_REF)
     if 4 == eventType and 0 < contractId and 9 > contractId then    --is prevalidation
         local REF, data, debitedText = RavKav_getField(EVENT_REC_REF, "Debit amount")
         local debitAmount = 0
-        if data then debitAmount = util.number(data) end
+        if data then debitAmount = cp.bytes.number(data) end
         if 0 < debitAmount then
             if 1 ~= eventType then  --not an exit event
                 details = RAVKAV_EVENT_TYPES[eventType]
@@ -1118,7 +1115,7 @@ function RavKav_summariseEvent(EVENTS_REF, nRec, LT_REF)
     elseif 6 ~= eventType and 0 < contractId and 9 > contractId then     --not a transit trip
         local REF, data, debitedText = RavKav_getField(EVENT_REC_REF, "Debit amount")
         local debitAmount = 0
-        if data then debitAmount = util.number(data) end
+        if data then debitAmount = cp.bytes.number(data) end
         if 0 < debitAmount then
             if 1 ~= eventType then  --not an exit event
             details = RAVKAV_EVENT_TYPES[eventType]
@@ -1246,7 +1243,7 @@ function RavKav_summariseSpecialEvent(SPECIALEVENTS_REF, nRec, LT_REF)
     if 4 == eventType and 0 < contractId and 9 > contractId then    --is prevalidation
         local REF, data, debitedText = RavKav_getField(SPECIALEVENT_REC_REF, "Debit amount")
         local debitAmount = 0
-        if data then debitAmount = util.number(data) end
+        if data then debitAmount = cp.bytes.number(data) end
         if 0 < debitAmount then
             if 1 ~= eventType then  --not an exit event
                 details = RAVKAV_EVENT_TYPES[eventType]
@@ -1263,7 +1260,7 @@ function RavKav_summariseSpecialEvent(SPECIALEVENTS_REF, nRec, LT_REF)
     elseif 6 ~= eventType and 0 < contractId and 9 > contractId then     --not a transit trip
         local REF, data, debitedText = RavKav_getField(SPECIALEVENT_REC_REF, "Debit amount")
         local debitAmount = 0
-        if data then debitAmount = util.number(data) end
+        if data then debitAmount = cp.bytes.number(data) end
         if 0 < debitAmount then
             if 1 ~= eventType then  --not an exit event
             details = RAVKAV_EVENT_TYPES[eventType]
@@ -1359,7 +1356,7 @@ function RavKav_summariseContract(CONTRACTS_REF, nRec, VC_REF, IC_REF)
     if 0 < etta then
         local REF, data = RavKav_getField(CONTRACT_REC_REF, "Extended ticket type (ETT_B)")
         if data then
-            local ettb = util.number(data)
+            local ettb = cp.bytes.number(data)
             if RAVKAV_CONTRACT_DESCRIPTIONS[etta][ettb] then
                 RavKav_addTextNode(CTSUM_REF, "Type of contract", RAVKAV_CONTRACT_DESCRIPTIONS[etta][ettb])
             end

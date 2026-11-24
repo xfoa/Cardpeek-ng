@@ -142,14 +142,14 @@ LFI_LIST = {
 
 function calypso_select(ctx,desc,path,klass)
 	local path_parsed = util.file_path(path)
-	local lfi = util.sub(path_parsed,-2)
+	local lfi = cp.bytes.sub(path_parsed,-2)
 	local response, resp, sw
 	local r,item
 	local parent_node=ctx
 	local file_node=nil
 
 	if sel_method==SEL_BY_LFI then
-		response = apdu.select(util.format(lfi,"#%D"))
+		response = apdu.select(cp.bytes.format(lfi,"#%D"))
 		sw,resp = response.status,response.data
 	else
 		response = apdu.select(path)
@@ -158,7 +158,7 @@ function calypso_select(ctx,desc,path,klass)
 
 	if sw==0x9000 then
 		for r=0,(#path_parsed/2)-1 do
-			item = util.format(util.sub(path_parsed,r*2,r*2+1),"%D")
+			item = cp.bytes.format(cp.bytes.sub(path_parsed,r*2,r*2+1),"%D")
 
 			file_node = cp.nodes.find_first(parent_node,{id=item})
 			if file_node==nil then
@@ -188,19 +188,19 @@ function calypso_guess_network(cardenv)
 		if record_node then
 			data = record_node:get("value"):convert(1)
 			if #data > 36 then
-				local country_bin = util.sub(data,13,24)
-				local network_bin = util.sub(data,25,36)
-				local country_num = util.number(country_bin)
-				   local network_num = util.number(network_bin)
+				local country_bin = cp.bytes.sub(data,13,24)
+				local network_bin = cp.bytes.sub(data,25,36)
+				local country_num = cp.bytes.number(country_bin)
+				   local network_num = cp.bytes.number(network_bin)
 
 				if country_num==250 or country_num==56 or country_num==131 then
 					return country_num, network_num
 				end
 
-				country_bin = util.sub(data,3,14)
-                network_bin = util.sub(data,15,22)
-				country_num = util.number(country_bin)
-				   network_num = util.number(network_bin)
+				country_bin = cp.bytes.sub(data,3,14)
+                network_bin = cp.bytes.sub(data,15,22)
+				country_num = cp.bytes.number(country_bin)
+				   network_num = cp.bytes.number(network_bin)
 				if country_num==376 then
 					return 376,network_num
 				end

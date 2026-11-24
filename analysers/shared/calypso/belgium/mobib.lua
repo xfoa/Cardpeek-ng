@@ -29,21 +29,21 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
-local en = require('shared.lib.en1545')
+local en = require('cardpeek').en1545
 
 require('shared.calypso.belgium.brussels-metro')
 require('shared.calypso.belgium.brussels-bus')
 
 function mobib_BIRTHDATE(source)
 	local source_digits = source:convert(4)
-	local year   = tonumber(util.sub(source_digits,0,3):to_hex())
-	local month  = tonumber(util.sub(source_digits,4,5):to_hex())
-	local day    = tonumber(util.sub(source_digits,6,7):to_hex())
+	local year   = tonumber(cp.bytes.sub(source_digits,0,3):to_hex())
+	local month  = tonumber(cp.bytes.sub(source_digits,4,5):to_hex())
+	local day    = tonumber(cp.bytes.sub(source_digits,6,7):to_hex())
 	return os.date("%x",os.time({['year']=year,['month']=month,['day']=day}))
 end
 
 function mobib_GENDER(source)
-	local n = util.number(source)
+	local n = cp.bytes.number(source)
 	if n==1 then
 		return "Male"
 	elseif n==2 then
@@ -54,14 +54,14 @@ end
 
 function mobib_HOLDERNUMBER(source)
 	local source_digits = source:convert(4)
-	return  tostring(util.sub(source_digits,0,5)).."/"..
-		tostring(util.sub(source_digits,6,17)).."/"..
-		tostring(util.sub(source_digits,18,18))
+	return  tostring(cp.bytes.sub(source_digits,0,5)).."/"..
+		tostring(cp.bytes.sub(source_digits,6,17)).."/"..
+		tostring(cp.bytes.sub(source_digits,18,18))
 end
 
 
 function mobib_TRANSPORT_BUS(source)
-	local stationid = util.number(source)
+	local stationid = cp.bytes.number(source)
 	local retval = BRUSSELS_BUS[stationid]
 	if retval then
 		return retval
@@ -70,7 +70,7 @@ function mobib_TRANSPORT_BUS(source)
 end
 
 function mobib_TRANSPORT_METRO(source)
-	local stationid = util.number(source)
+	local stationid = cp.bytes.number(source)
 	local retval = BRUSSELS_METRO[stationid]
 	if retval then
 		return retval
@@ -79,7 +79,7 @@ function mobib_TRANSPORT_METRO(source)
 end
 
 function mobib_TRANSPORT(source)
-	local t = util.number(source)
+	local t = cp.bytes.number(source)
 	if t==0 then return "metro"
 	elseif t==7 then return "premetro"
 	elseif t==15 then return "bus"
@@ -89,7 +89,7 @@ function mobib_TRANSPORT(source)
 end
 
 function mobib_process_block(ref,label,beginp,endp,block,func)
-	local data = util.sub(block,beginp,endp)
+	local data = cp.bytes.sub(block,beginp,endp)
 	local res = func(data)
 	ref:append{ classname="item",
 	 	    label=label,

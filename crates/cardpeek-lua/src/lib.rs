@@ -1,5 +1,9 @@
 //! Lua analyser execution and `Cardpeek` NG APIs.
 
+mod binary;
+mod en1545;
+mod pace;
+mod tlv;
 use std::cell::{Cell, RefCell};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -212,11 +216,13 @@ fn install_common_modules<'scope, 'env: 'scope, S: EventSink>(
     provenance: Option<(String, String)>,
 ) -> LuaResult<()> {
     let module = lua.create_table()?;
-    module.set("bytes", bytes_module(lua)?)?;
+    module.set("bytes", binary::module(lua)?)?;
     module.set("nodes", nodes_module(lua, document, next_node, provenance)?)?;
     module.set("log", log_module(lua, scope, events)?)?;
     module.set("ui", ui_module(lua, scope, events)?)?;
     module.set("asn1", asn1_module(lua)?)?;
+    module.set("tlv", tlv::module(lua)?)?;
+    module.set("en1545", en1545::module(lua)?)?;
     module.set("crypto", crypto_module(lua)?)?;
     module.set("encoding", encoding_module(lua)?)?;
     let loaded: Table = lua.globals().get::<Table>("package")?.get("loaded")?;
@@ -395,6 +401,13 @@ fn asn1_join(tag: u32, value: &ByteString) -> Result<ByteString, CoreError> {
 
 fn crypto_module(lua: &Lua) -> LuaResult<Table> {
     let module = lua.create_table()?;
+    add_hash_crypto(lua, &module)?;
+    add_cipher_crypto(lua, &module)?;
+    add_pace_crypto(lua, &module)?;
+    Ok(module)
+}
+
+fn add_hash_crypto(lua: &Lua, module: &Table) -> LuaResult<()> {
     module.set(
         "sha1",
         lua.create_function(|_lua, input: AnyUserData| {
@@ -410,6 +423,10 @@ fn crypto_module(lua: &Lua) -> LuaResult<Table> {
             )))
         })?,
     )?;
+    Ok(())
+}
+
+fn add_cipher_crypto(lua: &Lua, module: &Table) -> LuaResult<()> {
     module.set(
         "des_ede3_cbc",
         lua.create_function(
@@ -440,7 +457,140 @@ fn crypto_module(lua: &Lua) -> LuaResult<Table> {
             Ok(LuaBytes(ByteString::from_bytes(iso9797_mac(&key, &input))))
         })?,
     )?;
-    Ok(module)
+    module.set(
+        "sha256",
+        lua.create_function(|_lua, input: AnyUserData| {
+            use sha2::{Digest, Sha256};
+            let input = crypto_bytes(&input, 0)?;
+            Ok(LuaBytes(ByteString::from_bytes(
+                Sha256::digest(&input).to_vec(),
+            )))
+        })?,
+    )?;
+    module.set(
+        "aes_cbc",
+        lua.create_function(
+            |_lua, (encrypt, key, iv, input): (bool, AnyUserData, AnyUserData, AnyUserData)| {
+                let key = crypto_bytes(&key, 32)?;
+                let iv = crypto_bytes(&iv, 16)?;
+                let mut input = crypto_bytes(&input, 0)?;
+                if !input.len().is_multiple_of(16) {
+                    return Err(LuaError::external(CoreError::InvalidDocument(
+                        "AES input must contain complete blocks".into(),
+                    )));
+                }
+                aes_cbc(encrypt, &key, &iv, &mut input);
+                let output = input;
+                Ok(LuaBytes(ByteString::from_bytes(output)))
+            },
+        )?,
+    )?;
+    module.set(
+        "aes_cmac",
+        lua.create_function(|_lua, (key, input): (AnyUserData, AnyUserData)| {
+            use cmac::{Cmac, Mac};
+            let key = crypto_bytes(&key, 32)?;
+            let input = crypto_bytes(&input, 0)?;
+            let mut mac = Cmac::<aes::Aes256>::new_from_slice(&key).map_err(LuaError::external)?;
+            mac.update(&input);
+            Ok(LuaBytes(ByteString::from_bytes(
+                mac.finalize().into_bytes().to_vec(),
+            )))
+        })?,
+    )?;
+    Ok(())
+}
+
+fn add_pace_crypto(lua: &Lua, module: &Table) -> LuaResult<()> {
+    module.set(
+        "pace_new",
+        lua.create_function(
+            |lua,
+             (credential, secret, mapping_scalar, ephemeral_scalar): (
+                String,
+                AnyUserData,
+                Option<AnyUserData>,
+                Option<AnyUserData>,
+            )| {
+                let secret = crypto_bytes(&secret, 0)?;
+                let mapping_scalar = mapping_scalar
+                    .as_ref()
+                    .map(|bytes| crypto_bytes(bytes, 48))
+                    .transpose()?;
+                let ephemeral_scalar = ephemeral_scalar
+                    .as_ref()
+                    .map(|bytes| crypto_bytes(bytes, 48))
+                    .transpose()?;
+                let session = pace::Session::new(
+                    &credential,
+                    &secret,
+                    mapping_scalar.as_deref(),
+                    ephemeral_scalar.as_deref(),
+                )
+                .map_err(LuaError::external)?;
+                lua.create_userdata(session)
+            },
+        )?,
+    )?;
+    module.set(
+        "pace_handshake",
+        lua.create_function(|lua, (session, response): (AnyUserData, Option<Table>)| {
+            let mut session = session.borrow_mut::<pace::Session>()?;
+            let response = response
+                .map(|response| {
+                    LuaResult::Ok((
+                        crypto_bytes(&response.get::<AnyUserData>("data")?, 0)?,
+                        response.get::<u16>("status")?,
+                    ))
+                })
+                .transpose()?;
+            let command = session.handshake(response).map_err(LuaError::external)?;
+            match command {
+                Some(command) => Ok(mlua::Value::UserData(
+                    lua.create_userdata(LuaBytes(ByteString::from_bytes(command)))?,
+                )),
+                None => Ok(mlua::Value::Nil),
+            }
+        })?,
+    )?;
+    module.set(
+        "pace_protect",
+        lua.create_function(|_lua, (session, command): (AnyUserData, AnyUserData)| {
+            let mut session = session.borrow_mut::<pace::Session>()?;
+            let command = crypto_bytes(&command, 0)?;
+            Ok(LuaBytes(ByteString::from_bytes(
+                session.protect(&command).map_err(LuaError::external)?,
+            )))
+        })?,
+    )?;
+    module.set(
+        "pace_unprotect",
+        lua.create_function(|lua, (session, response): (AnyUserData, AnyUserData)| {
+            let mut session = session.borrow_mut::<pace::Session>()?;
+            let response = crypto_bytes(&response, 0)?;
+            let (data, status) = session.unprotect(&response).map_err(LuaError::external)?;
+            let result = lua.create_table()?;
+            result.set("data", LuaBytes(ByteString::from_bytes(data)))?;
+            result.set("status", status)?;
+            Ok(result)
+        })?,
+    )?;
+    Ok(())
+}
+
+fn aes_cbc(encrypt: bool, key: &[u8], iv: &[u8], output: &mut [u8]) {
+    use cbc::cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit, block_padding::NoPadding};
+    if encrypt {
+        cbc::Encryptor::<aes::Aes256>::new_from_slices(key, iv)
+            .expect("validated AES parameters")
+            .encrypt_padded_mut::<NoPadding>(output, output.len())
+            .expect("complete AES blocks");
+    } else {
+        cbc::Decryptor::<aes::Aes256>::new_from_slices(key, iv)
+            .expect("validated AES parameters")
+            .decrypt_padded_mut::<NoPadding>(output)
+            .expect("complete AES blocks");
+    }
 }
 
 fn crypto_bytes(input: &AnyUserData, exact: usize) -> LuaResult<Vec<u8>> {
@@ -606,40 +756,6 @@ fn configure_module_path(lua: &Lua, root: &Path) -> LuaResult<()> {
         root.to_string_lossy()
     );
     package.set("path", path)
-}
-
-fn bytes_module(lua: &Lua) -> LuaResult<Table> {
-    let module = lua.create_table()?;
-    module.set(
-        "new",
-        lua.create_function(|_lua, (width, values): (u8, Vec<u8>)| {
-            Ok(LuaBytes::new(
-                ByteString::from_elements(width, values).map_err(LuaError::external)?,
-            ))
-        })?,
-    )?;
-    module.set(
-        "from_hex",
-        lua.create_function(|_lua, (input, width): (String, Option<u8>)| {
-            Ok(LuaBytes::new(
-                ByteString::from_hex(width.unwrap_or(8), &input).map_err(LuaError::external)?,
-            ))
-        })?,
-    )?;
-    module.set(
-        "from_string",
-        lua.create_function(|_lua, input: String| {
-            Ok(LuaBytes::new(ByteString::from_bytes(input.into_bytes())))
-        })?,
-    )?;
-    module.set(
-        "all",
-        lua.create_function(|_lua, (input, expected): (AnyUserData, u8)| {
-            let input = input.borrow::<LuaBytes>()?.0.clone();
-            Ok(!input.is_empty() && input.elements().iter().all(|value| *value == expected))
-        })?,
-    )?;
-    Ok(module)
 }
 
 #[derive(Clone, Debug)]
@@ -1623,6 +1739,29 @@ mod tests {
             assert(#cp.crypto.sha1(cp.bytes.from_string('abc')) == 20)
             assert(#cp.crypto.des_ede3_cbc(true, cp.bytes.from_hex('0123456789ABCDEFFEDCBA9876543210'), cp.bytes.from_hex('0000000000000000'), cp.bytes.from_hex('0000000000000000')) == 8)
             assert(#cp.crypto.iso9797_mac(cp.bytes.from_hex('0123456789ABCDEFFEDCBA9876543210'), cp.bytes.from_hex('00')) == 8)
+            local packed = cp.bytes.pack(8, '3B', 0, cp.bytes.from_hex('90'))
+            assert(packed:to_hex() == '3B0090')
+            assert(cp.bytes.sub(packed, -2):to_hex() == '0090')
+            assert(cp.bytes.number(cp.bytes.from_hex('0102')) == 258)
+            assert(cp.bytes.format(packed, '%w:%l:%D') == '8:3:3B0090')
+            assert(cp.bytes.printable(cp.bytes.from_string('ABC')))
+            assert(cp.bytes.reverse(cp.bytes.from_hex('0102')):to_hex() == '0201')
+            assert(cp.bytes.pad_left(cp.bytes.from_hex('01'), 2, 0):to_hex() == '0001')
+            assert(cp.bytes.pad_right(cp.bytes.from_hex('01'), 2, 0):to_hex() == '0100')
+            assert(cp.en1545.date(cp.bytes.new(1, {0,0,0,0,0,0,0,0,0,0,0,0,0,0})) == 'Wed 01/01/97')
+            assert(cp.en1545.time(cp.bytes.new(1, {0,0,0,0,0,0,1,1,1,1,0})) == '00:30')
+            local tlv_root = cp.nodes.root():append('card', 'TLV')
+            cp.tlv.parse(tlv_root, cp.bytes.from_hex('6F03840101'))
+            cp.tlv.parse(tlv_root, cp.bytes.from_hex('BF0C00'))
+            assert(cp.nodes.find_first(tlv_root, { id = '84' }):get('value'):to_hex() == '01')
+            local custom = cp.nodes.root():append('card', 'Custom')
+            cp.tlv.parse(custom, cp.bytes.from_hex('800141'), {
+                ['80'] = { 'Text', function(node, value)
+                    node:set('value', value)
+                    node:set('alternative', cp.bytes.format(value, '%P'))
+                end }
+            })
+            assert(custom:children()[1]:get('alternative') == 'A')
             assert(child:remove() and #root:children() == 0)
         ";
         let (request, root) = request(source);

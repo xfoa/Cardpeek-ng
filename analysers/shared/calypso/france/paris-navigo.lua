@@ -28,7 +28,7 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
-local en = require('shared.lib.en1545')
+local en = require('cardpeek').en1545
 require('shared.calypso.france.paris-metro')
 require('shared.calypso.france.paris-rer')
 
@@ -82,11 +82,11 @@ function navigo_process_events(cardenv,node_label)
 
 	    -- is it RATP or SNCF ?
 	    ref_node = record_node:find_first({label="EventServiceProvider"})
-	    service_provider_value = util.number(legacy_get(ref_node,"val"))
+	    service_provider_value = cp.bytes.number(legacy_get(ref_node,"val"))
 	    legacy_set(ref_node,"alt",SERVICE_PROVIDERS[service_provider_value])
 	    
 	    ref_node = record_node:find_first({label="EventCode"})
-	    code_value = util.number(legacy_get(ref_node,"val"))
+	    code_value = cp.bytes.number(legacy_get(ref_node,"val"))
 
 	    -- is it a bus, a tram, a metro, ... ?
 	    code_transport = rshift(code_value,4)
@@ -103,7 +103,7 @@ function navigo_process_events(cardenv,node_label)
 	    -- service_provider_value == RATP and code_transport in { metro, tram, train } ? 
 	    if (service_provider_value==3 or service_provider_value==2) and code_transport>=3 and code_transport<=5 then
 	       ref_node = record_node:find_first({label="EventLocationId"})
-	       location_id_value = util.number(legacy_get(ref_node,"val"))
+	       location_id_value = cp.bytes.number(legacy_get(ref_node,"val"))
 	       sector_id = rshift(location_id_value,9)
 	       station_id = band(rshift(location_id_value,4),0x1F)
 

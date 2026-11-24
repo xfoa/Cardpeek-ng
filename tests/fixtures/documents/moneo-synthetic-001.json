@@ -45,37 +45,19 @@
               "class": "item",
               "label": "File Control Information (FCI) Template",
               "identifier": "6F",
-              "children": [
-                {
-                  "id": "node-0005",
-                  "parent": "node-0004",
-                  "class": "card",
-                  "label": "Unparsed ASN1 data",
-                  "size_bits": 0,
-                  "value": {
-                    "kind": "bytes",
-                    "value": {
-                      "width": 8,
-                      "elements": []
-                    }
-                  },
-                  "alternative": "(error)",
-                  "children": [],
-                  "extensions": {}
-                }
-              ],
+              "children": [],
               "extensions": {}
             },
             {
-              "id": "node-0006",
+              "id": "node-0005",
               "parent": "node-0003",
               "class": "file",
               "label": "Rechargement rapide",
               "identifier": "08",
               "children": [
                 {
-                  "id": "node-0007",
-                  "parent": "node-0006",
+                  "id": "node-0006",
+                  "parent": "node-0005",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -97,15 +79,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0008",
+              "id": "node-0007",
               "parent": "node-0003",
               "class": "file",
               "label": "Numero de sequence de rechargement rapide",
               "identifier": "0A",
               "children": [
                 {
-                  "id": "node-0009",
-                  "parent": "node-0008",
+                  "id": "node-0008",
+                  "parent": "node-0007",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -128,15 +110,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0010",
+              "id": "node-0009",
               "parent": "node-0003",
               "class": "file",
               "label": "ICP",
               "identifier": "0C",
               "children": [
                 {
-                  "id": "node-0011",
-                  "parent": "node-0010",
+                  "id": "node-0010",
+                  "parent": "node-0009",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -158,15 +140,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0012",
+              "id": "node-0011",
               "parent": "node-0003",
               "class": "file",
               "label": "Identifiants",
               "identifier": "17",
               "children": [
                 {
-                  "id": "node-0013",
-                  "parent": "node-0012",
+                  "id": "node-0012",
+                  "parent": "node-0011",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -201,8 +183,8 @@
                   },
                   "children": [
                     {
-                      "id": "node-0014",
-                      "parent": "node-0013",
+                      "id": "node-0013",
+                      "parent": "node-0012",
                       "class": "item",
                       "label": "PAN",
                       "size_bits": 80,
@@ -229,8 +211,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0015",
-                      "parent": "node-0013",
+                      "id": "node-0014",
+                      "parent": "node-0012",
                       "class": "item",
                       "label": "Date d'expiration",
                       "size_bits": 16,
@@ -249,8 +231,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0016",
-                      "parent": "node-0013",
+                      "id": "node-0015",
+                      "parent": "node-0012",
                       "class": "item",
                       "label": "Date d'activation",
                       "size_bits": 24,
@@ -270,8 +252,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0017",
-                      "parent": "node-0013",
+                      "id": "node-0016",
+                      "parent": "node-0012",
                       "class": "item",
                       "label": "Code pays",
                       "size_bits": 16,
@@ -289,8 +271,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0018",
-                      "parent": "node-0013",
+                      "id": "node-0017",
+                      "parent": "node-0012",
                       "class": "item",
                       "label": "Code monnaie",
                       "size_bits": 24,
@@ -316,15 +298,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0019",
+              "id": "node-0018",
               "parent": "node-0003",
               "class": "file",
               "label": "Montants",
               "identifier": "18",
               "children": [
                 {
-                  "id": "node-0020",
-                  "parent": "node-0019",
+                  "id": "node-0019",
+                  "parent": "node-0018",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -348,8 +330,8 @@
                   },
                   "children": [
                     {
-                      "id": "node-0021",
-                      "parent": "node-0020",
+                      "id": "node-0020",
+                      "parent": "node-0019",
                       "class": "item",
                       "label": "Credit actuel",
                       "size_bits": 24,
@@ -369,8 +351,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0022",
-                      "parent": "node-0020",
+                      "id": "node-0021",
+                      "parent": "node-0019",
                       "class": "item",
                       "label": "Credit maximum",
                       "size_bits": 24,
@@ -390,8 +372,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0023",
-                      "parent": "node-0020",
+                      "id": "node-0022",
+                      "parent": "node-0019",
                       "class": "item",
                       "label": "Montant maximum de transaction",
                       "size_bits": 24,
@@ -417,15 +399,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0024",
+              "id": "node-0023",
               "parent": "node-0003",
               "class": "file",
               "label": "Type de porte-monnaie",
               "identifier": "19",
               "children": [
                 {
-                  "id": "node-0025",
-                  "parent": "node-0024",
+                  "id": "node-0024",
+                  "parent": "node-0023",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -447,15 +429,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0026",
+              "id": "node-0025",
               "parent": "node-0003",
               "class": "file",
               "label": "Numero de sequence de rechargement",
               "identifier": "1A",
               "children": [
                 {
-                  "id": "node-0027",
-                  "parent": "node-0026",
+                  "id": "node-0026",
+                  "parent": "node-0025",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -478,15 +460,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0028",
+              "id": "node-0027",
               "parent": "node-0003",
               "class": "file",
               "label": "Numero de sequence d'achat",
               "identifier": "1B",
               "children": [
                 {
-                  "id": "node-0029",
-                  "parent": "node-0028",
+                  "id": "node-0028",
+                  "parent": "node-0027",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -509,15 +491,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0030",
+              "id": "node-0029",
               "parent": "node-0003",
               "class": "file",
               "label": "Journal des rechargements",
               "identifier": "1C",
               "children": [
                 {
-                  "id": "node-0031",
-                  "parent": "node-0030",
+                  "id": "node-0030",
+                  "parent": "node-0029",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -576,8 +558,8 @@
                   },
                   "children": [
                     {
-                      "id": "node-0032",
-                      "parent": "node-0031",
+                      "id": "node-0031",
+                      "parent": "node-0030",
                       "class": "item",
                       "label": "Compteur de rechargements",
                       "size_bits": 16,
@@ -591,13 +573,13 @@
                           ]
                         }
                       },
-                      "alternative": "258.0",
+                      "alternative": "258",
                       "children": [],
                       "extensions": {}
                     },
                     {
-                      "id": "node-0033",
-                      "parent": "node-0031",
+                      "id": "node-0032",
+                      "parent": "node-0030",
                       "class": "item",
                       "label": "Montant de recharge",
                       "size_bits": 24,
@@ -617,8 +599,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0034",
-                      "parent": "node-0031",
+                      "id": "node-0033",
+                      "parent": "node-0030",
                       "class": "item",
                       "label": "Reste",
                       "size_bits": 24,
@@ -638,8 +620,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0035",
-                      "parent": "node-0031",
+                      "id": "node-0034",
+                      "parent": "node-0030",
                       "class": "item",
                       "label": "Terminal",
                       "size_bits": 64,
@@ -663,8 +645,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0036",
-                      "parent": "node-0031",
+                      "id": "node-0035",
+                      "parent": "node-0030",
                       "class": "item",
                       "label": "Date",
                       "size_bits": 56,
@@ -694,15 +676,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0037",
+              "id": "node-0036",
               "parent": "node-0003",
               "class": "file",
               "label": "Journal des achats",
               "identifier": "1D",
               "children": [
                 {
-                  "id": "node-0038",
-                  "parent": "node-0037",
+                  "id": "node-0037",
+                  "parent": "node-0036",
                   "class": "record",
                   "label": "record",
                   "identifier": "1",
@@ -761,8 +743,8 @@
                   },
                   "children": [
                     {
-                      "id": "node-0039",
-                      "parent": "node-0038",
+                      "id": "node-0038",
+                      "parent": "node-0037",
                       "class": "item",
                       "label": "Compteur d'achats",
                       "size_bits": 16,
@@ -776,13 +758,13 @@
                           ]
                         }
                       },
-                      "alternative": "258.0",
+                      "alternative": "258",
                       "children": [],
                       "extensions": {}
                     },
                     {
-                      "id": "node-0040",
-                      "parent": "node-0038",
+                      "id": "node-0039",
+                      "parent": "node-0037",
                       "class": "item",
                       "label": "Montant de la transaction",
                       "size_bits": 24,
@@ -802,8 +784,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0041",
-                      "parent": "node-0038",
+                      "id": "node-0040",
+                      "parent": "node-0037",
                       "class": "item",
                       "label": "Terminal",
                       "size_bits": 80,
@@ -829,8 +811,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0042",
-                      "parent": "node-0038",
+                      "id": "node-0041",
+                      "parent": "node-0037",
                       "class": "item",
                       "label": "Date",
                       "size_bits": 56,
@@ -854,8 +836,8 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0043",
-                      "parent": "node-0038",
+                      "id": "node-0042",
+                      "parent": "node-0037",
                       "class": "item",
                       "label": "Reste",
                       "size_bits": 24,

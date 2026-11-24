@@ -8,12 +8,13 @@
 -- April 2013 contributions by Darius Matboo.
 -- Licensed under GPL-3.0-or-later. See the project NOTICE.md.
 
+local cp = require('cardpeek')
 local util = require('shared.lib.util')
 local apdu = require('shared.lib.apdu')
-local tlv = require('shared.lib.tlv')
+local tlv = cp.tlv
 
 local function bcd(data, index)
-  local value = util.get(data, index)
+  local value = cp.bytes.get(data, index)
   if value == nil then error('truncated Moneo BCD field') end
   return tonumber(string.format('%x', value))
 end
@@ -32,38 +33,38 @@ local function date_time(data)
 end
 
 local function identifiers(node, data)
-  util.node(node, 'item', 'PAN', util.sub(data, 0, 9), util.sub(data, 0, 9):to_hex())
-  util.node(node, 'item', "Date d'expiration", util.sub(data, 10, 11),
+  util.node(node, 'item', 'PAN', cp.bytes.sub(data, 0, 9), cp.bytes.sub(data, 0, 9):to_hex())
+  util.node(node, 'item', "Date d'expiration", cp.bytes.sub(data, 10, 11),
     string.format('%d/%d', bcd(data, 11), bcd(data, 10) + 2000))
-  util.node(node, 'item', "Date d'activation", util.sub(data, 12, 14), date(util.sub(data, 12, 14)))
-  util.node(node, 'item', 'Code pays', util.sub(data, 15, 16))
-  util.node(node, 'item', 'Code monnaie', util.sub(data, 17, 19), util.format(util.sub(data, 17, 19), '%C'))
+  util.node(node, 'item', "Date d'activation", cp.bytes.sub(data, 12, 14), date(cp.bytes.sub(data, 12, 14)))
+  util.node(node, 'item', 'Code pays', cp.bytes.sub(data, 15, 16))
+  util.node(node, 'item', 'Code monnaie', cp.bytes.sub(data, 17, 19), cp.bytes.format(cp.bytes.sub(data, 17, 19), '%C'))
 end
 
 local function reload_journal(node, data)
-  util.node(node, 'item', 'Compteur de rechargements', util.sub(data, 1, 2), util.number(util.sub(data, 1, 2)))
-  util.node(node, 'item', 'Montant de recharge', util.sub(data, 4, 6), amount(util.sub(data, 4, 6)))
-  util.node(node, 'item', 'Reste', util.sub(data, 7, 9), amount(util.sub(data, 7, 9)))
-  util.node(node, 'item', 'Terminal', util.sub(data, 13, 20))
-  util.node(node, 'item', 'Date', util.sub(data, 24, 30), date_time(util.sub(data, 24, 30)))
+  util.node(node, 'item', 'Compteur de rechargements', cp.bytes.sub(data, 1, 2), cp.bytes.number(cp.bytes.sub(data, 1, 2)))
+  util.node(node, 'item', 'Montant de recharge', cp.bytes.sub(data, 4, 6), amount(cp.bytes.sub(data, 4, 6)))
+  util.node(node, 'item', 'Reste', cp.bytes.sub(data, 7, 9), amount(cp.bytes.sub(data, 7, 9)))
+  util.node(node, 'item', 'Terminal', cp.bytes.sub(data, 13, 20))
+  util.node(node, 'item', 'Date', cp.bytes.sub(data, 24, 30), date_time(cp.bytes.sub(data, 24, 30)))
 end
 
 local function purchase_journal(node, data)
-  util.node(node, 'item', "Compteur d'achats", util.sub(data, 1, 2), util.number(util.sub(data, 1, 2)))
-  util.node(node, 'item', 'Montant de la transaction', util.sub(data, 5, 7), amount(util.sub(data, 5, 7)))
-  util.node(node, 'item', 'Terminal', util.sub(data, 8, 17))
-  util.node(node, 'item', 'Date', util.sub(data, 29, 35), date_time(util.sub(data, 29, 35)))
-  util.node(node, 'item', 'Reste', util.sub(data, 26, 28), amount(util.sub(data, 26, 28)))
+  util.node(node, 'item', "Compteur d'achats", cp.bytes.sub(data, 1, 2), cp.bytes.number(cp.bytes.sub(data, 1, 2)))
+  util.node(node, 'item', 'Montant de la transaction', cp.bytes.sub(data, 5, 7), amount(cp.bytes.sub(data, 5, 7)))
+  util.node(node, 'item', 'Terminal', cp.bytes.sub(data, 8, 17))
+  util.node(node, 'item', 'Date', cp.bytes.sub(data, 29, 35), date_time(cp.bytes.sub(data, 29, 35)))
+  util.node(node, 'item', 'Reste', cp.bytes.sub(data, 26, 28), amount(cp.bytes.sub(data, 26, 28)))
 end
 
 local function amounts(node, data)
-  util.node(node, 'item', 'Credit actuel', util.sub(data, 0, 2), amount(util.sub(data, 0, 2)))
-  util.node(node, 'item', 'Credit maximum', util.sub(data, 3, 5), amount(util.sub(data, 3, 5)))
-  util.node(node, 'item', 'Montant maximum de transaction', util.sub(data, 6, 8), amount(util.sub(data, 6, 8)))
+  util.node(node, 'item', 'Credit actuel', cp.bytes.sub(data, 0, 2), amount(cp.bytes.sub(data, 0, 2)))
+  util.node(node, 'item', 'Credit maximum', cp.bytes.sub(data, 3, 5), amount(cp.bytes.sub(data, 3, 5)))
+  util.node(node, 'item', 'Montant maximum de transaction', cp.bytes.sub(data, 6, 8), amount(cp.bytes.sub(data, 6, 8)))
 end
 
 local function sequence_number(node, data)
-  node:set('alternative', string.format('%.0f', util.number(data)))
+  node:set('alternative', cp.bytes.number(data))
 end
 
 local FILES = {

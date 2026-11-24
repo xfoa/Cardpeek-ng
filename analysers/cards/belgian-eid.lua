@@ -10,7 +10,7 @@
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
 local apdu = require('shared.lib.apdu')
-local tlv = require('shared.lib.tlv')
+local tlv = require('cardpeek').tlv
 
 local printable = tlv.parsers.printable
 
@@ -91,7 +91,7 @@ local function load_files(parent, entries, path)
         restore_path(path)
       else
         local position = 0
-        local data = util.bytes(8)
+        local data = cp.bytes.pack(8)
         repeat
           response = apdu.read_binary(position, 0)
           data = data .. response.data

@@ -111,6 +111,12 @@ This crate embeds vendored Lua 5.4 through mlua.
 It implements the Cardpeek-ng Lua API.
 It does not provide Cardpeek globals, Lua 5.2 emulation, or compatibility shims.
 
+Native modules implement binary operations, ASN.1 encoding, TLV traversal, EN 1545 decoding, character encodings, cryptography, and PACE secure messaging.
+EN 1545 date and time decoding uses deterministic UTC calendar arithmetic.
+TLV traversal enforces a 64-level nesting limit.
+Integer conversion uses checked arithmetic and rejects values outside Lua's signed integer range.
+Lua analysers retain card-specific command sequences, tag metadata, display callbacks, and lookup data.
+
 Each analyser run receives:
 
 - A fresh Lua state.

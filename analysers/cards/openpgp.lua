@@ -20,7 +20,7 @@ end
 
 local function failure(parent, status, data)
   parent:set('value', 'unexpected response')
-  append(parent, 'item', 'status', util.bytes(8, (status >> 8) & 0xFF, status & 0xFF))
+  append(parent, 'item', 'status', cp.bytes.pack(8, (status >> 8) & 0xFF, status & 0xFF))
   append(parent, 'item', 'response', data)
 end
 
@@ -32,18 +32,18 @@ local function value(label, converter)
 end
 
 local function hex(label) return value(label) end
-local function integer(label) return value(label, function(data) return string.format('%.0f', util.number(data)) end) end
+local function integer(label) return value(label, function(data) return string.format('%.0f', cp.bytes.number(data)) end) end
 local function text(label)
   return value(label, function(data)
-    if util.printable(data) then return util.format(data, '%P') end
+    if cp.bytes.printable(data) then return cp.bytes.format(data, '%P') end
     return nil
   end)
 end
 local function timestamp(label)
-  return value(label, function(data) return os.date('!%Y-%m-%d %H:%M:%S UTC', util.number(data)) end)
+  return value(label, function(data) return os.date('!%Y-%m-%d %H:%M:%S UTC', cp.bytes.number(data)) end)
 end
 local function mapped(label, mapping)
-  return value(label, function(data) return mapping[util.number(data)] end)
+  return value(label, function(data) return mapping[cp.bytes.number(data)] end)
 end
 
 local function structure(label, renderer, suppress_data)
@@ -59,11 +59,11 @@ local function fixed_elements(elements)
     local offset = 0
     for _, element in ipairs(elements) do
       local length = element[1]
-      local part = util.sub(data, offset, offset + length - 1)
-      element[2](parent, part or util.bytes(8))
+      local part = cp.bytes.sub(data, offset, offset + length - 1)
+      element[2](parent, part or cp.bytes.pack(8))
       offset = offset + length
     end
-    local additional = util.sub(data, offset)
+    local additional = cp.bytes.sub(data, offset)
     if additional and #additional > 0 then append(parent, 'item', 'additional data', additional) end
   end
 end
@@ -100,25 +100,25 @@ local function compact_split(data)
   if #data == 0 then return nil end
   local first = data[1]
   local tag, length = first & 0xF0, first & 0x0F
-  return tag, util.sub(data, 1, length), util.sub(data, 1 + length)
+  return tag, cp.bytes.sub(data, 1, length), cp.bytes.sub(data, 1 + length)
 end
 
 local function bit_set(mask, label)
   return function(parent, data)
-    if #data > 0 and (data[1] & mask) == mask then append(parent, 'item', label, util.bytes(8, mask)) end
+    if #data > 0 and (data[1] & mask) == mask then append(parent, 'item', label, cp.bytes.pack(8, mask)) end
   end
 end
 
 local function bit_clear(mask, label)
   return function(parent, data)
-    if #data > 0 and (data[1] & mask) == 0 then append(parent, 'item', label, util.bytes(8, (~mask) & 0xFF)) end
+    if #data > 0 and (data[1] & mask) == 0 then append(parent, 'item', label, cp.bytes.pack(8, (~mask) & 0xFF)) end
   end
 end
 
 local function bit_hex(mask, label)
   return function(parent, data)
     local bits = #data > 0 and (data[1] & mask) or 0
-    if bits ~= 0 then append(parent, 'item', label, util.bytes(8, bits)) end
+    if bits ~= 0 then append(parent, 'item', label, cp.bytes.pack(8, bits)) end
   end
 end
 
@@ -149,9 +149,9 @@ local LIFE_STATUS = mapped('card life status', {
 
 local function historical_type_00(parent, data)
   if #data < 4 then return append(parent, 'item', 'Malformed historical bytes', data) end
-  HISTORICAL_ELEMENTS(parent, util.sub(data, 1, #data - 4) or util.bytes(8))
-  LIFE_STATUS(parent, util.sub(data, #data - 3, #data - 3))
-  append(parent, 'item', 'status bytes', util.sub(data, #data - 2, #data - 1))
+  HISTORICAL_ELEMENTS(parent, cp.bytes.sub(data, 1, #data - 4) or cp.bytes.pack(8))
+  LIFE_STATUS(parent, cp.bytes.sub(data, #data - 3, #data - 3))
+  append(parent, 'item', 'status bytes', cp.bytes.sub(data, #data - 2, #data - 1))
 end
 
 local HISTORICAL = structure('Historical Bytes', function(parent, data)

@@ -22,7 +22,7 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
-local en = require('shared.lib.en1545')
+local en = require('cardpeek').en1545
 
 SERVICE_PROVIDERS = {
   [5] = "TAM"
@@ -73,11 +73,11 @@ function process_events(cardenv,node_label)
 
         -- is it TAM?
         ref_node = record_node:find_first({label="EventServiceProvider"})
-        service_provider_value = util.number(legacy_get(ref_node,"val"))
+        service_provider_value = cp.bytes.number(legacy_get(ref_node,"val"))
         legacy_set(ref_node,"alt",SERVICE_PROVIDERS[service_provider_value])
 
         ref_node = record_node:find_first({label="EventCode"})
-        code_value = util.number(legacy_get(ref_node,"val"))
+        code_value = cp.bytes.number(legacy_get(ref_node,"val"))
 
         -- is it a bus, a tram, ...?
         code_transport = rshift(code_value,4)

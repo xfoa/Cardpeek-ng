@@ -1,0 +1,14 @@
+schema_version = 1
+fixture_id = "fineid-synthetic-001"
+description = "Synthetic fineid replay and expected document"
+origin = "synthetic"
+created_by = "Cardpeek-ng contributors"
+source_project = "Cardpeek-ng"
+source_url = "https://dvv.fi/en/fineid-specifications"
+source_revision = ""
+source_version = "fineid 1.0.0; FINEID S1 v4.2 and S4-1 v4.2"
+retrieved_at = "2026-11-24"
+license = "GPL-3.0-or-later"
+contains_live_card_data = false
+sanitisation = "not-applicable"
+generator = "Hand-authored ISO/IEC 7816-15 objects and a self-signed synthetic X.509 certificate"

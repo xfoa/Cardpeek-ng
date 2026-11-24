@@ -31,7 +31,7 @@ end
 
 function M.verify(pin, p1, p2)
   local data = cp.bytes.from_string(pin)
-  return util.transmit(util.bytes(8, 0, 0x20, p1 or 0, p2 or 0, #data, data))
+  return util.transmit(cp.bytes.pack(8, 0, 0x20, p1 or 0, p2 or 0, #data, data))
 end
 
 return M

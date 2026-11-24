@@ -8,11 +8,26 @@
 - Replay transport tests.
 - Native JSON document and trace round-trip tests.
 - Lua API tests.
+- Checked byte conversion and formatting tests.
+- Deterministic EN 1545 calendar tests.
+- TLV nesting, metadata, and custom decoder tests.
+- PACE handshake and secure-messaging tests.
 - Tests that Cardpeek globals and compatibility shims are absent.
 - Analyser integration tests with synthetic traces.
 - Command, event, cancellation, and interaction tests.
 - CLI snapshot tests.
 - Desktop application-state and workflow tests.
+
+Run the offline validation suite with:
+
+```sh
+cargo fmt --all --check
+cargo test --workspace --all-targets --locked
+cargo clippy --workspace --all-targets --locked -- -D warnings
+RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
+```
+
+These commands must complete without warnings treated as errors.
 
 ## Hardware tests
 

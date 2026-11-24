@@ -52,37 +52,19 @@
                   "elements": []
                 }
               },
-              "children": [
-                {
-                  "id": "node-0005",
-                  "parent": "node-0004",
-                  "class": "card",
-                  "label": "Unparsed ASN1 data",
-                  "size_bits": 0,
-                  "value": {
-                    "kind": "bytes",
-                    "value": {
-                      "width": 8,
-                      "elements": []
-                    }
-                  },
-                  "alternative": "(error)",
-                  "children": [],
-                  "extensions": {}
-                }
-              ],
+              "children": [],
               "extensions": {}
             },
             {
-              "id": "node-0006",
+              "id": "node-0005",
               "parent": "node-0003",
               "class": "file",
               "label": "POINTERS",
               "identifier": ".2001",
               "children": [
                 {
-                  "id": "node-0007",
-                  "parent": "node-0006",
+                  "id": "node-0006",
+                  "parent": "node-0005",
                   "class": "header",
                   "label": "answer to select",
                   "size_bits": 0,
@@ -93,50 +75,32 @@
                       "elements": []
                     }
                   },
-                  "children": [
-                    {
-                      "id": "node-0008",
-                      "parent": "node-0007",
-                      "class": "card",
-                      "label": "Unparsed ASN1 data",
-                      "size_bits": 0,
-                      "value": {
-                        "kind": "bytes",
-                        "value": {
-                          "width": 8,
-                          "elements": []
-                        }
-                      },
-                      "alternative": "(error)",
-                      "children": [],
-                      "extensions": {}
-                    }
-                  ],
+                  "children": [],
                   "extensions": {}
                 },
                 {
-                  "id": "node-0009",
-                  "parent": "node-0006",
+                  "id": "node-0007",
+                  "parent": "node-0005",
                   "class": "body",
                   "label": "content",
                   "children": [
                     {
-                      "id": "node-0010",
-                      "parent": "node-0009",
+                      "id": "node-0008",
+                      "parent": "node-0007",
                       "class": "item",
                       "label": "TLV (Private)",
                       "identifier": "E0",
                       "children": [
                         {
-                          "id": "node-0011",
-                          "parent": "node-0010",
+                          "id": "node-0009",
+                          "parent": "node-0008",
                           "class": "item",
                           "label": "TLV (Context-specific)",
                           "identifier": "A0",
                           "children": [
                             {
-                              "id": "node-0012",
-                              "parent": "node-0011",
+                              "id": "node-0010",
+                              "parent": "node-0009",
                               "class": "item",
                               "label": "TLV (Context-specific)",
                               "identifier": "82",
@@ -171,8 +135,8 @@
                           "extensions": {}
                         },
                         {
-                          "id": "node-0013",
-                          "parent": "node-0010",
+                          "id": "node-0011",
+                          "parent": "node-0008",
                           "class": "item",
                           "label": "TLV (Context-specific)",
                           "identifier": "80",
@@ -210,15 +174,15 @@
               "extensions": {}
             },
             {
-              "id": "node-0014",
+              "id": "node-0012",
               "parent": "node-0003",
               "class": "file",
               "label": "POINTERS",
               "identifier": ".2001",
               "children": [
                 {
-                  "id": "node-0015",
-                  "parent": "node-0014",
+                  "id": "node-0013",
+                  "parent": "node-0012",
                   "class": "header",
                   "label": "answer to select",
                   "size_bits": 0,
@@ -229,50 +193,32 @@
                       "elements": []
                     }
                   },
-                  "children": [
-                    {
-                      "id": "node-0016",
-                      "parent": "node-0015",
-                      "class": "card",
-                      "label": "Unparsed ASN1 data",
-                      "size_bits": 0,
-                      "value": {
-                        "kind": "bytes",
-                        "value": {
-                          "width": 8,
-                          "elements": []
-                        }
-                      },
-                      "alternative": "(error)",
-                      "children": [],
-                      "extensions": {}
-                    }
-                  ],
+                  "children": [],
                   "extensions": {}
                 },
                 {
-                  "id": "node-0017",
-                  "parent": "node-0014",
+                  "id": "node-0014",
+                  "parent": "node-0012",
                   "class": "body",
                   "label": "content",
                   "children": [
                     {
-                      "id": "node-0018",
-                      "parent": "node-0017",
+                      "id": "node-0015",
+                      "parent": "node-0014",
                       "class": "item",
                       "label": "TLV (Private)",
                       "identifier": "E0",
                       "children": [
                         {
-                          "id": "node-0019",
-                          "parent": "node-0018",
+                          "id": "node-0016",
+                          "parent": "node-0015",
                           "class": "item",
                           "label": "TLV (Context-specific)",
                           "identifier": "A0",
                           "children": [
                             {
-                              "id": "node-0020",
-                              "parent": "node-0019",
+                              "id": "node-0017",
+                              "parent": "node-0016",
                               "class": "item",
                               "label": "TLV (Context-specific)",
                               "identifier": "82",
@@ -307,8 +253,8 @@
                           "extensions": {}
                         },
                         {
-                          "id": "node-0021",
-                          "parent": "node-0018",
+                          "id": "node-0018",
+                          "parent": "node-0015",
                           "class": "item",
                           "label": "TLV (Context-specific)",
                           "identifier": "80",

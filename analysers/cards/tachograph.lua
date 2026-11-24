@@ -71,18 +71,18 @@ function tacho_select(fileid)
 end
 
 function tacho_perform_hash()
-    return util.transmit(util.bytes(8, "80 2A 90 00"))
+    return util.transmit(cp.bytes.pack(8, "80 2A 90 00"))
 end
 
 function tacho_compute_digital_signature()
-    return util.transmit(util.bytes(8, "00 2A 9E 9A 80"))
+    return util.transmit(cp.bytes.pack(8, "00 2A 9E 9A 80"))
 end
 
 function tacho_read_file(size)
     local pos=0
     local sw, resp, response
     local expected
-    local data = util.bytes(8)
+    local data = cp.bytes.pack(8)
     local progress = 0
 
     if size > 500 then
@@ -106,7 +106,7 @@ function tacho_read_file(size)
             cp.log.debug(string.format("Lecture du fichier: %.0f%%",100*pos/size))
         end
 
-        data = util.concat(data,resp)
+        data = cp.bytes.concat(data,resp)
         pos = pos + #resp
     end
     cp.log.debug("Lecture reussie");
@@ -291,22 +291,22 @@ function Tacho_NATION_NUMERIC(data,node)
 end
 
 function Tacho_DATE(data,node)
-    local time=util.number(data)
+    local time=cp.bytes.number(data)
     legacy_set(node,"alt",os.date("!%d/%m/%Y",time))
 end
 
 function Tacho_TIME(data,node)
-    local time=util.number(data)
+    local time=cp.bytes.number(data)
     legacy_set(node,"alt",os.date("!%H:%M:%S %d/%m/%Y",time))
 end
 
 function Tacho_TEXT(data,node)
-    legacy_set(node,"alt",util.format(data,"%P"))
+    legacy_set(node,"alt",cp.bytes.format(data,"%P"))
 end 
 
 function Tacho_TEXT_8859(data,node)
     if #data > 0 and data[1] > 0 then
-        local converted = cp.encoding.decode('ISO-8859-' .. data[1], util.sub(data, 1))
+        local converted = cp.encoding.decode('ISO-8859-' .. data[1], cp.bytes.sub(data, 1))
         legacy_set(node, 'alt', converted)
     elseif #data > 0 and data[1] == 0 then
         legacy_set(node, 'alt', '(empty)')
@@ -315,12 +315,12 @@ end
 
 function Tacho_DATEF(data,node)
     local digits = data:convert(4)
-    local value = util.sub(digits, 6, 7):to_hex() .. '/' .. util.sub(digits, 4, 5):to_hex() .. '/' .. util.sub(digits, 0, 3):to_hex()
+    local value = cp.bytes.sub(digits, 6, 7):to_hex() .. '/' .. cp.bytes.sub(digits, 4, 5):to_hex() .. '/' .. cp.bytes.sub(digits, 0, 3):to_hex()
     legacy_set(node, 'alt', value)
 end
 
 function Tacho_NUMERIC(data,node)
-    legacy_set(node,"alt",util.number(data))
+    legacy_set(node,"alt",cp.bytes.number(data))
 end
 
 function Tacho_REGION_NUMERIC(data,node)
@@ -329,9 +329,9 @@ end
 
 function Tacho_VEHICLE_RECORD_ADJUST(data,node)
     local parent =  node:parent()
-    local o_begin = util.number(legacy_get(parent:find_first({label='vehicleOdometerBegin'}), 'val'))
-    local o_end = util.number(legacy_get(parent:find_first({label='vehicleOdometerEnd'}), 'val'))
-    local v_date = util.number(legacy_get(parent:find_first({label='vehicleFirstUse'}), 'val'))
+    local o_begin = cp.bytes.number(legacy_get(parent:find_first({label='vehicleOdometerBegin'}), 'val'))
+    local o_end = cp.bytes.number(legacy_get(parent:find_first({label='vehicleOdometerEnd'}), 'val'))
+    local v_date = cp.bytes.number(legacy_get(parent:find_first({label='vehicleFirstUse'}), 'val'))
     local v_reg = legacy_get(parent:find_first({label='vehicleRegistrationNumber'}), 'alt')
     
     legacy_set(parent,"val", string.format("%s: %d km, %s", os.date("!%d/%m/%Y",v_date), o_end-o_begin, v_reg))
@@ -339,7 +339,7 @@ end
 
 function Tacho_ActivityChangeInfo(data,node)
     local summary
-    local time = band(util.number(data),0x07FF)
+    local time = band(cp.bytes.number(data),0x07FF)
     local sub_node = append_node(node,{  classname='record',
                                     label='Change', 
                                     id=string.format("%02u:%02u",time/60,time%60),
@@ -394,19 +394,19 @@ end
 
 function subpart(data,first,last)
     if first>=#data then
-        return util.sub(data,first-#data,last-#data)
+        return cp.bytes.sub(data,first-#data,last-#data)
     end
     if last<#data then
-        return util.sub(data,first,last)
+        return cp.bytes.sub(data,first,last)
     else
-        return util.sub(data,first,#data-1) .. util.sub(data,0,last-#data)
+        return cp.bytes.sub(data,first,#data-1) .. cp.bytes.sub(data,0,last-#data)
     end
 end
 
 function Tacho_ACTIVITY_RECORDS(data,node)
     local subnode
-    local newest = util.number(legacy_get(node:parent():find_first({label="activityPointerNewestRecord"}), 'val'))
-    local oldest = util.number(legacy_get(node:parent():find_first({label="activityPointerOldestDayRecord"}), 'val'))
+    local newest = cp.bytes.number(legacy_get(node:parent():find_first({label="activityPointerNewestRecord"}), 'val'))
+    local oldest = cp.bytes.number(legacy_get(node:parent():find_first({label="activityPointerOldestDayRecord"}), 'val'))
     local ptr = oldest
     local counter = 1
    
@@ -417,7 +417,7 @@ function Tacho_ACTIVITY_RECORDS(data,node)
     --print("oldest: "..oldest);
 
     while true do
-        local rec_len = util.number(subpart(data,ptr+2,ptr+3))
+        local rec_len = cp.bytes.number(subpart(data,ptr+2,ptr+3))
         local activity = subpart(data,ptr+12,ptr+rec_len-1)
         local subsub_node
         local cat_total = { 0, 0, 0, 0 }
@@ -425,7 +425,7 @@ function Tacho_ACTIVITY_RECORDS(data,node)
         local cur_time = 0 
         local old_time = 0
         local cat_cur = 0
-        local rec_date = os.date("!%d/%m/%Y", util.number(subpart(data,ptr+4,ptr+7)))
+        local rec_date = os.date("!%d/%m/%Y", cp.bytes.number(subpart(data,ptr+4,ptr+7)))
 
         subnode = append_node(node,{classname='record',label='CardActivityDailyRecord', size=rec_len, id=counter})
         append_node(subnode,{classname='item',
@@ -435,7 +435,7 @@ function Tacho_ACTIVITY_RECORDS(data,node)
         append_node(subnode,{classname='item',
                         label='activityPreviousRecordLength',
                         val=subpart(data,ptr,ptr+1),
-                        alt=util.number(subpart(data,ptr,ptr+1))})
+                        alt=cp.bytes.number(subpart(data,ptr,ptr+1))})
         append_node(subnode,{classname='item',
                         label='activityRecordDate',
                         val=subpart(data,ptr+4,ptr+7),
@@ -443,11 +443,11 @@ function Tacho_ACTIVITY_RECORDS(data,node)
         append_node(subnode,{classname='item',
                         label='dailyPresenceCounter',
                         val=subpart(data,ptr+8,ptr+9),
-                        alt=util.number(subpart(data,ptr+8,ptr+9)) })
+                        alt=cp.bytes.number(subpart(data,ptr+8,ptr+9)) })
         append_node(subnode,{classname='item',
                         label='activityDayDistance',
                         val=subpart(data,ptr+10,ptr+11),
-                        alt=util.number(subpart(data,ptr+10,ptr+11)) .. " km"})
+                        alt=cp.bytes.number(subpart(data,ptr+10,ptr+11)) .. " km"})
         subsub_node = append_node(subnode,{classname='record',
                         label='activityChangeInfo',
                         size=#activity,
@@ -455,7 +455,7 @@ function Tacho_ACTIVITY_RECORDS(data,node)
 
         if #activity>0 then
             for i=0,#activity-1,2 do
-                cur_time, cat_cur = Tacho_ActivityChangeInfo(util.sub(activity,i,i+1),subsub_node)
+                cur_time, cat_cur = Tacho_ActivityChangeInfo(cp.bytes.sub(activity,i,i+1),subsub_node)
                 if cat_ptr~=0 then
                     cat_total[cat_ptr] = cat_total[cat_ptr]+(cur_time-old_time)
                 end 
@@ -466,7 +466,7 @@ function Tacho_ACTIVITY_RECORDS(data,node)
             cat_total[cat_ptr]=cat_total[cat_ptr]+1440-cur_time
             legacy_set(subnode,"alt",string.format("%s: %d km\n  %dh%02d break, %dh%02d availability, %dh%02d work, %dh%02d drive",
                     rec_date,
-                    util.number(subpart(data,ptr+10,ptr+11)),
+                    cp.bytes.number(subpart(data,ptr+10,ptr+11)),
                     cat_total[1]/60,  cat_total[1]%60,
                     cat_total[2]/60,  cat_total[2]%60,
                     cat_total[3]/60,  cat_total[3]%60,
@@ -687,11 +687,11 @@ function tacho_map_ex(map, data, node)
                 end
              end 
         else
-            local data_sub = util.sub(data,0,count-1)
+            local data_sub = cp.bytes.sub(data,0,count-1)
             
             item = append_node(node,{label=v[1], classname=v[2], val=data_sub})
             if item == nil then error('nil tachograph node for ' .. tostring(v[1]) .. ' count ' .. tostring(count)) end
-            data = util.sub(data,count)
+            data = cp.bytes.sub(data,count)
 
             if type(v[4])=="function" then
                 v[4](data_sub,item)
@@ -718,14 +718,14 @@ function tacho_map(efname, data, node)
     end
 end
 
-local ddd = util.bytes(8)
+local ddd = cp.bytes.pack(8)
 
 function ddd_append_data(ef, data)
-    ddd = util.concat(ddd,ef,00,rshift(#data,8),band(#data,0xFF),data)
+    ddd = cp.bytes.concat(ddd,ef,00,rshift(#data,8),band(#data,0xFF),data)
 end
 
 function ddd_append_signature(ef, signature)
-    ddd = util.concat(ddd,ef,01,rshift(#signature,8),band(#signature,0xFF),signature)
+    ddd = cp.bytes.concat(ddd,ef,01,rshift(#signature,8),band(#signature,0xFF),signature)
 end
 
 function ddd_save(card)
@@ -885,17 +885,17 @@ do
 
         -- cleanup empty events:
         for node in cp.nodes.find(TACHO,{label='eventType'}) do
-            if util.get(legacy_get(node,"val"),0)==0 then
+            if cp.bytes.get(legacy_get(node,"val"),0)==0 then
                 node:parent():remove()
             end
         end
         for node in cp.nodes.find(TACHO,{label='faultType'}) do
-            if util.get(legacy_get(node,"val"),0)==0 then
+            if cp.bytes.get(legacy_get(node,"val"),0)==0 then
                 node:parent():remove()
             end
         end
         for node in cp.nodes.find(TACHO,{label='specificConditionType'}) do
-            if util.get(legacy_get(node,"val"),0)==0 then
+            if cp.bytes.get(legacy_get(node,"val"),0)==0 then
                 node:parent():remove()
             end
         end

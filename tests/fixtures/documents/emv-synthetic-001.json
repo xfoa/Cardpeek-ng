@@ -156,25 +156,7 @@
                       "class": "item",
                       "label": "FCI Issuer Discretionary Data",
                       "identifier": "BF0C",
-                      "children": [
-                        {
-                          "id": "node-0011",
-                          "parent": "node-0010",
-                          "class": "card",
-                          "label": "Unparsed ASN1 data",
-                          "size_bits": 0,
-                          "value": {
-                            "kind": "bytes",
-                            "value": {
-                              "width": 8,
-                              "elements": []
-                            }
-                          },
-                          "alternative": "(error)",
-                          "children": [],
-                          "extensions": {}
-                        }
-                      ],
+                      "children": [],
                       "extensions": {}
                     }
                   ],
@@ -187,15 +169,15 @@
           "extensions": {}
         },
         {
-          "id": "node-0012",
+          "id": "node-0011",
           "parent": "node-0001",
           "class": "application",
           "label": "application",
           "identifier": "#A0000000031010",
           "children": [
             {
-              "id": "node-0013",
-              "parent": "node-0012",
+              "id": "node-0012",
+              "parent": "node-0011",
               "class": "header",
               "label": "answer to select",
               "size_bits": 248,
@@ -240,15 +222,15 @@
               },
               "children": [
                 {
-                  "id": "node-0014",
-                  "parent": "node-0013",
+                  "id": "node-0013",
+                  "parent": "node-0012",
                   "class": "item",
                   "label": "File Control Information (FCI) Template",
                   "identifier": "6F",
                   "children": [
                     {
-                      "id": "node-0015",
-                      "parent": "node-0014",
+                      "id": "node-0014",
+                      "parent": "node-0013",
                       "class": "item",
                       "label": "Dedicated File (DF) Name",
                       "identifier": "84",
@@ -273,15 +255,15 @@
                       "extensions": {}
                     },
                     {
-                      "id": "node-0016",
-                      "parent": "node-0014",
+                      "id": "node-0015",
+                      "parent": "node-0013",
                       "class": "item",
                       "label": "FCI Proprietary Template",
                       "identifier": "A5",
                       "children": [
                         {
-                          "id": "node-0017",
-                          "parent": "node-0016",
+                          "id": "node-0016",
+                          "parent": "node-0015",
                           "class": "item",
                           "label": "Application Label",
                           "identifier": "50",
@@ -308,8 +290,8 @@
                           "extensions": {}
                         },
                         {
-                          "id": "node-0018",
-                          "parent": "node-0016",
+                          "id": "node-0017",
+                          "parent": "node-0015",
                           "class": "card",
                           "label": "Unparsed ASN1 data",
                           "size_bits": 24,
@@ -335,15 +317,15 @@
                   "extensions": {}
                 },
                 {
-                  "id": "node-0019",
-                  "parent": "node-0013",
+                  "id": "node-0018",
+                  "parent": "node-0012",
                   "class": "item",
                   "label": "TLV (Universal)",
                   "identifier": "38",
                   "children": [
                     {
-                      "id": "node-0020",
-                      "parent": "node-0019",
+                      "id": "node-0019",
+                      "parent": "node-0018",
                       "class": "card",
                       "label": "Unparsed ASN1 data",
                       "size_bits": 8,
@@ -364,8 +346,8 @@
                   "extensions": {}
                 },
                 {
-                  "id": "node-0021",
-                  "parent": "node-0013",
+                  "id": "node-0020",
+                  "parent": "node-0012",
                   "class": "card",
                   "label": "Unparsed ASN1 data",
                   "size_bits": 8,

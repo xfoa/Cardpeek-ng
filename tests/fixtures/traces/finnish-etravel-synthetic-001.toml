@@ -1,0 +1,14 @@
+schema_version = 1
+fixture_id = "finnish-etravel-synthetic-001"
+description = "Synthetic Finnish eTravel PACE replay and expected document"
+origin = "synthetic"
+created_by = "Cardpeek-ng contributors"
+source_project = "Cardpeek-ng"
+source_url = "https://dvv.fi/en/fineid-specifications"
+source_revision = ""
+source_version = "finnish-etravel 1.0.0; BSI TR-03110; ICAO Doc 9303"
+retrieved_at = "2026-11-24"
+license = "GPL-3.0-or-later"
+contains_live_card_data = false
+sanitisation = "not-applicable"
+generator = "tests/fixtures/generate_finnish_etravel.py with fixed synthetic scalars and CAN; no live card data"

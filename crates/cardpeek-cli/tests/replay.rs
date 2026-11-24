@@ -9,17 +9,23 @@ const GSM_USIM_EXPECTED: &str =
 
 const PORTED_FIXTURES: &[(&str, &str, &str)] = &[
     ("openpgp", "openpgp-synthetic-001", "Exported 41 nodes"),
-    ("emv", "emv-synthetic-001", "Exported 21 nodes"),
+    (
+        "finnish-etravel",
+        "finnish-etravel-synthetic-001",
+        "Exported 43 nodes",
+    ),
+    ("emv", "emv-synthetic-001", "Exported 20 nodes"),
     ("thai-eid", "thai-eid-synthetic-001", "Exported 28 nodes"),
-    ("moneo", "moneo-synthetic-001", "Exported 43 nodes"),
+    ("fineid", "fineid-synthetic-001", "Exported 53 nodes"),
+    ("moneo", "moneo-synthetic-001", "Exported 42 nodes"),
     ("mifare", "mifare-synthetic-001", "Exported 91 nodes"),
     (
         "belgian-eid",
         "belgian-eid-synthetic-001",
         "Exported 26 nodes",
     ),
-    ("vitale-2", "vitale-2-synthetic-001", "Exported 21 nodes"),
-    ("calypso", "calypso-synthetic-001", "Exported 224 nodes"),
+    ("vitale-2", "vitale-2-synthetic-001", "Exported 18 nodes"),
+    ("calypso", "calypso-synthetic-001", "Exported 239 nodes"),
     (
         "tachograph",
         "tachograph-synthetic-001",
@@ -123,7 +129,9 @@ fn discovers_analysers_without_executing_them() {
         .stdout(contains("belgian-eid"))
         .stdout(contains("calypso"))
         .stdout(contains("e-passport"))
+        .stdout(contains("finnish-etravel"))
         .stdout(contains("emv"))
+        .stdout(contains("fineid"))
         .stdout(contains("gsm-legacy"))
         .stdout(contains("gsm-usim"))
         .stdout(contains("mifare"))
@@ -320,7 +328,7 @@ fn manages_and_uses_the_platform_analyser_library() {
     assert!(bundled > 0);
     for resource in [
         "shared/lib/util.lua",
-        "shared/lib/tlv.lua",
+        "shared/data/country-codes.lua",
         "shared/calypso/france/intercode.lua",
         "shared/data/smartcard_list.txt",
     ] {
@@ -408,6 +416,19 @@ fn replays_every_ported_analyser_against_synthetic_fixtures() {
             let new = "local answers = { '123456789', '010101', '010101' }\nlocal function prompt(_) return table.remove(answers, 1) end";
             std::fs::write(&path, source.replace(old, new)).unwrap();
         }
+        if *analyser == "finnish-etravel" {
+            let path = resources.join("cards/finnish-etravel.lua");
+            let source = std::fs::read_to_string(&path).unwrap();
+            let old = "local function secret(prompt)\n  return cp.ui.secret(prompt) or ''\nend";
+            let new = "local function secret(_) return '123456' end\nlocal function scalar(value)\n  return cp.bytes.pack(8, string.rep('00', 47), string.format('%02X', value))\nend";
+            let source = source.replace(old, new);
+            let old = "local session = cp.crypto.pace_new(credential, cp.bytes.from_string(value))";
+            let new = "local session = cp.crypto.pace_new(credential, cp.bytes.from_string(value), scalar(3), scalar(4))";
+            let source = source.replace(old, new);
+            let old = "local method = cp.ui.question('Use CAN for PACE? Cancel to use the machine-readable zone.')";
+            let new = "local method = true";
+            std::fs::write(&path, source.replace(old, new)).unwrap();
+        }
 
         let output = directory.path().join("result.json");
         Command::cargo_bin("cardpeek")
@@ -427,6 +448,89 @@ fn replays_every_ported_analyser_against_synthetic_fixtures() {
             std::fs::read_to_string(fixture_path(&format!("documents/{fixture}.json"))).unwrap(),
             "unexpected document for {analyser}"
         );
+    }
+}
+
+#[test]
+fn fineid_retries_length_and_get_response_statuses() {
+    fn replay_variant(
+        records: &mut Vec<serde_json::Value>,
+        target: &str,
+        inserted: serde_json::Value,
+    ) {
+        let index = records
+            .iter()
+            .position(|record| record["id"] == target)
+            .unwrap();
+        let data = records[index]["response"]["data"].clone();
+        records[index]["response"]["status"] = inserted["status"].clone();
+        if inserted["command"][1] == 192 {
+            records[index]["response"]["data"] = serde_json::json!(data.as_array().unwrap()[..8]);
+        } else {
+            records[index]["response"]["data"] = serde_json::json!([]);
+        }
+        let mut response = inserted;
+        response.as_object_mut().unwrap().remove("status");
+        let response_data = if response["command"][1] == 192 {
+            serde_json::json!(data.as_array().unwrap()[8..])
+        } else {
+            data
+        };
+        response["response"] = serde_json::json!({ "data": response_data, "status": 0x9000 });
+        records.insert(index + 1, response);
+    }
+
+    let directory = tempfile::tempdir().unwrap();
+    for (name, target, inserted) in [
+        (
+            "length",
+            "record-0007",
+            serde_json::json!({
+                "id": "retry-length",
+                "kind": "command",
+                "command": [0, 176, 0, 0, 80],
+                "status": 0x6c50
+            }),
+        ),
+        (
+            "response",
+            "record-0011",
+            serde_json::json!({
+                "id": "get-response",
+                "kind": "command",
+                "command": [0, 192, 0, 0, 0],
+                "status": 0x6100
+            }),
+        ),
+    ] {
+        let mut trace: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/fixtures/traces/fineid-synthetic-001.json"
+        ))
+        .unwrap();
+        replay_variant(trace["records"].as_array_mut().unwrap(), target, inserted);
+        let trace_path = directory.path().join(format!("{name}.json"));
+        std::fs::write(&trace_path, serde_json::to_vec(&trace).unwrap()).unwrap();
+        let output = directory.path().join(format!("{name}-result.json"));
+        Command::cargo_bin("cardpeek")
+            .unwrap()
+            .arg("replay")
+            .arg(trace_path)
+            .arg("--analysers")
+            .arg(analysers())
+            .arg("fineid")
+            .arg("--output")
+            .arg(&output)
+            .assert()
+            .success();
+        let actual = std::fs::read_to_string(output).unwrap();
+        let actual: serde_json::Value = serde_json::from_str(&actual).unwrap();
+        let baseline: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(fixture("documents/fineid-synthetic-001.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(actual["id"], format!("doc-{name}"));
+        assert_eq!(actual["run_id"], format!("run-{name}"));
+        assert_eq!(actual["roots"], baseline["roots"]);
     }
 }
 

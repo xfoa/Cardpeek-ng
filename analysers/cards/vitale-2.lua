@@ -10,10 +10,10 @@
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
 local apdu = require('shared.lib.apdu')
-local tlv = require('shared.lib.tlv')
+local tlv = require('cardpeek').tlv
 
 local function ascii_date(node, data)
-  local value = util.format(data, '%P')
+  local value = cp.bytes.format(data, '%P')
   local time = os.time({ year = tonumber(value:sub(1, 4)), month = tonumber(value:sub(5, 6)), day = tonumber(value:sub(7, 8)) })
   node:set('value', data)
   node:set('alternative', os.date('%x', time))
@@ -33,7 +33,7 @@ local AID_VITALE = '#D250000002564954414C45'
 local AID_VITALE_MF = '#D2500000024D465F564954414C45'
 
 local function read_binary()
-  local data = util.bytes(8)
+  local data = cp.bytes.pack(8)
   local offset = 0
   repeat
     local response = apdu.read_binary(offset, 0)
@@ -60,19 +60,19 @@ local function create_card_map()
     local application_tag, application
     application_tag, application, applications = cp.asn1.split(applications)
     if application_tag == 0x82 and #application >= 4 then
-      local entry = util.sub(application, 0, 1):to_hex()
-      map[entry] = { aid = '#' .. util.sub(application, 4):to_hex(), files = {} }
+      local entry = cp.bytes.sub(application, 0, 1):to_hex()
+      map[entry] = { aid = '#' .. cp.bytes.sub(application, 4):to_hex(), files = {} }
     end
   end
   while descriptors do
     local descriptor_tag, descriptor
     descriptor_tag, descriptor, descriptors = cp.asn1.split(descriptors)
     if descriptor_tag == 0x80 and #descriptor >= 12 then
-      local entry = util.sub(descriptor, 8, 9):to_hex()
+      local entry = cp.bytes.sub(descriptor, 8, 9):to_hex()
       if map[entry] then
         table.insert(map[entry].files, {
-          name = util.format(util.sub(descriptor, 0, 7), '%P'),
-          id = '.' .. util.sub(descriptor, 10, 11):to_hex(),
+          name = cp.bytes.format(cp.bytes.sub(descriptor, 0, 7), '%P'),
+          id = '.' .. cp.bytes.sub(descriptor, 10, 11):to_hex(),
         })
       end
     end

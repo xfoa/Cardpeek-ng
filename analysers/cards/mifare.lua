@@ -44,7 +44,7 @@ MIFARE_STD_KEYS= {
 }
 
 function mifare_read_uid()
-	return util.transmit(util.bytes(8,"FF CA 00 00 00"))
+	return util.transmit(cp.bytes.pack(8,"FF CA 00 00 00"))
 end
 
 local USE_VOLATILE_MEM = true
@@ -52,7 +52,7 @@ local USE_VOLATILE_MEM = true
 function mifare_load_key(keynum,keyval,options)
     local command, response
 
-    local key = util.bytes(8,keyval)
+    local key = cp.bytes.pack(8,keyval)
 
     if options==nil then 
         if USE_VOLATILE_MEM then
@@ -70,7 +70,7 @@ function mifare_load_key(keynum,keyval,options)
         end
     end
 
-    command = util.bytes(8,"FF 82", options, keynum, #key, key)
+    command = cp.bytes.pack(8,"FF 82", options, keynum, #key, key)
 
     response = util.transmit(command)
 
@@ -78,11 +78,11 @@ function mifare_load_key(keynum,keyval,options)
 end
 
 function mifare_authenticate(addr,keynum,keytype)
-	return util.transmit(util.bytes(8,"FF 86 00 00 05 01",rshift(addr,8),band(addr,0xFF),keytype,keynum))
+	return util.transmit(cp.bytes.pack(8,"FF 86 00 00 05 01",rshift(addr,8),band(addr,0xFF),keytype,keynum))
 end
 
 function mifare_read_binary(addr,len)
-	return util.transmit(util.bytes(8,"FF B0",rshift(addr,8),band(addr,0xFF),len))
+	return util.transmit(cp.bytes.pack(8,"FF B0",rshift(addr,8),band(addr,0xFF),len))
 end
 
 function mifare_textify(node,data)
@@ -101,9 +101,9 @@ function mifare_textify(node,data)
 end
 
 function mifare_trailer(node,data)
-    local keyA = util.sub(data,0,5)
-    local perm = util.sub(data,6,9)
-    local keyB = util.sub(data,10,15)
+    local keyA = cp.bytes.sub(data,0,5)
+    local perm = cp.bytes.sub(data,6,9)
+    local keyB = cp.bytes.sub(data,10,15)
 
     r = "KeyA:(redacted) Access:" .. perm:to_hex() .. " keyB:(redacted)" 
     node:set("alternative",r)
@@ -165,7 +165,7 @@ function mifare_key_access(node, code)
 end
 
 function mifare_access_permission_get(tailer, block)
-    local access_bits = util.sub(tailer,6,9):convert(1)
+    local access_bits = cp.bytes.sub(tailer,6,9):convert(1)
     local access
     local ssecca 
 
@@ -208,7 +208,7 @@ function mifare_read_card(keys)
     local resp
     local sw
 
-    if util.get(atr,13)==0 and util.get(atr,14)==2 then
+    if cp.bytes.get(atr,13)==0 and cp.bytes.get(atr,14)==2 then
         mfdata['last_sector'] = 63
     else
         mfdata['last_sector'] = 15
@@ -265,7 +265,7 @@ function mifare_read_card(keys)
 
                     if sw == 0x9000 then
                         if block==3 then
-                            mfdata[sector*4+block] = util.concat(util.bytes(8,"000000000000"),util.sub(resp,6,9),util.bytes(8,"000000000000"))
+                            mfdata[sector*4+block] = cp.bytes.concat(cp.bytes.pack(8,"000000000000"),cp.bytes.sub(resp,6,9),cp.bytes.pack(8,"000000000000"))
                         else
                             mfdata[sector*4+block] = resp
                         end
@@ -370,11 +370,11 @@ end
 
 function mifare_display(root, mfdata, mfuid)
 
-    util.node(root, "block", "UID", mfuid, string.format("%.0f", util.number(mfuid)))
+    util.node(root, "block", "UID", mfuid, string.format("%.0f", cp.bytes.number(mfuid)))
 	
 	for sector=0,mfdata['last_sector'] do
         SECTOR = util.node(root, "record", "sector", nil, nil, sector)
-        -- SECTOR:append{ classname="item", label="access key", val=util.bytes(8,key) }
+        -- SECTOR:append{ classname="item", label="access key", val=cp.bytes.pack(8,key) }
         for block = 0,3 do
             local data = mfdata[sector*4+block]
             if data==nil then

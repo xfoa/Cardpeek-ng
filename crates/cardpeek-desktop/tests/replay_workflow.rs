@@ -484,11 +484,15 @@ fn library_removal_refreshes_selection() {
     let library = AnalyserLibrary::at(directories.path().join("analysers")).unwrap();
     let controller = Controller::new(DesktopBackend::new(None, None), library.clone());
     let mut state = DesktopState::default();
-    wait_for(&controller, &mut state, |state| state.analysers.len() == 13);
+    let bundled = cardpeek_analyser::discover(&analysers()).unwrap().len();
+    wait_for(&controller, &mut state, |state| {
+        state.analysers.len() == bundled
+    });
     state.selected_analyser = Some("atr".into());
     controller.remove_analyser(&mut state);
     wait_for(&controller, &mut state, |state| {
-        state.analysers.len() == 12 && state.selected_analyser.as_deref() == Some("belgian-eid")
+        state.analysers.len() == bundled - 1
+            && state.selected_analyser.as_deref() == Some("belgian-eid")
     });
     assert!(!library.root().join("cards/atr.lua").exists());
 }

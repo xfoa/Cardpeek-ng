@@ -218,6 +218,10 @@ mod tests {
             identify(&Atr::from_hex("3B391900534F4D414453333033").unwrap()),
             Some("Identity card of the Republic of Kazakhstan (passport)")
         );
+        assert_eq!(
+            identify(&Atr::from_hex("3B7F9600008031B865B085050011122460829000").unwrap()),
+            Some("Finnish Henkilokortti electronic identity card (FINEID S4-1 v4.0)")
+        );
         assert_eq!(identify(&Atr::from_hex("3B00").unwrap()), None);
     }
 }

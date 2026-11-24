@@ -20,10 +20,18 @@ license = "GPL-3.0-or-later"
 publish = false
 
 [workspace.dependencies]
+aes = "0.8.4"
+bp384 = { version = "0.14.0", default-features = false, features = ["arithmetic", "std"] }
 cbc = "0.1.2"
 cipher = "0.4.4"
 clap = { version = "4.5.51", features = ["derive"] }
+cmac = "0.7.2"
 des = "0.8.1"
+rand_core = "0.10.0"
+sha2 = "0.11.0"
+subtle = "2.6.0"
+zeroize = "1.8.2"
+getrandom = "0.4.3"
 directories = "6.0.0"
 encoding_rs = "0.8.35"
 gpui = "0.2.2"

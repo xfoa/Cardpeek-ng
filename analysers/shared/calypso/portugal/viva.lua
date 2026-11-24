@@ -54,13 +54,13 @@ function viva_CONTRACT_USED(source)
 end
 
 function viva_TRANSITION(source)
-	return TRANSITION_LIST[util.number(source)]
+	return TRANSITION_LIST[cp.bytes.number(source)]
 end
 
 local operator_num = nil
 local operator_info = nil
 function viva_OPERATOR(source)
-	operator_num = util.number(source)
+	operator_num = cp.bytes.number(source)
 	operator_info = LISBON_NETWORK[operator_num]
 	if operator_info==nil then
 		return "unknown"
@@ -70,7 +70,7 @@ function viva_OPERATOR(source)
 end
 
 function viva_CARD_NUM(source)
-	return string.format("%03d", operator_num) .. " " .. string.format("%09d", util.number(source))
+	return string.format("%03d", operator_num) .. " " .. string.format("%09d", cp.bytes.number(source))
 end
 
 local line_num = nil
@@ -80,9 +80,9 @@ function viva_LINE(source)
 		return "unknown"
 	else
 		if operator_num==16 then -- MTS
-			source = util.sub(source,12,15)
+			source = cp.bytes.sub(source,12,15)
 		end
-		line_num = util.number(source)
+		line_num = cp.bytes.number(source)
 		if operator_num==1 then -- Carris
 			line_info = nil
 			return line_num
@@ -105,9 +105,9 @@ function viva_STATION(source, node)
 		return "unknown"
 	else
 		if operator_num==2 then -- Metro Lisboa
-			source = util.sub(source,0,5)
+			source = cp.bytes.sub(source,0,5)
 		end
-		local station_num = util.number(source)
+		local station_num = cp.bytes.number(source)
 		if operator_num==3 and line_num==40960 then -- CP Sado/Cascais line
 			local line_node = node:parent():find_first({label="line"})
 			if station_num<=54 then
@@ -130,7 +130,7 @@ local contract_num = 0
 local is_zapping = {}
 function viva_PRODUCT(source)
 	is_zapping[contract_num] = false
-	product_num = util.number(source)
+	product_num = cp.bytes.number(source)
 	local ret = product_num
 	local op_info = LISBON_NETWORK[operator_num]
 	if op_info~=nil then
@@ -148,19 +148,19 @@ end
 
 local units
 function viva_PERIOD_UNITS(source)
-	units = util.number(source)
+	units = cp.bytes.number(source)
 	return PERIOD_UNITS[units]
 end
 
 local date_days
 -- Same as en.date, but the number of days is kept and reused in viva_VALIDITY
 function viva_DATE(source)
-	date_days = EPOCH+util.number(source)*24*3600
+	date_days = EPOCH+cp.bytes.number(source)*24*3600
 	return os.date("%a %x",date_days)
 end
 
 function viva_VALIDITY(source)
-	local validity = util.number(source)
+	local validity = cp.bytes.number(source)
 	local end_time
 	if units==266 then --months
 		end_time = date_days
@@ -180,7 +180,7 @@ end
 
 local combined_type
 function viva_COMBINED_TYPE(source)
-	combined_type = util.number(source)
+	combined_type = cp.bytes.number(source)
 	return nil
 end
 
@@ -188,7 +188,7 @@ function viva_OPERATOR1(source)
 	if operator_num~=30 or product_num==720 or product_num==725 then --Navegantes
 		return nil
 	end
-	local op_info = LISBON_NETWORK[util.number(source)]
+	local op_info = LISBON_NETWORK[cp.bytes.number(source)]
 	if op_info==nil then
 		return "unknown"
 	else
@@ -219,7 +219,7 @@ function viva_AMOUNT(source)
 end
 
 function viva_SALES_POINT(source)
-	local sales_point_num = util.number(source)
+	local sales_point_num = cp.bytes.number(source)
 	local sales_point_name = SALES_POINT[sales_point_num]
 	if sales_point_name~=nil then
 		return sales_point_name
@@ -244,9 +244,9 @@ if ok and answer then
   approved = response.status == 0x9000
 end
 if approved then
-  response = { status = 0x9000, data = util.bytes(8) }
+  response = { status = 0x9000, data = cp.bytes.pack(8) }
 else
-  response = { status = 0x6982, data = util.bytes(8) }
+  response = { status = 0x6982, data = cp.bytes.pack(8) }
 end
         sw, resp = response.status, response.data
 if sw==0x9000 then
@@ -255,7 +255,7 @@ if sw==0x9000 then
 	response = apdu.read_record(0,1,0x1D)
         sw, resp = response.status, response.data
 	if sw==0x9000 then
-	   local decoded = converter:iconv(util.format(util.sub(resp, 0, 20), '%P'))
+	   local decoded = converter:iconv(cp.bytes.format(cp.bytes.sub(resp, 0, 20), '%P'))
 	   util.node(cp.nodes.find_first(CARD,{label="ID"}), 'record', 'name', resp, decoded, '1')
 	end
 end

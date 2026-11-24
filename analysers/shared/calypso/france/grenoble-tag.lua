@@ -28,7 +28,7 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
-local en = require('shared.lib.en1545')
+local en = require('cardpeek').en1545
 require('shared.calypso.france.grenoble-tag-stops')
 require('shared.calypso.france.grenoble-tag-lines')
 
@@ -78,11 +78,11 @@ function navigo_process_events(ctx)
 	    if RECORD==nil then break end
 	    
 	    REF = cp.nodes.find_first(RECORD,"EventServiceProvider")
-	    service_provider_value = util.number(legacy_get(REF,"val"))
+	    service_provider_value = cp.bytes.number(legacy_get(REF,"val"))
 	    legacy_set(REF,"alt",SERVICE_PROVIDERS[service_provider_value])
 	    
 	    REF = cp.nodes.find_first(RECORD,"EventCode")
-	    code_value = util.number(legacy_get(REF,"val"))
+	    code_value = cp.bytes.number(legacy_get(REF,"val"))
 
 	    code_transport = rshift(code_value,4)
 	    code_transport_string  = TRANSPORT_LIST[code_transport]
@@ -96,7 +96,7 @@ function navigo_process_events(ctx)
 
 	    if service_provider_value == 3 and code_transport <=1 then
 	       REF = cp.nodes.find_first(RECORD,"EventLocationId")
-	       location_id_value = util.number(legacy_get(REF,"val"))
+	       location_id_value = cp.bytes.number(legacy_get(REF,"val"))
 --	       sector_id = rshift(location_id_value,9)
 --	       station_id = band(rshift(location_id_value,4),0x1F)
 
@@ -119,7 +119,7 @@ function navigo_process_events(ctx)
                legacy_set(REF,"alt",location_string)
 
 	     REF = cp.nodes.find_first(RECORD,"EventRouteNumber")
-	     route_number_value = util.number(legacy_get(REF,"val"))
+	     route_number_value = cp.bytes.number(legacy_get(REF,"val"))
 	     if LINES_LIST[route_number_value]["name"] then
 	     	route_string = LINES_LIST[route_number_value]["name"]
 	     else

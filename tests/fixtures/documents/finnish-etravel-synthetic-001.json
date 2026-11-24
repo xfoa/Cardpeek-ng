@@ -1,0 +1,1287 @@
+{
+  "schema_version": 1,
+  "id": "doc-finnish-etravel-synthetic-001",
+  "run_id": "run-finnish-etravel-synthetic-001",
+  "revision": 1,
+  "roots": [
+    {
+      "id": "node-0001",
+      "class": "card",
+      "label": "Finnish eTravel",
+      "children": [
+        {
+          "id": "node-0002",
+          "parent": "node-0001",
+          "class": "atr",
+          "label": "cold ATR",
+          "size_bits": 40,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                59,
+                127,
+                150,
+                0,
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "record": "record-0001",
+            "operation": "Cold reset"
+          },
+          "children": [],
+          "extensions": {}
+        },
+        {
+          "id": "node-0003",
+          "parent": "node-0001",
+          "class": "file",
+          "label": "EF.CardAccess",
+          "identifier": "011C",
+          "size_bits": 176,
+          "value": {
+            "kind": "bytes",
+            "value": {
+              "width": 8,
+              "elements": [
+                49,
+                20,
+                48,
+                18,
+                6,
+                10,
+                4,
+                0,
+                127,
+                0,
+                7,
+                2,
+                2,
+                4,
+                2,
+                4,
+                2,
+                1,
+                2,
+                128,
+                1,
+                13
+              ]
+            }
+          },
+          "children": [
+            {
+              "id": "node-0005",
+              "parent": "node-0003",
+              "class": "body",
+              "label": "Card access security information",
+              "children": [
+                {
+                  "id": "node-0006",
+                  "parent": "node-0005",
+                  "class": "item",
+                  "label": "Security infos",
+                  "identifier": "31",
+                  "children": [
+                    {
+                      "id": "node-0007",
+                      "parent": "node-0006",
+                      "class": "item",
+                      "label": "PACE info",
+                      "identifier": "30",
+                      "children": [
+                        {
+                          "id": "node-0008",
+                          "parent": "node-0007",
+                          "class": "item",
+                          "label": "Protocol",
+                          "identifier": "6",
+                          "size_bits": 80,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                4,
+                                0,
+                                127,
+                                0,
+                                7,
+                                2,
+                                2,
+                                4,
+                                2,
+                                4
+                              ]
+                            }
+                          },
+                          "alternative": "0.4.0.127.0.7.2.2.4.2.4",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0009",
+                          "parent": "node-0007",
+                          "class": "item",
+                          "label": "Version",
+                          "identifier": "2",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                2
+                              ]
+                            }
+                          },
+                          "alternative": "2",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0010",
+                          "parent": "node-0007",
+                          "class": "item",
+                          "label": "Parameter identifier",
+                          "identifier": "80",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                13
+                              ]
+                            }
+                          },
+                          "alternative": "13",
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        },
+        {
+          "id": "node-0004",
+          "parent": "node-0001",
+          "class": "application",
+          "label": "ICAO eTravel application",
+          "identifier": "A0000002471001",
+          "children": [
+            {
+              "id": "node-0011",
+              "parent": "node-0004",
+              "class": "item",
+              "label": "PACE authentication",
+              "alternative": "PACE-ECDH-GM-AES-CBC-CMAC-256, Brainpool P-384r1, CAN",
+              "children": [],
+              "extensions": {}
+            },
+            {
+              "id": "node-0012",
+              "parent": "node-0004",
+              "class": "file",
+              "label": "EF.DG1",
+              "identifier": "0101",
+              "size_bits": 928,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    97,
+                    114,
+                    92,
+                    8,
+                    1,
+                    1,
+                    1,
+                    2,
+                    1,
+                    14,
+                    1,
+                    29,
+                    95,
+                    31,
+                    101,
+                    73,
+                    68,
+                    70,
+                    73,
+                    78,
+                    88,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    49,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    48,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    48,
+                    48,
+                    48,
+                    49,
+                    48,
+                    49,
+                    50,
+                    70,
+                    51,
+                    48,
+                    48,
+                    49,
+                    48,
+                    49,
+                    56,
+                    70,
+                    73,
+                    78,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    48,
+                    83,
+                    80,
+                    69,
+                    67,
+                    73,
+                    77,
+                    69,
+                    78,
+                    60,
+                    60,
+                    80,
+                    69,
+                    82,
+                    83,
+                    79,
+                    78,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60,
+                    60
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0013",
+                  "parent": "node-0012",
+                  "class": "item",
+                  "label": "LDS1 eMRTD data group 1",
+                  "identifier": "61",
+                  "children": [
+                    {
+                      "id": "node-0014",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Data group tag list",
+                      "identifier": "5C",
+                      "size_bits": 64,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            1,
+                            1,
+                            1,
+                            2,
+                            1,
+                            14,
+                            1,
+                            29
+                          ]
+                        }
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0015",
+                      "parent": "node-0013",
+                      "class": "item",
+                      "label": "Machine readable zone",
+                      "identifier": "5F1F",
+                      "size_bits": 808,
+                      "value": {
+                        "kind": "bytes",
+                        "value": {
+                          "width": 8,
+                          "elements": [
+                            73,
+                            68,
+                            70,
+                            73,
+                            78,
+                            88,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            49,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            48,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            48,
+                            48,
+                            48,
+                            49,
+                            48,
+                            49,
+                            50,
+                            70,
+                            51,
+                            48,
+                            48,
+                            49,
+                            48,
+                            49,
+                            56,
+                            70,
+                            73,
+                            78,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            48,
+                            83,
+                            80,
+                            69,
+                            67,
+                            73,
+                            77,
+                            69,
+                            78,
+                            60,
+                            60,
+                            80,
+                            69,
+                            82,
+                            83,
+                            79,
+                            78,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60,
+                            60
+                          ]
+                        }
+                      },
+                      "alternative": "IDFINX00000000100000000000000<<<<<<<<<<<<<<0001012F3001018FIN<<<<<<<<<<<0SPECIMEN<<PERSON<<<<<<<<<<<<",
+                      "children": [],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0016",
+              "parent": "node-0004",
+              "class": "file",
+              "label": "EF.DG2",
+              "identifier": "0102",
+              "size_bits": 704,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    117,
+                    86,
+                    127,
+                    97,
+                    83,
+                    2,
+                    1,
+                    1,
+                    127,
+                    96,
+                    77,
+                    161,
+                    4,
+                    128,
+                    2,
+                    1,
+                    1,
+                    95,
+                    46,
+                    68,
+                    70,
+                    65,
+                    67,
+                    0,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    68,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    54,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    255,
+                    216,
+                    255,
+                    224,
+                    0,
+                    16,
+                    74,
+                    70,
+                    73,
+                    70,
+                    0,
+                    1,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1,
+                    0,
+                    0,
+                    255,
+                    217
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0017",
+                  "parent": "node-0016",
+                  "class": "item",
+                  "label": "Biometric instance count",
+                  "size_bits": 8,
+                  "value": {
+                    "kind": "text",
+                    "value": "1"
+                  },
+                  "children": [],
+                  "extensions": {}
+                },
+                {
+                  "id": "node-0018",
+                  "parent": "node-0016",
+                  "class": "body",
+                  "label": "Facial biometric data",
+                  "size_bits": 544,
+                  "value": {
+                    "kind": "bytes",
+                    "value": {
+                      "width": 8,
+                      "elements": [
+                        70,
+                        65,
+                        67,
+                        0,
+                        1,
+                        1,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        68,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        54,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        255,
+                        216,
+                        255,
+                        224,
+                        0,
+                        16,
+                        74,
+                        70,
+                        73,
+                        70,
+                        0,
+                        1,
+                        1,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        0,
+                        255,
+                        217
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "node-0019",
+                      "parent": "node-0018",
+                      "class": "item",
+                      "label": "Number of facial images",
+                      "size_bits": 8,
+                      "value": {
+                        "kind": "text",
+                        "value": "1"
+                      },
+                      "children": [],
+                      "extensions": {}
+                    },
+                    {
+                      "id": "node-0020",
+                      "parent": "node-0018",
+                      "class": "item",
+                      "label": "Facial record 1",
+                      "alternative": "54 bytes",
+                      "children": [
+                        {
+                          "id": "node-0021",
+                          "parent": "node-0020",
+                          "class": "item",
+                          "label": "Image width",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "text",
+                            "value": "1"
+                          },
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0022",
+                          "parent": "node-0020",
+                          "class": "item",
+                          "label": "Image height",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "text",
+                            "value": "1"
+                          },
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0023",
+                          "parent": "node-0020",
+                          "class": "image",
+                          "label": "Facial photograph",
+                          "size_bits": 176,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                255,
+                                216,
+                                255,
+                                224,
+                                0,
+                                16,
+                                74,
+                                70,
+                                73,
+                                70,
+                                0,
+                                1,
+                                1,
+                                0,
+                                0,
+                                1,
+                                0,
+                                1,
+                                0,
+                                0,
+                                255,
+                                217
+                              ]
+                            }
+                          },
+                          "mime_type": "image/jpeg",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0024",
+                          "parent": "node-0020",
+                          "class": "item",
+                          "label": "Image data type",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "text",
+                            "value": "1"
+                          },
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0025",
+              "parent": "node-0004",
+              "class": "file",
+              "label": "EF.DG14",
+              "identifier": "010E",
+              "size_bits": 168,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    49,
+                    19,
+                    48,
+                    17,
+                    6,
+                    9,
+                    4,
+                    0,
+                    127,
+                    0,
+                    7,
+                    2,
+                    1,
+                    3,
+                    1,
+                    2,
+                    1,
+                    2,
+                    131,
+                    1,
+                    13
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0026",
+                  "parent": "node-0025",
+                  "class": "item",
+                  "label": "Security infos",
+                  "identifier": "31",
+                  "children": [
+                    {
+                      "id": "node-0027",
+                      "parent": "node-0026",
+                      "class": "item",
+                      "label": "PACE info",
+                      "identifier": "30",
+                      "children": [
+                        {
+                          "id": "node-0028",
+                          "parent": "node-0027",
+                          "class": "item",
+                          "label": "Protocol",
+                          "identifier": "6",
+                          "size_bits": 72,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                4,
+                                0,
+                                127,
+                                0,
+                                7,
+                                2,
+                                1,
+                                3,
+                                1
+                              ]
+                            }
+                          },
+                          "alternative": "0.4.0.127.0.7.2.1.3.1",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0029",
+                          "parent": "node-0027",
+                          "class": "item",
+                          "label": "Version",
+                          "identifier": "2",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                2
+                              ]
+                            }
+                          },
+                          "alternative": "2",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0030",
+                          "parent": "node-0027",
+                          "class": "item",
+                          "label": "Domain parameter",
+                          "identifier": "83",
+                          "size_bits": 8,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                13
+                              ]
+                            }
+                          },
+                          "children": [],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            },
+            {
+              "id": "node-0031",
+              "parent": "node-0004",
+              "class": "file",
+              "label": "EF.SOD",
+              "identifier": "011D",
+              "size_bits": 848,
+              "value": {
+                "kind": "bytes",
+                "value": {
+                  "width": 8,
+                  "elements": [
+                    119,
+                    104,
+                    48,
+                    102,
+                    6,
+                    9,
+                    42,
+                    134,
+                    72,
+                    134,
+                    247,
+                    13,
+                    1,
+                    7,
+                    2,
+                    160,
+                    89,
+                    48,
+                    87,
+                    49,
+                    13,
+                    48,
+                    11,
+                    6,
+                    9,
+                    96,
+                    134,
+                    72,
+                    1,
+                    101,
+                    3,
+                    4,
+                    2,
+                    1,
+                    48,
+                    70,
+                    49,
+                    68,
+                    4,
+                    32,
+                    100,
+                    82,
+                    100,
+                    206,
+                    76,
+                    251,
+                    41,
+                    78,
+                    119,
+                    11,
+                    66,
+                    40,
+                    221,
+                    148,
+                    57,
+                    125,
+                    30,
+                    243,
+                    128,
+                    210,
+                    243,
+                    182,
+                    186,
+                    236,
+                    199,
+                    86,
+                    63,
+                    28,
+                    76,
+                    93,
+                    51,
+                    187,
+                    4,
+                    32,
+                    28,
+                    207,
+                    175,
+                    4,
+                    55,
+                    92,
+                    57,
+                    249,
+                    16,
+                    235,
+                    229,
+                    64,
+                    76,
+                    250,
+                    69,
+                    4,
+                    230,
+                    151,
+                    29,
+                    104,
+                    211,
+                    89,
+                    40,
+                    227,
+                    244,
+                    54,
+                    83,
+                    46,
+                    79,
+                    101,
+                    36,
+                    8
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "node-0032",
+                  "parent": "node-0031",
+                  "class": "item",
+                  "label": "Document security object",
+                  "identifier": "77",
+                  "children": [
+                    {
+                      "id": "node-0033",
+                      "parent": "node-0032",
+                      "class": "item",
+                      "label": "Sequence",
+                      "identifier": "30",
+                      "children": [
+                        {
+                          "id": "node-0034",
+                          "parent": "node-0033",
+                          "class": "item",
+                          "label": "Object identifier",
+                          "identifier": "6",
+                          "size_bits": 72,
+                          "value": {
+                            "kind": "bytes",
+                            "value": {
+                              "width": 8,
+                              "elements": [
+                                42,
+                                134,
+                                72,
+                                134,
+                                247,
+                                13,
+                                1,
+                                7,
+                                2
+                              ]
+                            }
+                          },
+                          "alternative": "1.2.840.113549.1.7.2",
+                          "children": [],
+                          "extensions": {}
+                        },
+                        {
+                          "id": "node-0035",
+                          "parent": "node-0033",
+                          "class": "item",
+                          "label": "Signed data [0]",
+                          "identifier": "A0",
+                          "children": [
+                            {
+                              "id": "node-0036",
+                              "parent": "node-0035",
+                              "class": "item",
+                              "label": "Sequence",
+                              "identifier": "30",
+                              "children": [
+                                {
+                                  "id": "node-0037",
+                                  "parent": "node-0036",
+                                  "class": "item",
+                                  "label": "Set",
+                                  "identifier": "31",
+                                  "children": [
+                                    {
+                                      "id": "node-0038",
+                                      "parent": "node-0037",
+                                      "class": "item",
+                                      "label": "Sequence",
+                                      "identifier": "30",
+                                      "children": [
+                                        {
+                                          "id": "node-0039",
+                                          "parent": "node-0038",
+                                          "class": "item",
+                                          "label": "Object identifier",
+                                          "identifier": "6",
+                                          "size_bits": 72,
+                                          "value": {
+                                            "kind": "bytes",
+                                            "value": {
+                                              "width": 8,
+                                              "elements": [
+                                                96,
+                                                134,
+                                                72,
+                                                1,
+                                                101,
+                                                3,
+                                                4,
+                                                2,
+                                                1
+                                              ]
+                                            }
+                                          },
+                                          "alternative": "2.16.840.1.101.3.4.2.1",
+                                          "children": [],
+                                          "extensions": {}
+                                        }
+                                      ],
+                                      "extensions": {}
+                                    }
+                                  ],
+                                  "extensions": {}
+                                },
+                                {
+                                  "id": "node-0040",
+                                  "parent": "node-0036",
+                                  "class": "item",
+                                  "label": "Sequence",
+                                  "identifier": "30",
+                                  "children": [
+                                    {
+                                      "id": "node-0041",
+                                      "parent": "node-0040",
+                                      "class": "item",
+                                      "label": "Set",
+                                      "identifier": "31",
+                                      "children": [
+                                        {
+                                          "id": "node-0042",
+                                          "parent": "node-0041",
+                                          "class": "item",
+                                          "label": "Digest",
+                                          "identifier": "4",
+                                          "size_bits": 256,
+                                          "value": {
+                                            "kind": "bytes",
+                                            "value": {
+                                              "width": 8,
+                                              "elements": [
+                                                100,
+                                                82,
+                                                100,
+                                                206,
+                                                76,
+                                                251,
+                                                41,
+                                                78,
+                                                119,
+                                                11,
+                                                66,
+                                                40,
+                                                221,
+                                                148,
+                                                57,
+                                                125,
+                                                30,
+                                                243,
+                                                128,
+                                                210,
+                                                243,
+                                                182,
+                                                186,
+                                                236,
+                                                199,
+                                                86,
+                                                63,
+                                                28,
+                                                76,
+                                                93,
+                                                51,
+                                                187
+                                              ]
+                                            }
+                                          },
+                                          "children": [],
+                                          "extensions": {}
+                                        },
+                                        {
+                                          "id": "node-0043",
+                                          "parent": "node-0041",
+                                          "class": "item",
+                                          "label": "Digest",
+                                          "identifier": "4",
+                                          "size_bits": 256,
+                                          "value": {
+                                            "kind": "bytes",
+                                            "value": {
+                                              "width": 8,
+                                              "elements": [
+                                                28,
+                                                207,
+                                                175,
+                                                4,
+                                                55,
+                                                92,
+                                                57,
+                                                249,
+                                                16,
+                                                235,
+                                                229,
+                                                64,
+                                                76,
+                                                250,
+                                                69,
+                                                4,
+                                                230,
+                                                151,
+                                                29,
+                                                104,
+                                                211,
+                                                89,
+                                                40,
+                                                227,
+                                                244,
+                                                54,
+                                                83,
+                                                46,
+                                                79,
+                                                101,
+                                                36,
+                                                8
+                                              ]
+                                            }
+                                          },
+                                          "children": [],
+                                          "extensions": {}
+                                        }
+                                      ],
+                                      "extensions": {}
+                                    }
+                                  ],
+                                  "extensions": {}
+                                }
+                              ],
+                              "extensions": {}
+                            }
+                          ],
+                          "extensions": {}
+                        }
+                      ],
+                      "extensions": {}
+                    }
+                  ],
+                  "extensions": {}
+                }
+              ],
+              "extensions": {}
+            }
+          ],
+          "extensions": {}
+        }
+      ],
+      "extensions": {}
+    }
+  ]
+}

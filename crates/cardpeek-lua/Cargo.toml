@@ -8,16 +8,24 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+aes.workspace = true
+bp384.workspace = true
 cardpeek-analyser = { path = "../cardpeek-analyser" }
 cardpeek-core = { path = "../cardpeek-core" }
 cardpeek-transport = { path = "../cardpeek-transport" }
 cbc.workspace = true
 cipher.workspace = true
+cmac.workspace = true
 des.workspace = true
 encoding_rs.workspace = true
+getrandom.workspace = true
 mlua.workspace = true
+rand_core.workspace = true
 sha1.workspace = true
+sha2.workspace = true
+subtle.workspace = true
 thiserror.workspace = true
+zeroize.workspace = true
 
 [lints]
 workspace = true

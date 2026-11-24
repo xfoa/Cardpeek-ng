@@ -34,7 +34,7 @@ local function legacy_get(node,name) local fields={val='value',alt='alternative'
 
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
-local en = require('shared.lib.en1545')
+local en = require('cardpeek').en1545
 
 local card_num = require('shared.calypso.card-number')
 
@@ -43,15 +43,15 @@ intercode_Contract_types = {} -- list of contract types (detected by BestContrac
 intercode_Contract_pointers = {} -- list of contract pointers (detected by BestContracts structure)
 
 function intercode_parse_best_contract_tariff(source)
-    local sort_key = util.number(util.sub(source, 0, 3))
-    local contract_type = util.number(util.sub(source, 4, 11))
-    local priority = util.number(util.sub(source, 12, 15))
+    local sort_key = cp.bytes.number(cp.bytes.sub(source, 0, 3))
+    local contract_type = cp.bytes.number(cp.bytes.sub(source, 4, 11))
+    local priority = cp.bytes.number(cp.bytes.sub(source, 12, 15))
     table.insert(intercode_Contract_types, contract_type)
     return "Sort key: "..sort_key.." - Contract type: "..string.format('%02Xh', contract_type).." - Priority: "..priority
 end
 
 function intercode_parse_best_contract_pointer(source)
-    local pointer = util.number(source)
+    local pointer = cp.bytes.number(source)
     table.insert(intercode_Contract_pointers, pointer)
     return tostring(pointer)
 end

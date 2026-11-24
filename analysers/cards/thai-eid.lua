@@ -57,7 +57,7 @@ local function date(node)
 end
 
 local function sex(node)
-  local value = util.get(node:get('value'), 0)
+  local value = cp.bytes.get(node:get('value'), 0)
   local decoded = value == 0x31 and 'Male' or value == 0x32 and 'Female' or string.format('Unknown %c', value)
   node:set('alternative', decoded)
 end
@@ -78,11 +78,11 @@ local ELEMENTS = {
 local function read_data()
   local response = apdu.select('#A000000054480001')
   if response.status ~= 0x9000 then return nil, response.status end
-  local data = util.bytes(8)
+  local data = cp.bytes.pack(8)
   local remaining = 5950
   for offset = 0, 5949, 255 do
     local length = math.min(255, remaining)
-    response = util.transmit(util.bytes(8, 0x80, 0xB0, (offset >> 8) & 0x7F, offset & 0xFF, 0x02, 0x00, length))
+    response = util.transmit(cp.bytes.pack(8, 0x80, 0xB0, (offset >> 8) & 0x7F, offset & 0xFF, 0x02, 0x00, length))
     if response.status ~= 0x9000 then return nil, response.status end
     data = data .. response.data
     remaining = remaining - #response.data
@@ -94,7 +94,7 @@ local root = apdu.start('Thai eID')
 local data, status = read_data()
 if data then
   for _, element in ipairs(ELEMENTS) do
-    local value = util.sub(data, element[2], element[2] + element[3] - 1)
+    local value = cp.bytes.sub(data, element[2], element[2] + element[3] - 1)
     if value then
       local node = util.node(root, 'item', element[1], value)
       element[4](node)

@@ -5547,6 +5547,10 @@
 	https://dvv.fi/en/organisation-cards
 	https://github.com/OpenSC/OpenSC/wiki/Finnish-FINEID
 
+3B 7B 00 00 00 80 62 00 51 56 46 69 6E 45 49 44
+	Finnish Henkilokortti electronic identity card (legacy SetCOS FINEID)
+	https://dvv.fi/en/fineid-specifications
+
 3B 7B 94 00 00 80 62 1[12] 51 56 46 69 6E 45 49 44
 	Finnish Electronic ID card for persons (Former FINeID card)
 	https://dvv.fi/en/citizen-certificate-and-electronic-identity
@@ -6422,11 +6426,12 @@
 	http://vrk.fi/en/citizen-certificate
 
 3B 7F 96 00 00 80 31 B8 65 B0 85 04 02 1B 12 00 F6 82 90 00
-	Finnish ID-card v5.0(?) (eID)
+	Finnish Henkilokortti electronic identity card (FINEID S4-1 v3.1)
 	https://dvv.fi/en/fineid-specifications
 
 3B 7F 96 00 00 80 31 B8 65 B0 85 05 00 11 12 24 60 82 90 00
-	wasim finnish id (eID)
+	Finnish Henkilokortti electronic identity card (FINEID S4-1 v4.0)
+	https://dvv.fi/en/fineid-specifications
 
 3B 7F 96 00 00 80 31 B8 65 B0 85 05 10 24 12 24 60 82 90 00
 	Finnish identification card (eID)

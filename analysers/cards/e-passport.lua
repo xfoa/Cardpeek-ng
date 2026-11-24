@@ -25,7 +25,7 @@
 
 local cp = require('cardpeek')
 local util = require('shared.lib.util')
-local tlv = require('shared.lib.tlv')
+local tlv = require('cardpeek').tlv
 local function band(a,b) return a & b end
 local function bxor(a,b) return a ~ b end
 local function rshift(a,b) return a >> b end
@@ -81,7 +81,7 @@ function epass_inc_SSC()
 	while i>=0 do
 	   local values = SSC:elements()
 	   values[i+1] = (values[i+1] + 1) & 0xFF
-	   SSC = util.bytes(8, table.unpack(values))
+	   SSC = cp.bytes.pack(8, table.unpack(values))
 	   if values[i+1]~=0 then break end
 	   i=i-1
 	end
@@ -94,13 +94,13 @@ function epass_key_derivation(seed)
 	local D
 	local Kenc
 	local Kmac
-	
+
 	SHA1 = nil
-	D = util.concat(seed, util.bytes(8,"00 00 00 01"))
+	D = cp.bytes.concat(seed, cp.bytes.pack(8,"00 00 00 01"))
         Kenc = cp.crypto.sha1(D)
-        D = util.concat(seed, util.bytes(8,"00 00 00 02"))
+        D = cp.bytes.concat(seed, cp.bytes.pack(8,"00 00 00 02"))
         Kmac = cp.crypto.sha1(D)
-        return util.sub(Kenc,0,15),util.sub(Kmac,0,15)
+        return cp.bytes.sub(Kenc,0,15),cp.bytes.sub(Kmac,0,15)
 end
 
 function epass_create_master_keys(mrz_info)
@@ -109,7 +109,7 @@ function epass_create_master_keys(mrz_info)
 
 	SHA1 = nil;
 	hash = cp.crypto.sha1(cp.bytes.from_string(mrz_info))
-	KM_ENC, KM_MAC = epass_key_derivation(util.sub(hash,0,15))
+	KM_ENC, KM_MAC = epass_key_derivation(cp.bytes.sub(hash,0,15))
 	return true
 end
 
@@ -117,69 +117,69 @@ function epass_create_session_keys()
 	local sw, resp, response
 	local rnd_icc
 	local rnd_ifd
-	local k_ifd =   util.bytes(8,"0B 79 52 40 CB 70 49 B0 1C 19 B3 3E 32 80 4F 0B")
+	local k_ifd =   cp.bytes.pack(8,"0B 79 52 40 CB 70 49 B0 1C 19 B3 3E 32 80 4F 0B")
 	local S
-	local iv = util.bytes(8,"00 00 00 00 00 00 00 00")
-	
-	
+	local iv = cp.bytes.pack(8,"00 00 00 00 00 00 00 00")
+
+
 	local e_ifd
 	local m_ifd
 
-	rnd_ifd = util.bytes(8,"01 23 45 67 89 AB DC FE") 
-	response = util.transmit(util.bytes(8,"00 84 00 00 08"))
+	rnd_ifd = cp.bytes.pack(8,"01 23 45 67 89 AB DC FE")
+	response = util.transmit(cp.bytes.pack(8,"00 84 00 00 08"))
 	sw, rnd_icc = response.status, response.data
-   
+
 	if (sw~=0x9000) then return false end
 	S = rnd_ifd .. rnd_icc .. k_ifd
 	e_ifd = cp.crypto.des_ede3_cbc(true,KM_ENC,iv,S)
 	m_ifd = cp.crypto.iso9797_mac(KM_MAC,e_ifd)
 	cmd_data = e_ifd..m_ifd
-	   
-	response = util.transmit(util.bytes(8,"00 82 00 00 28",cmd_data,0x28))
+
+	response = util.transmit(cp.bytes.pack(8,"00 82 00 00 28",cmd_data,0x28))
 	sw, resp = response.status, response.data
-	
+
 	if (sw==0x6300) then
 	   	cp.log.warning("Perhaps you didn't enter the right MRZ data for this passport")
         end
-	if (sw~=0x9000) then 
-		return false 
+	if (sw~=0x9000) then
+		return false
 	end
-	R = cp.crypto.des_ede3_cbc(false,KM_ENC,iv,util.sub(resp,0,31))
-	k_icc = util.sub(R,16,31)
-	k_seed = util.bytes(8)
+	R = cp.crypto.des_ede3_cbc(false,KM_ENC,iv,cp.bytes.sub(resp,0,31))
+	k_icc = cp.bytes.sub(R,16,31)
+	k_seed = cp.bytes.pack(8)
 	for i=0,15 do
-	    k_seed = util.concat(k_seed,bxor(util.get(k_ifd,i),util.get(k_icc,i)))
+	    k_seed = cp.bytes.concat(k_seed,bxor(cp.bytes.get(k_ifd,i),cp.bytes.get(k_icc,i)))
 	end
-	SSC = util.sub(rnd_icc,4,7)..util.sub(rnd_ifd,4,7)
+	SSC = cp.bytes.sub(rnd_icc,4,7)..cp.bytes.sub(rnd_ifd,4,7)
 	KS_ENC, KS_MAC = epass_key_derivation(k_seed)
 	return true
 end
 
 function epass_select(EF)
-	local cmdheader = util.bytes(8,"0C A4 02 0C")
-	local cmdbody   = util.bytes(8,rshift(EF,8),band(EF,0xFF))
-	
-	
-	local iv = util.bytes(8,"00 00 00 00 00 00 00 00")
+	local cmdheader = cp.bytes.pack(8,"0C A4 02 0C")
+	local cmdbody   = cp.bytes.pack(8,rshift(EF,8),band(EF,0xFF))
+
+
+	local iv = cp.bytes.pack(8,"00 00 00 00 00 00 00 00")
 	local DO87, DO8E
 	local command
 	local DO99
 
 	local padded_body = cmdbody .. cp.bytes.from_hex('80')
 	while #padded_body % 8 ~= 0 do padded_body = padded_body .. cp.bytes.from_hex('00') end
-	M = util.concat("01",cp.crypto.des_ede3_cbc(true,KS_ENC,iv,padded_body))
+	M = cp.bytes.concat("01",cp.crypto.des_ede3_cbc(true,KS_ENC,iv,padded_body))
 	DO87 = cp.asn1.join(0x87,M)
 	epass_inc_SSC()
-	N = util.concat(SSC,cmdheader,"80 00 00 00",DO87)
+	N = cp.bytes.concat(SSC,cmdheader,"80 00 00 00",DO87)
 	CC = cp.crypto.iso9797_mac(KS_MAC,N)
 	DO8E = cp.asn1.join(0x8E,cp.crypto.iso9797_mac(KS_MAC,N))
-	command=util.concat(cmdheader,(#DO87+#DO8E),DO87,DO8E,0)
+	command=cp.bytes.concat(cmdheader,(#DO87+#DO8E),DO87,DO8E,0)
 	response = util.transmit(command)
 	sw, resp = response.status, response.data
 	epass_inc_SSC()
 	if sw~=0x9000 then
 		return sw, resp
-	end 
+	end
 	tag_99, value_99, rest = cp.asn1.split(resp)
 	tag_8E, value_8E, rest = cp.asn1.split(rest)
 	if tag_99~=0x99 then
@@ -190,7 +190,7 @@ function epass_select(EF)
            cp.log.warning("Expected tag 8E in card response")
            return 0x6FFF
         end
-	sw = 0+util.number(value_99)
+	sw = 0+cp.bytes.number(value_99)
 
 	N = SSC..cp.asn1.join(tag_99,value_99)
 
@@ -202,24 +202,24 @@ function epass_select(EF)
 end
 
 function epass_read_binary(start,len)
-	local cmdheader = util.bytes(8,"0C B0", rshift(start,8),band(start,0xFF))
-	
-	
+	local cmdheader = cp.bytes.pack(8,"0C B0", rshift(start,8),band(start,0xFF))
+
+
 	local DO97,D08E
 	local value_87
-	local iv = util.bytes(8,"00 00 00 00 00 00 00 00")
+	local iv = cp.bytes.pack(8,"00 00 00 00 00 00 00 00")
 
-	DO97 = util.bytes(8,0x97,01,len)
+	DO97 = cp.bytes.pack(8,0x97,01,len)
 	epass_inc_SSC()
-	DO8E = cp.asn1.join(0x8E,cp.crypto.iso9797_mac(KS_MAC,util.concat(SSC,cmdheader,"80 00 00 00",DO97)))
-	command = util.concat(cmdheader,(#DO97+#DO8E),DO97,DO8E,0)
+	DO8E = cp.asn1.join(0x8E,cp.crypto.iso9797_mac(KS_MAC,cp.bytes.concat(SSC,cmdheader,"80 00 00 00",DO97)))
+	command = cp.bytes.concat(cmdheader,(#DO97+#DO8E),DO97,DO8E,0)
 	response = util.transmit(command)
 	sw, resp = response.status, response.data
 	epass_inc_SSC()
 	if (sw~=0x9000) and (sw~=0x6282) then return false end
 	tag_87, value_87 = cp.asn1.split(resp)
-	decrypted_data = cp.crypto.des_ede3_cbc(false,KS_ENC,iv,util.sub(value_87,1,-1))
-	return sw, util.sub(decrypted_data,0,len-1)
+	decrypted_data = cp.crypto.des_ede3_cbc(false,KS_ENC,iv,cp.bytes.sub(value_87,1,-1))
+	return sw, cp.bytes.sub(decrypted_data,0,len-1)
 end
 
 function epass_read_file()
@@ -230,18 +230,18 @@ function epass_read_file()
 	len, rest = cp.asn1.split_length(rest)
 
 	--io.write("read_file: [")
-	
+
 	if len>127 then
-           to_read = len + 2 + util.get(resp,1)-128
+           to_read = len + 2 + cp.bytes.get(resp,1)-128
 	else
-           to_read = len + 2 
+           to_read = len + 2
 	end
 
 	cp.log.info("Expecting " .. to_read)
-	result = util.bytes(8)
+	result = cp.bytes.pack(8)
 	already_read = 0
 	while to_read>0 do
-	     --io.write(".");io.flush()    
+	     --io.write(".");io.flush()
 	     if to_read>0x80 then
 	        le = 0x80
              else
@@ -249,7 +249,7 @@ function epass_read_file()
 	     end
 	     sw, resp = epass_read_binary(already_read,le)
 	     if sw~=0x9000 then return result end
-	     result = util.concat(result,resp)
+	     result = cp.bytes.concat(result,resp)
 	     already_read = already_read + #resp
 	     to_read = to_read - #resp
 	end
@@ -258,10 +258,10 @@ function epass_read_file()
 end
 
 function ui_parse_version(node,data)
-	local ver = util.format(util.sub(data,0,1),"%P")
+	local ver = cp.bytes.format(cp.bytes.sub(data,0,1),"%P")
 	local i
 	for i=1,(#data/2)-1 do
-		ver = ver .. "." .. util.format(util.sub(data,i*2,i*2+1),"%P")
+		ver = ver .. "." .. cp.bytes.format(cp.bytes.sub(data,i*2,i*2+1),"%P")
 	end
 	set_attribute(node,"val",data)
 	set_attribute(node,"alt",ver)
@@ -273,7 +273,7 @@ end
 function ui_parse_cstring(node,data)
 	set_attribute(node,"val",data)
 	if #data>1 then
-        	set_attribute(node,"alt",util.format(util.sub(data,0,#data-2),"%P"))
+  set_attribute(node,"alt",cp.bytes.format(cp.bytes.sub(data,0,#data-2),"%P"))
 	end
 end
 
@@ -284,31 +284,31 @@ function ui_parse_utf8(node,data)
 		return false
 	end
 
-	local alt = util.format(data,"%C")
-	if not util.printable(data) then
-		alt = util.format(data,"%C (%D)")
+	local alt = cp.bytes.format(data,"%C")
+	if not cp.bytes.printable(data) then
+		alt = cp.bytes.format(data,"%C (%D)")
 	end
         set_attribute(node,"alt",alt)
 	return true
 end
 
-BL_FAC_RECORD_HEADER = { 
+BL_FAC_RECORD_HEADER = {
 	{ "Format Identifier", 4, ui_parse_cstring },
-	{ "Format Version", 4, ui_parse_cstring }, 
-	{ "Length of Record", 4, tlv.parsers.number }, 
+	{ "Format Version", 4, ui_parse_cstring },
+	{ "Length of Record", 4, tlv.parsers.number },
 	{ "Number of Faces", 2, tlv.parsers.number }
 }
 
 BL_FAC_INFORMATION = {
 	{ "Face Image Block Length", 4, tlv.parsers.number },
 	{ "Number of Feature Points", 2, tlv.parsers.number },
-	{ "Gender", 1 , { 
-		[0]="Unspecified", 
-		[1]="Male", 
-		[2]="Female", 
+	{ "Gender", 1 , {
+		[0]="Unspecified",
+		[1]="Male",
+		[2]="Female",
 		[3]="Unknown" }},
 	{ "Eye Color", 1, {
-		[0]="Unspecified", 
+		[0]="Unspecified",
                 [1]="Black",
                 [2]="Blue",
                 [3]="Brown",
@@ -318,7 +318,7 @@ BL_FAC_INFORMATION = {
                 [7]="Pink",
                 [8]="Other or Unknown" }},
 	{ "Hair Color", 1 , {
-		[0]="Unspecified", 
+		[0]="Unspecified",
                 [1]="Bald",
                 [2]="Black",
                 [3]="Blonde",
@@ -339,7 +339,7 @@ BL_FAC_INFORMATION = {
                 [5]="Eyes looking away",
                 [6]="Squinting",
                 [7]="Frowning" }},
-	{ "Pose Angle", 3 }, 
+	{ "Pose Angle", 3 },
 	{ "Pose Angle Uncertainty", 3 }
 }
 
@@ -351,7 +351,7 @@ BL_FAC_FEATURE_POINT = {
 	{ "Reserved", 2 }
 }
 
-BL_FAC_IMAGE_INFORMATION = { 
+BL_FAC_IMAGE_INFORMATION = {
 	{ "Face Image Type", 1 },
 	{ "Image Data Type", 1 },
 	{ "Width", 2, tlv.parsers.number },
@@ -361,7 +361,7 @@ BL_FAC_IMAGE_INFORMATION = {
 	{ "Device Type", 2 },
 	{ "Quality", 2 }
 }
-	
+
 BL_FIR_GENERAL_RECORD_HEADER = {
 	{ "Format Identifier", 4, ui_parse_cstring },
 	{ "Version Number", 4, ui_parse_cstring },
@@ -421,14 +421,14 @@ function ui_parse_block(node,format,data,pos)
 
 	for i,v in ipairs(format) do
 		ITEM = node:append({ classname="item", label=v[1], id=i-1, size=v[2] })
-		block = util.sub(data,pos,pos+v[2]-1)
+		block = cp.bytes.sub(data,pos,pos+v[2]-1)
 		if v[3]~=nil then
 			if type(v[3])=="function" then
 			   if v[3](ITEM,block)==false then
 			      return nil
 			   end
 			elseif type(v[3])=="table" then
-			   index = util.number(block)
+			   index = cp.bytes.number(block)
 			   set_attribute(ITEM,"val",block)
 			   if v[3][index] then
 				set_attribute(ITEM,"alt",v[3][index])
@@ -437,7 +437,7 @@ function ui_parse_block(node,format,data,pos)
 			   end
 			else
 			   return nil
-			end 
+			end
 		else
 			set_attribute(ITEM,"val",block)
 		end
@@ -446,8 +446,8 @@ function ui_parse_block(node,format,data,pos)
 	return pos
 end
 
-FAC_FORMAT_IDENTIFIER = util.bytes(8,"46414300")
-FIR_FORMAT_IDENTIFIER = util.bytes(8,"46495200")
+FAC_FORMAT_IDENTIFIER = cp.bytes.pack(8,"46414300")
+FIR_FORMAT_IDENTIFIER = cp.bytes.pack(8,"46495200")
 
 function ui_parse_biometry_fac(node,data)
 	local BLOCK
@@ -462,57 +462,57 @@ function ui_parse_biometry_fac(node,data)
 	local image_len
 	local i,j
 
-	num_faces = util.number(util.sub(data,12,13))
+	num_faces = cp.bytes.number(cp.bytes.sub(data,12,13))
 
 	BLOCK = node:append({ classname="item", label="Facial Record Header" })
 	index = ui_parse_block(BLOCK,BL_FAC_RECORD_HEADER,data,index)
 	if index==nil then
-		cp.log.error("Failed to parse facial header information") 
-		return false 
-	end 
+		cp.log.error("Failed to parse facial header information")
+		return false
+	end
 
 	BLOCK = node:append({ classname="item", label="Facial Data Records" })
 
 	for i = 1,num_faces do
 		block_start = index
-		block_length = util.number(util.sub(data,index,index+3))
-		num_features = util.number(util.sub(data,index+4,index+5))
-		
+		block_length = cp.bytes.number(cp.bytes.sub(data,index,index+3))
+		num_features = cp.bytes.number(cp.bytes.sub(data,index+4,index+5))
+
 		SUBBLOCK = BLOCK:append({ classname="item", label="Facial Record Data", id=i, size=block_length })
-		
+
 		SUBSUBBLOCK = SUBBLOCK:append({ classname="item", label="Facial Information" })
 		index = ui_parse_block(SUBSUBBLOCK,BL_FAC_INFORMATION,data,index)
-		if index==nil then 
+		if index==nil then
 			cp.log.error("Failed to parse facial information")
-			return false 
-		end 	
+			return false
+		end
 
 		if num_features>0 then
 			SUBSUBBLOCK = SUBBLOCK:append({ classname="item", label="Feature points" })
 			for j=1,num_features do
 				SUBSUBSUBBLOCK =  node:append({ classname="item", label="Feature Point", id=j })
-				index = ui_parse_block(SUBSUBSUBBLOCK,BL_FEATURE_POINT,data,index)				
-				if index==nil then 
+				index = ui_parse_block(SUBSUBSUBBLOCK,BL_FEATURE_POINT,data,index)
+				if index==nil then
 					cp.log.error("Failed to parse facial feature information")
-					return false 
-				end 	
+					return false
+				end
 			end
 		end
 
 		SUBSUBBLOCK = SUBBLOCK:append({ classname="item", label="Image Information" })
 		index = ui_parse_block(SUBSUBBLOCK,BL_FAC_IMAGE_INFORMATION,data,index)
 		if index==nil then
-			cp.log.error("Failed to parse facial image information") 
-			return false 
+			cp.log.error("Failed to parse facial image information")
+			return false
 		end
-		
+
 		image_len = block_length-(index-block_start)
 		SUBSUBBLOCK = SUBBLOCK:append({ classname="item", label="Image Data", size=image_len })
-		set_attribute(SUBSUBBLOCK,"val",util.sub(data,index,index+image_len-1))
-        
-        if image_len>2 and util.sub(data,index,index+1) == util.bytes(8,"FF D8") then
+		set_attribute(SUBSUBBLOCK,"val",cp.bytes.sub(data,index,index+image_len-1))
+
+        if image_len>2 and cp.bytes.sub(data,index,index+1) == cp.bytes.pack(8,"FF D8") then
 		    set_attribute(SUBSUBBLOCK,"mime-type","image/jpeg")
-	    elseif image_len>6 and util.sub(data,index,index+5) == util.bytes(8,"00 00 00 0C 6A 50") then
+	    elseif image_len>6 and cp.bytes.sub(data,index,index+5) == cp.bytes.pack(8,"00 00 00 0C 6A 50") then
 		    set_attribute(SUBSUBBLOCK,"mime-type","image/jp2")
         else
             cp.log.warning("Could not identify facial image format.")
@@ -537,36 +537,36 @@ function ui_parse_biometry_fir(node,data)
 
 	BLOCK = node:append({ classname="item", label="Finger General Record Header" })
 	index = ui_parse_block(BLOCK,BL_FIR_GENERAL_RECORD_HEADER,data,index)
-	if index==nil then 
+	if index==nil then
 		cp.log.error("Failed to parse finger general record header information")
-		return false 
-	end 
-	num_images = util.number(util.sub(data,18,18))
+		return false
+	end
+	num_images = cp.bytes.number(cp.bytes.sub(data,18,18))
 
 	BLOCK = node:append({ classname="item", label="Finger Images" })
 	for i=1,num_images do
-		record_size = util.number(util.sub(data,index,index+3))
+		record_size = cp.bytes.number(cp.bytes.sub(data,index,index+3))
 		record_start = index
 
 		SUBBLOCK = BLOCK:append({ classname="item", label="Finger Image", id=i, size=record_size })
 		SUBSUBBLOCK = SUBBLOCK:append({ classname="item", label="Finger Image Record Header" })
 		index = ui_parse_block(SUBSUBBLOCK,BL_FIR_IMAGE_RECORD_HEADER,data,index)
-		if index==nil then 
+		if index==nil then
 			cp.log.error("Failed to parse finger image record header information")
-			return false 
+			return false
 		end
 
 		image_size = record_size-(index-record_start)
 		SUBSUBBLOCK = SUBBLOCK:append({ classname="item", label="Finger Image Data" })
-		set_attribute(SUBSUBBLOCK,"val",util.sub(data,index,index+image_size-1))
+		set_attribute(SUBSUBBLOCK,"val",cp.bytes.sub(data,index,index+image_size-1))
 		index = index + image_size
 	end
- 
+
 	return true
 end
 
 function ui_parse_biometry(node,data)
-	local tag = util.sub(data,0,3)
+	local tag = cp.bytes.sub(data,0,3)
 
 	if tag==FAC_FORMAT_IDENTIFIER then
 		ui_parse_biometry_fac(node,data)
@@ -580,7 +580,7 @@ end
 
 function ui_parse_jpeg(node,data)
 	set_attribute(node,"val", data)
-	if util.sub(data,1,2) == util.bytes(8,"D8 FF") then
+	if cp.bytes.sub(data,1,2) == cp.bytes.pack(8,"D8 FF") then
 		set_attribute(node,"mime-type","image/jpeg")
 	end
 	return true
@@ -656,7 +656,7 @@ MRP_REFERENCE = {
 
 
 
-FILES = { 
+FILES = {
   { ['FID']=0x011E, ['name']='EF.COM' },
   { ['FID']=0x0101, ['name']='EF.DG1' },
   { ['FID']=0x0102, ['name']='EF.DG2' },
@@ -674,7 +674,7 @@ FILES = {
   { ['FID']=0x010E, ['name']='EF.DG14' },
   { ['FID']=0x010F, ['name']='EF.DG15' },
   { ['FID']=0x0110, ['name']='EF.DG16' },
-  { ['FID']=0x011D, ['name']='EF.SOD' } 
+  { ['FID']=0x011D, ['name']='EF.SOD' }
 }
 
 local function prompt(prompt)
@@ -721,7 +721,7 @@ for _, file in ipairs(FILES) do
   if sw == 0x9000 then
     local data = epass_read_file()
     if data then
-      if util.get(data, 0) == 0x6D then
+      if cp.bytes.get(data, 0) == 0x6D then
         local _, value = cp.asn1.split(data)
         util.node(content, 'item', 'National specific data', value)
       else
