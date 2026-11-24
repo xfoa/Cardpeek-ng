@@ -17,6 +17,7 @@ Cardpeek-ng copies its contents when it creates a personal library.
 
 The Lua module search root is this directory, not `cards/`.
 Use dots for module path components in `require` calls.
+For the shared helper reference, see [Shared Lua helpers](../docs/architecture/lua-api.md#shared-lua-helpers).
 
 ## Calypso modules
 
