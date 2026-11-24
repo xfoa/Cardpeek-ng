@@ -179,11 +179,6 @@ struct ContextMenu {
 }
 
 #[derive(Clone, Default)]
-struct ActiveCardHover(Option<&'static str>);
-
-impl Global for ActiveCardHover {}
-
-#[derive(Clone, Default)]
 struct ActiveHelpTooltip {
     entry: Option<HelpEntry>,
     source: Option<SharedString>,
@@ -200,41 +195,6 @@ trait HelpTarget: StatefulInteractiveElement + Styled + ParentElement + Sized {
 }
 
 impl<T: StatefulInteractiveElement + Styled + ParentElement + Sized> HelpTarget for T {}
-
-fn card_hover_region(id: &'static str) -> impl IntoElement {
-    canvas(
-        |bounds, _, _| bounds,
-        move |_, bounds, window, _| {
-            window.on_mouse_event(move |event: &MouseMoveEvent, _, window, cx| {
-                let active = cx.default_global::<ActiveCardHover>();
-                let hovered = event.position.x >= bounds.left()
-                    && event.position.x < bounds.right()
-                    && event.position.y >= bounds.top() - px(1.)
-                    && event.position.y <= bounds.bottom();
-                let next = if hovered {
-                    Some(id)
-                } else if active.0 == Some(id) {
-                    None
-                } else {
-                    active.0
-                };
-                if active.0 != next {
-                    active.0 = next;
-                    window.refresh();
-                }
-            });
-            window.on_mouse_event(move |_: &MouseExitEvent, _, window, cx| {
-                let active = cx.default_global::<ActiveCardHover>();
-                if active.0 == Some(id) {
-                    active.0 = None;
-                    window.refresh();
-                }
-            });
-        },
-    )
-    .absolute()
-    .inset_0()
-}
 
 fn help_indicator(entry: HelpEntry, source: SharedString) -> impl IntoElement {
     canvas(
@@ -1128,25 +1088,26 @@ impl App {
         cx: &mut Context<'_, Self>,
     ) -> Stateful<Div> {
         let source = format!("card-detail-{id}");
-        let source_for_menu = source.clone();
-        let copy_text = format!("{label}\t{value}");
+        let pinned = self.context_menu_source.as_deref() == Some(source.as_str());
         help_detail_row(id, label, value, entry, self.state.help_mode)
-            .when(
-                self.context_menu_source.as_deref() == Some(source.as_str())
-                    || cx.default_global::<ActiveCardHover>().0 == Some(id),
-                |element| element.bg(BORDER),
-            )
-            .child(card_hover_region(id))
+            .h(px(44.))
+            .when(pinned, |element| element.bg(BORDER))
+            .when(self.context_menu.is_none(), |element| {
+                element.hover(|style| style.bg(BORDER))
+            })
             .on_mouse_down(
                 MouseButton::Right,
-                cx.listener(move |app, event: &MouseDownEvent, _, cx| {
-                    app.context_menu_source = Some(source_for_menu.clone());
-                    app.context_menu = Some(ContextMenu {
-                        position: event.position,
-                        text: copy_text.clone(),
-                        tree_text: None,
-                    });
-                    cx.notify();
+                cx.listener({
+                    let copy_text = format!("{label}\t{value}");
+                    move |app, event: &MouseDownEvent, _, cx| {
+                        app.context_menu_source = Some(source.clone());
+                        app.context_menu = Some(ContextMenu {
+                            position: event.position,
+                            text: copy_text.clone(),
+                            tree_text: None,
+                        });
+                        cx.notify();
+                    }
                 }),
             )
     }
@@ -1226,14 +1187,15 @@ impl App {
                     ))
                     .child(
                         detail_row("Reader", &session.reader.name)
-                            .relative()
+                            .h(px(44.))
                             .debug_selector(|| "card-reader".into())
                             .when(
-                                self.context_menu_source.as_deref() == Some("card-detail-reader")
-                                    || cx.default_global::<ActiveCardHover>().0 == Some("Reader"),
+                                self.context_menu_source.as_deref() == Some("card-detail-reader"),
                                 |element| element.bg(BORDER),
                             )
-                            .child(card_hover_region("Reader"))
+                            .when(self.context_menu.is_none(), |element| {
+                                element.hover(|style| style.bg(BORDER))
+                            })
                             .on_mouse_down(
                                 MouseButton::Right,
                                 cx.listener({
@@ -4423,7 +4385,7 @@ mod tests {
     struct AdjacentCardRows;
 
     impl Render for AdjacentCardRows {
-        fn render(&mut self, _: &mut Window, cx: &mut Context<'_, Self>) -> impl IntoElement {
+        fn render(&mut self, _: &mut Window, _: &mut Context<'_, Self>) -> impl IntoElement {
             div()
                 .size_full()
                 .child(
@@ -4434,19 +4396,11 @@ mod tests {
                         help::CARD_TYPE,
                         false,
                     )
-                    .when(
-                        cx.default_global::<ActiveCardHover>().0 == Some("help-card-type"),
-                        |element| element.bg(BORDER),
-                    )
-                    .child(card_hover_region("help-card-type")),
+                    .hover(|style| style.bg(BORDER)),
                 )
                 .child(
                     help_detail_row("help-connection", "Connection", "Test", help::PCSC, false)
-                        .when(
-                            cx.default_global::<ActiveCardHover>().0 == Some("help-connection"),
-                            |element| element.bg(BORDER),
-                        )
-                        .child(card_hover_region("help-connection")),
+                        .hover(|style| style.bg(BORDER)),
                 )
         }
     }
@@ -4495,13 +4449,9 @@ mod tests {
             None,
             Modifiers::none(),
         );
-        visual.read_global(|active: &ActiveCardHover, _| {
-            assert_eq!(active.0, Some("help-connection"));
-        });
+        assert!(connection.contains(&point(card_type.center().x, card_type.bottom())));
         visual.simulate_mouse_move(card_type.center(), None, Modifiers::none());
-        visual.read_global(|active: &ActiveCardHover, _| {
-            assert_eq!(active.0, Some("help-card-type"));
-        });
+        assert!(card_type.contains(&card_type.center()));
     }
 
     #[gpui::test]
@@ -4541,18 +4491,17 @@ mod tests {
         });
         let mut visual = gpui::VisualTestContext::from_window(window.into(), cx);
         visual.simulate_resize(size(px(1280.), px(820.)));
-        for (selector, expected) in [
-            ("help-card-type", "help-card-type"),
-            ("help-protocol", "help-protocol"),
-            ("help-atr", "help-atr"),
-            ("card-reader", "Reader"),
-            ("help-session", "help-session"),
+        for selector in [
+            "help-card-type",
+            "help-protocol",
+            "help-atr",
+            "card-reader",
+            "help-session",
         ] {
             let row = visual.debug_bounds(selector).unwrap();
             visual.simulate_mouse_move(row.center(), None, Modifiers::none());
-            visual.read_global(|active: &ActiveCardHover, _| {
-                assert_eq!(active.0, Some(expected));
-            });
+            let hovered = visual.debug_bounds(selector).unwrap();
+            assert!(hovered.contains(&row.center()));
         }
         let card_type = visual.debug_bounds("help-card-type").unwrap();
         let connection = visual.debug_bounds("help-connection").unwrap();
@@ -4562,21 +4511,34 @@ mod tests {
                 None,
                 Modifiers::none(),
             );
-            visual.read_global(|active: &ActiveCardHover, _| {
-                assert!(matches!(
-                    active.0,
-                    Some("help-card-type" | "help-connection")
-                ));
-            });
+            let first = visual.debug_bounds("help-card-type").unwrap();
+            let second = visual.debug_bounds("help-connection").unwrap();
+            let position = point(card_type.center().x, card_type.bottom() + px(offset));
+            assert!(first.contains(&position) || second.contains(&position));
         }
         visual.simulate_mouse_move(connection.center(), None, Modifiers::none());
-        visual.read_global(|active: &ActiveCardHover, _| {
-            assert_eq!(active.0, Some("help-connection"));
-        });
+        let hovered = visual.debug_bounds("help-connection").unwrap();
+        assert!(hovered.contains(&connection.center()));
         visual.simulate_mouse_move(point(px(1.), px(1.)), None, Modifiers::none());
-        visual.read_global(|active: &ActiveCardHover, _| {
-            assert_eq!(active.0, None);
+        let hovered = visual.debug_bounds("help-connection").unwrap();
+        assert!(!hovered.contains(&point(px(1.), px(1.))));
+    }
+
+    #[gpui::test]
+    fn card_rows_render_with_an_open_context_menu(cx: &mut TestAppContext) {
+        let window = cx.update(|cx| {
+            cx.open_window(WindowOptions::default(), |_, cx| {
+                cx.new(|_| AdjacentCardRows)
+            })
+            .unwrap()
         });
+        let mut visual = gpui::VisualTestContext::from_window(window.into(), cx);
+        visual.simulate_resize(size(px(640.), px(480.)));
+        let row = visual.debug_bounds("help-card-type").unwrap();
+        visual.simulate_mouse_move(row.center(), None, Modifiers::none());
+        visual.simulate_mouse_down(row.center(), MouseButton::Right, Modifiers::none());
+        visual.simulate_mouse_move(point(px(1.), px(1.)), None, Modifiers::none());
+        visual.simulate_mouse_down(row.center(), MouseButton::Right, Modifiers::none());
     }
 
     #[gpui::test]

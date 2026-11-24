@@ -96,25 +96,52 @@ impl BytePattern {
 /// Returns the first description from the most specific matching ATR entry.
 #[must_use]
 pub fn identify(atr: &Atr) -> Option<&'static str> {
-    identify_in(CARD_LIST, atr.as_bytes())
+    static ENTRIES: std::sync::OnceLock<std::collections::HashMap<usize, Vec<Entry<'static>>>> =
+        std::sync::OnceLock::new();
+    identify_entries(
+        ENTRIES
+            .get_or_init(|| index_entries(CARD_LIST))
+            .get(&atr.as_bytes().len())?,
+        atr.as_bytes(),
+    )
+}
+
+struct Entry<'a> {
+    pattern: Vec<BytePattern>,
+    description: &'a str,
+    specificity: usize,
+}
+
+fn index_entries(source: &str) -> std::collections::HashMap<usize, Vec<Entry<'_>>> {
+    let mut indexed = std::collections::HashMap::<usize, Vec<Entry<'_>>>::new();
+    for (pattern, description) in entries(source) {
+        let entry = Entry {
+            specificity: pattern.iter().map(|byte| byte.specificity()).sum(),
+            description,
+            pattern,
+        };
+        indexed.entry(entry.pattern.len()).or_default().push(entry);
+    }
+    indexed
 }
 
 fn identify_in<'a>(source: &'a str, atr: &[u8]) -> Option<&'a str> {
+    identify_entries(index_entries(source).get(&atr.len())?, atr)
+}
+
+fn identify_entries<'a>(entries: &[Entry<'a>], atr: &[u8]) -> Option<&'a str> {
     let mut best = None;
     let mut best_specificity = 0;
-    for (pattern, description) in entries(source) {
-        if pattern.len() != atr.len()
-            || !pattern
-                .iter()
-                .zip(atr)
-                .all(|(pattern, value)| pattern.matches(*value))
+    for entry in entries {
+        if entry
+            .pattern
+            .iter()
+            .zip(atr)
+            .all(|(pattern, value)| pattern.matches(*value))
+            && entry.specificity > best_specificity
         {
-            continue;
-        }
-        let specificity = pattern.iter().map(|byte| byte.specificity()).sum();
-        if specificity > best_specificity {
-            best = Some(description);
-            best_specificity = specificity;
+            best = Some(entry.description);
+            best_specificity = entry.specificity;
         }
     }
     best
