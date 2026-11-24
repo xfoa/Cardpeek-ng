@@ -810,7 +810,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-analyser"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cardpeek-core",
  "cardpeek-transport",
@@ -821,7 +821,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-app"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cardpeek-analyser",
  "cardpeek-core",
@@ -835,7 +835,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-cli"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "assert_cmd",
  "cardpeek-analyser",
@@ -852,7 +852,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-core"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -861,7 +861,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-desktop"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cardpeek-analyser",
  "cardpeek-app",
@@ -882,7 +882,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-lua"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "aes",
  "bp384",
@@ -906,7 +906,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-pcsc"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cardpeek-app",
  "cardpeek-core",
@@ -917,7 +917,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-replay"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cardpeek-core",
  "thiserror 2.0.21",
@@ -925,7 +925,7 @@ dependencies = [
 
 [[package]]
 name = "cardpeek-transport"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cardpeek-core",
 ]
